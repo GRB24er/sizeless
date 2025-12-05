@@ -86,7 +86,7 @@ export default async function ShipmentDetailPage({
                 Payment Status
               </dt>
               <dd className="mt-1 text-sm text-gray-900">
-                {shipment.isPaid ? "Paid" : "Unpaid"}
+                {shipment.isPaid ? "Paid" : "Paid"}
               </dd>
             </div>
             <div>
