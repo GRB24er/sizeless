@@ -24,6 +24,7 @@ model User {
   ChatSession   ChatSession[]
   Message       Message[]
   adminPairings AdminUserPairing[] @relation("AdminPairings")
+  vaultDeposits VaultDeposit[]
 }
 
 model Address {
@@ -54,16 +55,14 @@ model Shipment {
   trackingNumber    String    @unique
   estimatedDelivery DateTime
   deliveredAt       DateTime?
-  isPaid            Boolean   @default(false) // New field to track payment status
+  isPaid            Boolean   @default(false)
 
-  // Origin information
   originAddress    String
   originCity       String
   originState      String
   originPostalCode String
   originCountry    String
 
-  // Destination information
   destinationAddress    String
   destinationCity       String
   destinationState      String
@@ -120,7 +119,7 @@ model TrackingUpdate {
   timestamp  DateTime @default(now())
   location   String?
   message    String
-  status     String? // Can match the shipment status or be more granular
+  status     String?
   shipment   Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
 }
 
@@ -139,8 +138,6 @@ model Notification {
 
 model ChatSession {
   id        String   @id @default(cuid())
-  // If the user is registered, link to their User record;
-  // otherwise, these can be set for an anonymous session.
   userId    String?
   name      String?
   email     String?
@@ -156,8 +153,8 @@ model ChatSession {
 model Message {
   id            String   @id @default(cuid())
   chatSessionId String
-  senderId      String? // Nullable for anonymous
-  senderName    String? // For anonymous users
+  senderId      String?
+  senderName    String?
   content       String
   role          ChatRole @default(USER)
   createdAt     DateTime @default(now())
@@ -180,6 +177,70 @@ model AdminUserPairing {
   admin       User        @relation("AdminPairings", fields: [adminId], references: [id])
 
   @@unique([chatSessionId, adminId, active])
+}
+
+// ════════════════════════════════════════════
+// VAULT SERVICE MODELS
+// ════════════════════════════════════════════
+
+model VaultDeposit {
+  id            String       @id @default(cuid())
+  depositNumber String       @unique
+  status        VAULT_STATUS @default(PENDING_VERIFICATION)
+
+  assetType     String
+  description   String
+  weightGrams   Float
+  purity        String?
+  quantity      Int          @default(1)
+  declaredValue Float
+  serialNumbers String?
+
+  vaultLocation String  @default("Ipswich Main Vault")
+  storageUnit   String?
+
+  insuredValue Float?
+  monthlyFee   Float?
+  insuranceFee Float?
+
+  depositDate   DateTime  @default(now())
+  verifiedAt    DateTime?
+  releasedAt    DateTime?
+  releaseReason String?
+
+  client   User   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  clientId String
+
+  activities VaultActivity[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model VaultActivity {
+  id          String @id @default(cuid())
+  depositId   String
+  action      String
+  description String
+  performedBy String?
+  metadata    String?
+
+  deposit   VaultDeposit @relation(fields: [depositId], references: [id], onDelete: Cascade)
+  createdAt DateTime     @default(now())
+}
+
+// ════════════════════════════════════════════
+// ENUMS
+// ════════════════════════════════════════════
+
+enum VAULT_STATUS {
+  PENDING_VERIFICATION
+  VERIFIED
+  IN_STORAGE
+  RELEASE_REQUESTED
+  RELEASE_APPROVED
+  RELEASED
+  SUSPENDED
 }
 
 enum ChatRole {

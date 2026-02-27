@@ -2,125 +2,31 @@
 
 import * as React from "react";
 import {
-  CameraIcon,
-  FileCodeIcon,
-  FileTextIcon,
-  FolderIcon,
-  Globe,
-  HelpCircleIcon,
-  LayoutDashboardIcon,
-  // MessageCircle,
-  SettingsIcon,
-  // UsersIcon,
+  FileTextIcon, FolderIcon, Globe, HelpCircleIcon,
+  LayoutDashboardIcon, SettingsIcon, Vault, Users,
 } from "lucide-react";
-
 import { NavMain } from "./nav-main";
 import { NavSecondary } from "./nav-secondary";
 import { NavUser } from "./nav-user";
 import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
+  Sidebar, SidebarContent, SidebarFooter, SidebarHeader,
+  SidebarMenu, SidebarMenuButton, SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Logo } from "@/components/logo";
 
 const data = {
-  user: {
-    name: "shadcn",
-    email: "admin@euroswift.com",
-    avatar: "/avatars/shadcn.jpg",
-  },
+  user: { name: "Admin", email: "admin@aramexlogistics.org", avatar: "/avatars/admin.jpg" },
   navMain: [
-    {
-      title: "Dashboard",
-      url: "/dashboard",
-      icon: LayoutDashboardIcon,
-    },
-    {
-      title: "Website",
-      url: "/",
-      icon: Globe,
-    },
-    {
-      title: "Shipments",
-      url: "/dashboard/shipments",
-      icon: FolderIcon,
-    },
-    // {
-    //   title: "Chat",
-    //   url: "/dashboard/chat",
-    //   icon: MessageCircle,
-    // },
-
-    // {
-    //   title: "Users",
-    //   url: "/dashboard/users",
-    //   icon: UsersIcon,
-    // },
-  ],
-  navClouds: [
-    {
-      title: "Capture",
-      icon: CameraIcon,
-      isActive: true,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Proposal",
-      icon: FileTextIcon,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Prompts",
-      icon: FileCodeIcon,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
+    { title: "Dashboard", url: "/dashboard", icon: LayoutDashboardIcon },
+    { title: "Website", url: "/", icon: Globe },
+    { title: "Shipments", url: "/dashboard/shipments", icon: FolderIcon },
+    { title: "Users", url: "/dashboard/users", icon: Users },
+    { title: "Vault Management", url: "/dashboard/vault", icon: Vault },
+    { title: "Documents", url: "/dashboard/documents", icon: FileTextIcon },
   ],
   navSecondary: [
-    {
-      title: "Settings",
-      url: "#",
-      icon: SettingsIcon,
-    },
-    {
-      title: "Get Help",
-      url: "#",
-      icon: HelpCircleIcon,
-    },
+    { title: "Settings", url: "#", icon: SettingsIcon },
+    { title: "Get Help", url: "#", icon: HelpCircleIcon },
   ],
 };
 
@@ -130,10 +36,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              className="data-[slot=sidebar-menu-button]:!p-1.5"
-            >
+            <SidebarMenuButton asChild className="data-[slot=sidebar-menu-button]:!p-1.5">
               <Logo />
             </SidebarMenuButton>
           </SidebarMenuItem>

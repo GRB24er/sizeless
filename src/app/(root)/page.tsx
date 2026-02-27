@@ -1,17 +1,19 @@
-import { Achievement } from "@/components/features/public/archieve";
-import { Choice } from "@/components/features/public/choice";
-import { GlobalNetwork } from "@/components/global.network";
-import { Hero } from "@/components/features/public/hero";
-import { Service } from "@/components/features/public/Services";
+import { Hero } from "@/components/sections/hero";
+import { Choice } from "@/components/sections/choice";
+import { Achievement } from "@/components/sections/archieve";
+import { Service } from "@/components/sections/Services";
+import { GlobalNetwork } from "@/components/sections/network";
+import { Quota } from "@/components/sections/quota";
 
-export default async function Home() {
+export default function HomePage() {
   return (
-    <main className="">
+    <>
       <Hero />
-      <GlobalNetwork />
-      <Service />
-      <Achievement />
       <Choice />
-    </main>
+      <Achievement />
+      <Service />
+      <GlobalNetwork />
+      <Quota />
+    </>
   );
 }

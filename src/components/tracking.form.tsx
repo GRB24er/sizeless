@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Search, ArrowRight } from "lucide-react";
+import { Search, ArrowRight, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,7 +15,7 @@ const TrackingForm = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!trackingNumber) {
+    if (!trackingNumber.trim()) {
       toast.error("Please enter a tracking number");
       return;
     }
@@ -27,49 +27,42 @@ const TrackingForm = () => {
       toast.success("Tracking request submitted", {
         description: `Tracking number: ${trackingNumber}`,
       });
+      const num = trackingNumber.trim();
       setTrackingNumber("");
-      // Fixed: Use dynamic route instead of query parameter
-      router.push(`/track/${encodeURIComponent(trackingNumber.trim())}`);
-    }, 1500);
+      router.push(`/track/${encodeURIComponent(num)}`);
+    }, 1200);
   };
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className={cn(
-        "relative w-full max-w-3xl glass rounded-xl p-1.5 transition-all duration-300",
-        "shadow-elevation-1 hover:shadow-xl focus-within:shadow-2xl",
-        "border border-white/20 backdrop-blur-md bg-white"
-      )}
-    >
-      <div className="flex items-center ">
-        <div className="flex-none pl-3">
-          <Search className="text-top-header animate-pulse-soft" size={24} />
+    <form onSubmit={handleSubmit} className="w-full">
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
+          <Input
+            type="text"
+            placeholder="Enter tracking number (e.g. AML-XXXXXXXX)"
+            value={trackingNumber}
+            onChange={(e) => setTrackingNumber(e.target.value)}
+            className="h-14 pl-12 pr-4 text-base bg-[#0A1628]/50 border-emerald-900/30 text-white placeholder:text-slate-500 focus:border-emerald-500/50 focus:ring-emerald-500/20 rounded-xl"
+          />
         </div>
-
-        <Input
-          type="text"
-          placeholder="Tracking Number (e.g., SM12345678)"
-          value={trackingNumber}
-          onChange={(e) => setTrackingNumber(e.target.value)}
-          className="flex-grow border-0 bg-transparent text-lg h-14 px-4 focus-visible:ring-0 focus-visible:ring-offset-0 placeholder:text-gray-400"
-        />
-
         <Button
           type="submit"
-          className={cn(
-            "flex-none bg-shipping-600 hover:bg-secondary text-white h-12 px-6 rounded-lg bg-secondary/80",
-            "flex items-center gap-2 transition-all duration-300 ease-in-out",
-            "transform hover:scale-105 text-lg"
-          )}
           disabled={isLoading}
+          className={cn(
+            "h-14 px-8 rounded-xl font-semibold text-base",
+            "bg-gradient-to-r from-emerald-600 to-emerald-700",
+            "hover:from-emerald-500 hover:to-emerald-600",
+            "text-white shadow-lg shadow-emerald-600/25",
+            "transition-all duration-200",
+            "disabled:opacity-70"
+          )}
         >
           {isLoading ? (
-            <div className="animate-pulse">Processing...</div>
+            <Loader2 className="w-5 h-5 animate-spin" />
           ) : (
             <>
-              <span>Track</span>
-              <ArrowRight size={18} />
+              Track <ArrowRight className="w-5 h-5 ml-2" />
             </>
           )}
         </Button>

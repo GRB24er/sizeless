@@ -1,7 +1,5 @@
-// "use client";
-
 import { AnimatePresence } from "motion/react";
-import { Package } from "lucide-react";
+import { Package, Shield, Vault } from "lucide-react";
 import Image from "next/image";
 import { RegistrationForm } from "@/components/features/auth/registration.form";
 import { MotionDiv } from "@/components/motion.div";
@@ -12,59 +10,67 @@ const RegisterPage = async () => {
   const session = await auth();
   if (session?.user) redirect("/");
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-      <div className="w-full max-w-4xl grid md:grid-cols-2 bg-white rounded-xl shadow-lg overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-emerald-50/30 p-4">
+      <div className="w-full max-w-4xl grid md:grid-cols-2 bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-100">
+        {/* Left Column — Brand Panel */}
         <MotionDiv
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
-          className="bg-top-header p-8 text-white flex-col justify-between hidden md:flex"
+          className="bg-gradient-to-br from-[#0A1628] via-[#0D1F35] to-[#0A1628] p-8 text-white flex-col justify-between hidden md:flex relative overflow-hidden"
         >
-          <div>
+          <div className="absolute inset-0 opacity-[0.04]" style={{
+            backgroundImage: `radial-gradient(circle at 1px 1px, rgba(212,168,83,0.5) 1px, transparent 0)`,
+            backgroundSize: "32px 32px",
+          }} />
+
+          <div className="relative z-10">
             <div className="mb-8">
-              <Image
-                src="/images/logo.png"
-                alt="Amermax logistics Logo"
-                width={150}
-                height={50}
-                className="mb-6"
-              />
+              <Image src="/images/logo.png" alt="AramexLogistics" width={160} height={55} className="mb-8" />
               <h2 className="text-2xl font-bold mb-4">Join Our Network</h2>
-              <p className="text-gray-200 mb-6">
+              <p className="text-gray-300 mb-6 leading-relaxed">
                 Create an account to start shipping with the most reliable
-                logistics partner worldwide.
+                logistics partner worldwide. Access vault storage and premium services.
               </p>
             </div>
 
-            <div className="bg-black/20 p-6 rounded-lg mb-6">
-              <div className="flex items-start mb-4">
-                <Package className="text-secondary mr-3 mt-1" size={20} />
+            <div className="space-y-3">
+              <div className="flex items-start gap-3 bg-white/5 backdrop-blur-sm border border-white/10 p-4 rounded-xl">
+                <div className="w-9 h-9 rounded-lg bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                  <Package className="text-emerald-400 w-4 h-4" />
+                </div>
                 <div>
-                  <h3 className="font-semibold mb-1">
-                    Global Shipping Network
-                  </h3>
-                  <p className="text-sm text-gray-200">
-                    Access to over 200 countries and territories worldwide
-                  </p>
+                  <h3 className="font-semibold text-sm mb-0.5">Global Shipping Network</h3>
+                  <p className="text-xs text-gray-400">Access to 190+ countries and territories worldwide</p>
                 </div>
               </div>
-              <div className="flex items-start">
-                <Package className="text-secondary mr-3 mt-1" size={20} />
+              <div className="flex items-start gap-3 bg-white/5 backdrop-blur-sm border border-white/10 p-4 rounded-xl">
+                <div className="w-9 h-9 rounded-lg bg-emerald-500/20 flex items-center justify-center flex-shrink-0">
+                  <Shield className="text-emerald-400 w-4 h-4" />
+                </div>
                 <div>
-                  <h3 className="font-semibold mb-1">Real-time Tracking</h3>
-                  <p className="text-sm text-gray-200">
-                    Monitor your shipments with precision and ease
-                  </p>
+                  <h3 className="font-semibold text-sm mb-0.5">Real-Time Tracking</h3>
+                  <p className="text-xs text-gray-400">Monitor your shipments with precision and ease</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3 bg-white/5 backdrop-blur-sm border border-white/10 p-4 rounded-xl">
+                <div className="w-9 h-9 rounded-lg bg-[#D4A853]/20 flex items-center justify-center flex-shrink-0">
+                  <Vault className="text-[#D4A853] w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-sm mb-0.5">Secure Vault Storage</h3>
+                  <p className="text-xs text-gray-400">Insured gold and precious metals custody</p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="text-sm text-gray-300">
-            <p>&copy; 2025 Amermax logistics Shipping. All rights reserved.</p>
+          <div className="relative z-10 text-xs text-gray-500 pt-6 border-t border-white/10">
+            <p>&copy; {new Date().getFullYear()} AramexLogistics. All rights reserved.</p>
           </div>
         </MotionDiv>
 
+        {/* Right Column — Registration Form */}
         <div className="p-8 sm:p-10">
           <MotionDiv
             initial={{ opacity: 0, x: -20 }}
@@ -72,12 +78,8 @@ const RegisterPage = async () => {
             transition={{ duration: 0.5 }}
             className="mb-8 text-center"
           >
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
-              Create Your Account
-            </h1>
-            <p className="text-gray-600">
-              Fill in the form below to join our platform
-            </p>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">Create Your Account</h1>
+            <p className="text-gray-500 text-sm">Fill in the form below to join our platform</p>
           </MotionDiv>
 
           <AnimatePresence mode="wait">

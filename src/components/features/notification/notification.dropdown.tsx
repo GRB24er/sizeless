@@ -1,9 +1,4 @@
-import {
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
+import { DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
 
 export const NotificationsDropdown = () => (
@@ -11,22 +6,14 @@ export const NotificationsDropdown = () => (
     <DropdownMenuLabel>Notifications</DropdownMenuLabel>
     <DropdownMenuSeparator />
     <DropdownMenuItem>
-      <NotificationItem
-        title="Shipment #ES42851 Delivered"
-        time="2 hours ago"
-      />
+      <NotificationItem title="Shipment #AML-X8K2M Delivered" time="2 hours ago" />
     </DropdownMenuItem>
     <DropdownMenuItem>
-      <NotificationItem title="Shipment #ES42855 In Transit" time="Yesterday" />
+      <NotificationItem title="Shipment #AML-R4P7N In Transit" time="Yesterday" />
     </DropdownMenuItem>
     <DropdownMenuSeparator />
     <DropdownMenuItem>
-      <Link
-        href="/notifications"
-        className="w-full text-center text-xs text-secondary"
-      >
-        View All Notifications
-      </Link>
+      <Link href="/notifications" className="w-full text-center text-xs text-emerald-600">View All Notifications</Link>
     </DropdownMenuItem>
   </DropdownMenuContent>
 );

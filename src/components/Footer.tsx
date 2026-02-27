@@ -1,239 +1,98 @@
 "use client";
 
-import React, { useState } from "react";
 import Link from "next/link";
-import {
-  Mail,
-  ArrowRight,
-  MapPin,
-  Phone,
-  Send,
-  Facebook,
-  Twitter,
-  Linkedin,
-  Instagram,
-} from "lucide-react";
 import Image from "next/image";
-import { motion } from "framer-motion";
-import { useInView } from "react-intersection-observer";
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Facebook, Twitter, Linkedin, Instagram, Mail, Phone,
+  MapPin, ArrowRight, Shield, Package, Vault,
+} from "lucide-react";
 
-const fadeInUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.6, ease: [0.25, 0.1, 0.25, 1] as const },
-  },
-};
-
-const staggerContainer = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1,
-      delayChildren: 0.1,
-    },
-  },
-};
-
-export const Footer: React.FC = () => {
+export const Footer = () => {
   const [email, setEmail] = useState("");
-  const [footerRef, footerInView] = useInView({
-    triggerOnce: true,
-    threshold: 0.1,
-  });
-
-  const companyLinks = [
-    { name: "About Us", href: "/about" },
-    { name: "Track Shipment", href: "/track" },
-    { name: "Services", href: "/services" },
-    { name: "Contact", href: "/contact" },
-  ];
-
-  const serviceLinks = [
-    { name: "Ground Shipping", href: "/services" },
-    { name: "Air Freight", href: "/services" },
-    { name: "Ocean Freight", href: "/services" },
-    { name: "Warehousing", href: "/services" },
-    { name: "Express Delivery", href: "/services" },
-  ];
-
-  const legalLinks = [
-    { name: "Terms of Service", href: "/terms" },
-    { name: "Privacy Policy", href: "/privacy" },
-    { name: "Cookie Policy", href: "/cookies" },
-  ];
-
-  const socialLinks = [
-    { icon: Facebook, href: "#", label: "Facebook" },
-    { icon: Twitter, href: "#", label: "Twitter" },
-    { icon: Linkedin, href: "#", label: "LinkedIn" },
-    { icon: Instagram, href: "#", label: "Instagram" },
-  ];
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setEmail("");
-  };
+  const handleSubscribe = (e: React.FormEvent) => { e.preventDefault(); setEmail(""); };
 
   return (
-    <footer className="relative bg-slate-950 overflow-hidden">
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-blue-600/5 rounded-full blur-[150px]" />
-        <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-cyan-500/5 rounded-full blur-[120px]" />
+    <footer className="relative bg-[#0A1628] text-gray-300 overflow-hidden">
+      <div className="h-1 bg-gradient-to-r from-emerald-600 via-[#D4A853] to-emerald-600" />
+      <div className="absolute inset-0 pointer-events-none opacity-[0.03]">
+        <div className="absolute inset-0" style={{ backgroundImage: `radial-gradient(circle at 1px 1px, rgba(212,168,83,0.4) 1px, transparent 0)`, backgroundSize: "48px 48px" }} />
       </div>
 
-      <div className="relative border-b border-slate-800">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="max-w-4xl mx-auto">
-            <div className="relative p-8 sm:p-10 rounded-2xl bg-gradient-to-r from-blue-600/10 to-cyan-600/10 border border-slate-800">
-              <div className="absolute inset-0 bg-slate-900/50 rounded-2xl" />
-              <div className="relative flex flex-col lg:flex-row items-center justify-between gap-6">
-                <div className="text-center lg:text-left">
-                  <h3 className="text-2xl font-bold text-white mb-2">Stay Updated</h3>
-                  <p className="text-slate-400">Subscribe for shipping tips and exclusive offers.</p>
-                </div>
-                <form onSubmit={handleSubmit} className="flex w-full lg:w-auto gap-3">
-                  <div className="relative flex-1 lg:w-72">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-500" />
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="Enter your email"
-                      className="w-full pl-12 pr-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700 text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition-colors"
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    className="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-blue-700 text-white font-medium hover:from-blue-500 hover:to-blue-600 transition-all shadow-lg shadow-blue-600/25 flex items-center gap-2"
-                  >
-                    Subscribe
-                    <Send className="w-4 h-4" />
-                  </button>
-                </form>
+      <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 py-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
+          <div className="lg:col-span-1">
+            <Link href="/" className="inline-block mb-6">
+              <Image src="/images/logo.png" alt="AramexLogistics" width={180} height={60} className="brightness-110" />
+            </Link>
+            <p className="text-gray-400 text-sm leading-relaxed mb-6">Enterprise-grade global logistics, secure vault storage, and real-time shipment tracking. Trusted by businesses worldwide since 1998.</p>
+            <div className="flex items-center gap-4 mb-6">
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                <Shield className="w-3.5 h-3.5 text-emerald-400" /><span className="text-xs text-emerald-300 font-medium">ISO 9001</span>
               </div>
+              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#D4A853]/10 border border-[#D4A853]/20">
+                <Vault className="w-3.5 h-3.5 text-[#D4A853]" /><span className="text-xs text-[#D4A853] font-medium">LBMA Approved</span>
+              </div>
+            </div>
+            <div className="flex gap-3">
+              {[Facebook, Twitter, Linkedin, Instagram].map((Icon, i) => (
+                <a key={i} href="#" className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center hover:bg-emerald-500/20 hover:border-emerald-500/30 transition-all"><Icon className="w-4 h-4" /></a>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-white font-semibold text-sm tracking-wider uppercase mb-6 flex items-center gap-2"><Package className="w-4 h-4 text-emerald-400" /> Services</h3>
+            <ul className="space-y-3">
+              {[
+                { label: "Global Shipping", href: "/services" }, { label: "Express Delivery", href: "/services" },
+                { label: "Freight Forwarding", href: "/services" }, { label: "Container Shipping", href: "/services" },
+                { label: "Vault Storage", href: "/vault", gold: true }, { label: "Gold Custody", href: "/vault", gold: true },
+                { label: "Customs Clearance", href: "/services" },
+              ].map((item, i) => (
+                <li key={i}><Link href={item.href} className={`text-sm flex items-center gap-2 transition-colors ${item.gold ? "text-[#D4A853]/80 hover:text-[#D4A853]" : "text-gray-400 hover:text-emerald-400"}`}><ArrowRight className="w-3 h-3" /> {item.label}</Link></li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="text-white font-semibold text-sm tracking-wider uppercase mb-6">Support</h3>
+            <ul className="space-y-3">
+              {[
+                { label: "Track Shipment", href: "/track" }, { label: "Get a Quote", href: "/quote" },
+                { label: "Contact Us", href: "/contact" }, { label: "FAQs", href: "/support" },
+                { label: "Terms of Service", href: "/terms" }, { label: "Privacy Policy", href: "/privacy" },
+              ].map((item, i) => (
+                <li key={i}><Link href={item.href} className="text-sm text-gray-400 hover:text-emerald-400 transition-colors flex items-center gap-2"><ArrowRight className="w-3 h-3" /> {item.label}</Link></li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="text-white font-semibold text-sm tracking-wider uppercase mb-6">Get In Touch</h3>
+            <div className="space-y-4 mb-8">
+              <div className="flex items-start gap-3"><MapPin className="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0" /><p className="text-sm text-gray-400">17 Bluestem Rd, Ransomes Industrial Estate,<br />Ipswich IP3 9RR, United Kingdom</p></div>
+              <div className="flex items-center gap-3"><Phone className="w-4 h-4 text-emerald-400 flex-shrink-0" /><a href="tel:+440201412251" className="text-sm text-gray-400 hover:text-white transition-colors">+44 020 1412 251</a></div>
+              <div className="flex items-center gap-3"><Mail className="w-4 h-4 text-emerald-400 flex-shrink-0" /><a href="mailto:admin@aramexlogistics.org" className="text-sm text-gray-400 hover:text-white transition-colors">admin@aramexlogistics.org</a></div>
+            </div>
+            <div>
+              <p className="text-sm text-gray-400 mb-3">Subscribe for shipping updates & vault insights</p>
+              <form onSubmit={handleSubscribe} className="flex gap-2">
+                <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="your@email.com" className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 text-sm h-10 focus:border-emerald-500/50" />
+                <Button type="submit" size="sm" className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 h-10 flex-shrink-0"><ArrowRight className="w-4 h-4" /></Button>
+              </form>
             </div>
           </div>
         </div>
-      </div>
 
-      <motion.div
-        ref={footerRef}
-        initial="hidden"
-        animate={footerInView ? "visible" : "hidden"}
-        variants={staggerContainer}
-        className="relative container mx-auto px-4 sm:px-6 lg:px-8 py-16"
-      >
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-8">
-          <motion.div variants={fadeInUp} className="lg:col-span-2 space-y-6">
-            <Link href="/" className="inline-block">
-              <Image src="/images/logo.png" width={180} height={50} alt="AsyncShip Logo" className="brightness-0 invert" />
-            </Link>
-            <p className="text-slate-400 leading-relaxed max-w-sm">
-              Reliable, efficient shipping and logistics solutions for businesses and individuals worldwide.
-            </p>
-            <div className="space-y-3">
-              <div className="flex items-start gap-3 text-slate-400">
-                <MapPin className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
-                <span>17 Bluestem Rd, Ransomes Industrial Estate, Ipswich IP3 9RR, United Kingdom</span>
-              </div>
-              <div className="flex items-center gap-3 text-slate-400">
-                <Mail className="w-5 h-5 text-blue-400 flex-shrink-0" />
-                <a href="mailto:admin@asyncship.org" className="hover:text-white transition-colors">admin@asyncship.org</a>
-              </div>
-              <div className="flex items-center gap-3 text-slate-400">
-                <Phone className="w-5 h-5 text-blue-400 flex-shrink-0" />
-                <a href="tel:+440201412251" className="hover:text-white transition-colors">+44 020 1412 251</a>
-              </div>
-            </div>
-            <div className="flex items-center gap-3 pt-2">
-              {socialLinks.map((social, idx) => (
-                <a key={idx} href={social.href} aria-label={social.label} className="w-10 h-10 rounded-lg bg-slate-800/50 border border-slate-700/50 flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 hover:border-slate-600 transition-all">
-                  <social.icon className="w-5 h-5" />
-                </a>
-              ))}
-            </div>
-          </motion.div>
-
-          <motion.div variants={fadeInUp}>
-            <h4 className="text-white font-semibold mb-6">Company</h4>
-            <ul className="space-y-3">
-              {companyLinks.map((link) => (
-                <li key={link.name}>
-                  <Link href={link.href} className="text-slate-400 hover:text-white transition-colors inline-flex items-center gap-1 group">
-                    <ArrowRight className="w-3 h-3 opacity-0 -ml-4 group-hover:opacity-100 group-hover:ml-0 transition-all" />
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </motion.div>
-
-          <motion.div variants={fadeInUp}>
-            <h4 className="text-white font-semibold mb-6">Services</h4>
-            <ul className="space-y-3">
-              {serviceLinks.map((link) => (
-                <li key={link.name}>
-                  <Link href={link.href} className="text-slate-400 hover:text-white transition-colors inline-flex items-center gap-1 group">
-                    <ArrowRight className="w-3 h-3 opacity-0 -ml-4 group-hover:opacity-100 group-hover:ml-0 transition-all" />
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </motion.div>
-
-          <motion.div variants={fadeInUp}>
-            <h4 className="text-white font-semibold mb-6">Support</h4>
-            <ul className="space-y-3">
-              <li>
-                <Link href="/support" className="text-slate-400 hover:text-white transition-colors inline-flex items-center gap-1 group">
-                  <ArrowRight className="w-3 h-3 opacity-0 -ml-4 group-hover:opacity-100 group-hover:ml-0 transition-all" />
-                  Help Center
-                </Link>
-              </li>
-              <li>
-                <Link href="/faq" className="text-slate-400 hover:text-white transition-colors inline-flex items-center gap-1 group">
-                  <ArrowRight className="w-3 h-3 opacity-0 -ml-4 group-hover:opacity-100 group-hover:ml-0 transition-all" />
-                  FAQ
-                </Link>
-              </li>
-              <li>
-                <Link href="/contact" className="text-slate-400 hover:text-white transition-colors inline-flex items-center gap-1 group">
-                  <ArrowRight className="w-3 h-3 opacity-0 -ml-4 group-hover:opacity-100 group-hover:ml-0 transition-all" />
-                  Contact Us
-                </Link>
-              </li>
-            </ul>
-            <h4 className="text-white font-semibold mt-8 mb-4">Legal</h4>
-            <ul className="space-y-3">
-              {legalLinks.map((link) => (
-                <li key={link.name}>
-                  <Link href={link.href} className="text-slate-400 hover:text-white transition-colors inline-flex items-center gap-1 group">
-                    <ArrowRight className="w-3 h-3 opacity-0 -ml-4 group-hover:opacity-100 group-hover:ml-0 transition-all" />
-                    {link.name}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </motion.div>
-        </div>
-      </motion.div>
-
-      <div className="relative border-t border-slate-800">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-slate-500 text-sm">
-              © {new Date().getFullYear()} AsyncShip Logistics. All rights reserved.
-            </p>
-            <div className="flex items-center gap-6">
-              {legalLinks.map((link) => (
-                <Link key={link.name} href={link.href} className="text-slate-500 hover:text-slate-300 text-sm transition-colors">
-                  {link.name}
-                </Link>
-              ))}
+        <div className="mt-16 pt-8 border-t border-white/10">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-xs text-gray-500">&copy; {new Date().getFullYear()} AramexLogistics. All rights reserved. Licensed & Bonded International Freight Carrier.</p>
+            <div className="flex items-center gap-6 text-xs text-gray-500">
+              <span className="flex items-center gap-1.5"><Shield className="w-3 h-3 text-emerald-500" /> 256-bit SSL Encrypted</span>
+              <span className="flex items-center gap-1.5"><Vault className="w-3 h-3 text-[#D4A853]" /> Insured Vault Storage</span>
             </div>
           </div>
         </div>

@@ -12,7 +12,7 @@ export const Logo = () => (
     <Link href="/">
       <Image
         src="/images/logo.png"
-        alt="site logo"
+        alt="AramexLogistics"
         width={200}
         height={150}
         className="transition-all duration-300"

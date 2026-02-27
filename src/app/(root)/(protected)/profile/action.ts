@@ -1,157 +1,135 @@
 "use server";
+
 import { prisma } from "@/constants/config/db";
-import bcrypt from "bcryptjs";
-import { redirect } from "next/navigation";
-import { z } from "zod";
 import { auth } from "~/auth";
+import bcrypt from "bcryptjs";
 
-// Updated validation schema with proper structure
-const updateValidation = z.object({
-  company: z.string().optional(),
-  bio: z.string().max(500, "Bio cannot exceed 500 characters").optional(),
-  address: z.object({
-    street: z.string().min(1, "Street address is required"),
-    city: z.string().min(1, "City is required"),
-    state: z.string().min(1, "State is required"),
-    postalCode: z.string().min(1, "Postal code is required"),
-    country: z.string().min(1, "Country is required"),
-  }),
-});
-
-export const UpdateProfileAction = async (
+// ═══════════════════════════════════════════
+// UPDATE PROFILE
+// ═══════════════════════════════════════════
+export async function UpdateProfileAction(
   prevState: unknown,
   formData: FormData
-) => {
-  const session = await auth();
-  if (!session?.user) redirect("/");
-
-  // Convert FormData to nested object
-  const rawData = {
-    company: formData.get("company"),
-    bio: formData.get("bio"),
-    address: {
-      street: formData.get("address.street"),
-      city: formData.get("address.city"),
-      state: formData.get("address.state"),
-      postalCode: formData.get("address.postalCode"),
-      country: formData.get("address.country"),
-    },
-  };
-
-  // Validate data
-  const validationResult = updateValidation.safeParse(rawData);
-
-  if (!validationResult.success) {
-    // Format Zod errors into user-friendly format
-    const errors = validationResult.error.flatten().fieldErrors;
-    return {
-      success: false,
-      errors,
-      message: "Validation failed",
-    };
-  }
-
+) {
   try {
-    // Update profile with validated data
-    const updatedProfile = await prisma.profile.update({
-      where: { userId: session.user.id },
-      data: {
-        company: validationResult.data.company,
-        bio: validationResult.data.bio,
-        Address: {
-          update: validationResult.data.address,
-        },
-      },
-    });
-
-    return {
-      success: true,
-      message: "Profile updated successfully",
-      data: updatedProfile,
-    };
-  } catch (error) {
-    console.error("Error updating profile:", error);
-    return {
-      success: false,
-      message: "Database error occurred",
-    };
-  }
-};
-
-const securityFormSchema = z.object({
-  currentPassword: z
-    .string()
-    .min(1, { message: "Current password is required" }),
-  newPassword: z
-    .string()
-    .min(8, { message: "Password must be at least 8 characters" })
-    .regex(/[A-Z]/, {
-      message: "Password must contain at least one uppercase letter",
-    })
-    .regex(/[a-z]/, {
-      message: "Password must contain at least one lowercase letter",
-    })
-    .regex(/[0-9]/, { message: "Password must contain at least one number" }),
-});
-
-export const UpdatePassword = async (
-  prevState: unknown,
-  formData: FormData
-) => {
-  const session = await auth();
-  if (!session?.user) redirect("/");
-
-  const rawData = Object.fromEntries(formData);
-
-  const results = securityFormSchema.safeParse(rawData);
-
-  if (!results.success) {
-    // Format Zod errors into user-friendly format
-    const errors = results.error.flatten().fieldErrors;
-    return {
-      success: false,
-      errors,
-      message: "Validation failed",
-    };
-  }
-
-  try {
-    const user = await prisma.profile.findUnique({
-      where: { userId: session.user.id },
-      include: {
-        User: true,
-      },
-    });
-
-    if (!user) return redirect("/");
-
-    const match = await bcrypt.compare(
-      results.data.currentPassword,
-      user.User.password
-    );
-    if (!match) {
-      console.error(`Current password is Invalid`);
-      return null;
+    const session = await auth();
+    if (!session?.user?.id) {
+      return { success: false, message: "Unauthorized" };
     }
 
-    const hashedPassword = await bcrypt.hash(results.data.newPassword, 10);
+    const name = formData.get("name") as string;
+    const phone = formData.get("phone") as string;
+    const company = formData.get("company") as string;
+    const bio = formData.get("bio") as string;
+
+    const street = formData.get("address.street") as string;
+    const city = formData.get("address.city") as string;
+    const state = formData.get("address.state") as string;
+    const postalCode = formData.get("address.postalCode") as string;
+    const country = formData.get("address.country") as string;
+
+    // Update user name/phone
     await prisma.user.update({
-      where: { id: user.id },
-      data: {
-        password: hashedPassword,
-      },
+      where: { id: session.user.id },
+      data: { name, phone },
     });
 
-    return {
-      success: true,
-      message: "Your password has been changed successfully.",
-    };
+    // Update or create profile
+    const existingProfile = await prisma.profile.findUnique({
+      where: { userId: session.user.id },
+    });
+
+    if (existingProfile) {
+      await prisma.profile.update({
+        where: { userId: session.user.id },
+        data: { company, bio },
+      });
+    } else {
+      await prisma.profile.create({
+        data: {
+          userId: session.user.id,
+          company,
+          bio,
+        },
+      });
+    }
+
+    // Update or create address
+    const existingAddress = await prisma.address.findFirst({
+      where: { profileId: existingProfile?.id },
+    });
+
+    if (existingAddress) {
+      await prisma.address.update({
+        where: { id: existingAddress.id },
+        data: { street, city, state, postalCode, country },
+      });
+    } else if (existingProfile) {
+      await prisma.address.create({
+        data: {
+          profileId: existingProfile.id,
+          street,
+          city,
+          state,
+          postalCode,
+          country,
+        },
+      });
+    }
+
+    return { success: true, message: "Profile updated successfully" };
   } catch (error) {
-    console.error("Error updating password:", error);
-    return {
-      success: false,
-      error,
-      message: "Failed to update password. Please try again.",
-    };
+    console.error("Profile update error:", error);
+    return { success: false, message: "Failed to update profile" };
   }
-};
+}
+
+// ═══════════════════════════════════════════
+// UPDATE PASSWORD
+// ═══════════════════════════════════════════
+export async function UpdatePassword(
+  prevState: unknown,
+  formData: FormData
+) {
+  try {
+    const session = await auth();
+    if (!session?.user?.id) {
+      return { success: false, message: "Unauthorized" };
+    }
+
+    const currentPassword = formData.get("currentPassword") as string;
+    const newPassword = formData.get("newPassword") as string;
+
+    if (!currentPassword || !newPassword) {
+      return { success: false, message: "All fields are required" };
+    }
+
+    // Get user with password
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { password: true },
+    });
+
+    if (!user?.password) {
+      return { success: false, message: "User not found" };
+    }
+
+    // Verify current password
+    const isValid = await bcrypt.compare(currentPassword, user.password);
+    if (!isValid) {
+      return { success: false, message: "Current password is incorrect" };
+    }
+
+    // Hash and update new password
+    const hashedPassword = await bcrypt.hash(newPassword, 12);
+    await prisma.user.update({
+      where: { id: session.user.id },
+      data: { password: hashedPassword },
+    });
+
+    return { success: true, message: "Password updated successfully" };
+  } catch (error) {
+    console.error("Password update error:", error);
+    return { success: false, message: "Failed to update password" };
+  }
+}

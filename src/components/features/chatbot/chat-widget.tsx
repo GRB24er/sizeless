@@ -393,9 +393,9 @@ export default function ChatWidget() {
   // Agent avatar component
   const AgentAvatar = () => (
     <div className="relative w-8 h-8">
-      <div className="absolute inset-0 bg-blue-100 rounded-full"></div>
+      <div className="absolute inset-0 bg-emerald-100 rounded-full"></div>
       <div className="absolute inset-0 flex items-center justify-center">
-        <Bot className="h-5 w-5 text-blue-600" />
+        <Bot className="h-5 w-5 text-emerald-600" />
       </div>
     </div>
   );
@@ -420,7 +420,7 @@ export default function ChatWidget() {
         <div className="relative">
           <button
             onClick={() => setIsOpen(true)}
-            className="bg-blue-600 text-white rounded-full p-4 hover:bg-blue-700 transition-all shadow-xl flex items-center justify-center"
+            className="bg-emerald-600 text-white rounded-full p-4 hover:bg-emerald-700 transition-all shadow-xl flex items-center justify-center"
           >
             <MessageCircle className="h-6 w-6" />
           </button>
@@ -439,22 +439,22 @@ export default function ChatWidget() {
       {isOpen && (
         <div className="mt-3 bg-white rounded-lg shadow-xl w-80 sm:w-96 overflow-hidden flex flex-col border border-gray-200 max-h-[550px]">
           {/* Chat header */}
-          <div className="bg-blue-600 text-white px-4 py-3">
+          <div className="bg-emerald-600 text-white px-4 py-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
                 <div className="bg-white rounded-full p-2 flex items-center justify-center">
-                  <Package className="h-5 w-5 text-blue-600" />
+                  <Package className="h-5 w-5 text-emerald-600" />
                 </div>
                 <div className="flex flex-col">
                   <h3 className="font-semibold">Customer Support</h3>
                   <div className="flex items-center">
                     <span className="inline-flex h-2 w-2 rounded-full bg-green-400 mr-1.5"></span>
-                    <p className="text-xs text-blue-50">Online</p>
+                    <p className="text-xs text-emerald-50">Online</p>
                   </div>
                 </div>
               </div>
               <button
-                className="p-1.5 bg-blue-700 hover:bg-blue-800 rounded-lg transition-colors"
+                className="p-1.5 bg-emerald-700 hover:bg-emerald-800 rounded-lg transition-colors"
                 onClick={() => setIsOpen(false)}
               >
                 <X size={18} />
@@ -490,7 +490,7 @@ export default function ChatWidget() {
                       className={cn(
                         "rounded-lg px-4 py-2 inline-block",
                         message.type === "user"
-                          ? "bg-blue-600 text-white rounded-tr-none"
+                          ? "bg-emerald-600 text-white rounded-tr-none"
                           : "bg-white text-gray-800 shadow-sm rounded-tl-none border border-gray-100"
                       )}
                     >
@@ -509,7 +509,7 @@ export default function ChatWidget() {
                           <button
                             key={option}
                             onClick={() => handleQuickOption(option)}
-                            className="bg-blue-50 hover:bg-blue-100 text-blue-800 border border-blue-200 rounded-full px-3 py-1 text-xs transition-colors"
+                            className="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 rounded-full px-3 py-1 text-xs transition-colors"
                           >
                             {option}
                           </button>
@@ -526,13 +526,13 @@ export default function ChatWidget() {
                   <AgentAvatar />
                   <div className="bg-white text-gray-800 rounded-lg rounded-tl-none px-4 py-2 shadow-sm inline-block border border-gray-100">
                     <div className="flex space-x-1 items-center h-4">
-                      <div className="w-1.5 h-1.5 rounded-full bg-blue-300 animate-pulse"></div>
+                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-300 animate-pulse"></div>
                       <div
-                        className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse"
+                        className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"
                         style={{ animationDelay: "150ms" }}
                       ></div>
                       <div
-                        className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"
+                        className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"
                         style={{ animationDelay: "300ms" }}
                       ></div>
                     </div>
@@ -563,7 +563,7 @@ export default function ChatWidget() {
                 size="icon"
                 type="submit"
                 disabled={content.trim() === ""}
-                className="bg-blue-600 hover:bg-blue-700"
+                className="bg-emerald-600 hover:bg-emerald-700"
               >
                 <Send className="h-4 w-4" />
               </Button>

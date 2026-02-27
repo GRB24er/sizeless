@@ -43,8 +43,8 @@ export function InstantNavLink({
     >
       {children}
       {isLoading && (
-        <div className="absolute inset-0 bg-blue-100 bg-opacity-50 flex items-center justify-center rounded">
-          <div className="w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+        <div className="absolute inset-0 bg-emerald-100 bg-opacity-50 flex items-center justify-center rounded">
+          <div className="w-4 h-4 border-2 border-emerald-600 border-t-transparent rounded-full animate-spin"></div>
         </div>
       )}
     </Link>
