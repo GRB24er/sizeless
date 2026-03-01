@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import {
   Package,
   Search,
-  Filter,
   MoreHorizontal,
   CheckCircle,
   Truck,
@@ -16,6 +15,8 @@ import {
   File,
   Printer,
   MapPin,
+  Trash2,
+  Loader2,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -46,10 +47,17 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
-import ShipmentLabelModal from "./shipment.modal";
-// IMPORTANT: TrackingUpdateSheet.tsx must be in the same folder as this file.
-// If it’s in a different folder, just fix this path.
 import { TrackingUpdateSheet } from "../dashboard/shipments/TrackingUpdateSheet";
 
 export type ShipmentStatus =
@@ -158,9 +166,12 @@ function getStatusConfig(status: ShipmentStatus) {
   }
 }
 
-export const ShipmentsPage = ({ shipments }: ShipmentsPageProps) => {
+export const ShipmentsPage = ({
+  shipments: initialShipments,
+}: ShipmentsPageProps) => {
   const router = useRouter();
 
+  const [shipments, setShipments] = useState<Shipment[]>(initialShipments);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<ShipmentStatus | "all">(
     "all"
@@ -168,12 +179,21 @@ export const ShipmentsPage = ({ shipments }: ShipmentsPageProps) => {
   const [activeTab, setActiveTab] = useState<
     "all" | "active" | "delivered" | "pending"
   >("all");
-  const [labelModalOpen, setLabelModalOpen] = useState(false);
-  const [selectedShipment, setSelectedShipment] = useState<Shipment | null>(
-    null
-  );
   const [updateSheetShipment, setUpdateSheetShipment] =
     useState<Shipment | null>(null);
+
+  // Delete state
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [shipmentToDelete, setShipmentToDelete] = useState<Shipment | null>(
+    null
+  );
+  const [deleting, setDeleting] = useState(false);
+
+  // Loading states for PDF downloads
+  const [downloadingLabel, setDownloadingLabel] = useState<string | null>(null);
+  const [downloadingReceipt, setDownloadingReceipt] = useState<string | null>(
+    null
+  );
 
   const activeStatuses: ShipmentStatus[] = [
     "Pending",
@@ -196,6 +216,8 @@ export const ShipmentsPage = ({ shipments }: ShipmentsPageProps) => {
     (s) => s.status === "Pending" || s.status === "Proccessing"
   ).length;
 
+  // ─── ACTION HANDLERS ───
+
   const handleViewDetails = (
     e: MouseEvent<HTMLDivElement | HTMLButtonElement, globalThis.MouseEvent>,
     shipmentId: string
@@ -204,21 +226,58 @@ export const ShipmentsPage = ({ shipments }: ShipmentsPageProps) => {
     router.push(`/shipments/${shipmentId}`);
   };
 
-  const handleGenerateLabel = (
+  /** Generate Label — calls the API which uses generateAirwayBill from pdf-templates */
+  const handleGenerateLabel = async (
     e: MouseEvent<HTMLDivElement | HTMLButtonElement, globalThis.MouseEvent>,
     shipment: Shipment
   ) => {
     e.stopPropagation();
-    setSelectedShipment(shipment);
-    setLabelModalOpen(true);
+    setDownloadingLabel(shipment.id);
+    try {
+      const res = await fetch(`/api/shipments/${shipment.id}/label`);
+      if (!res.ok) throw new Error("Failed to generate label");
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `label-${shipment.tracking_number}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Label download error:", error);
+      alert("Failed to generate label. Please try again.");
+    } finally {
+      setDownloadingLabel(null);
+    }
   };
 
-  const handleDownloadReceipt = (
-    e: MouseEvent<HTMLDivElement | HTMLButtonElement, globalThis.MouseEvent>
+  /** Download Receipt — calls the API which uses generateCommercialInvoice from pdf-templates */
+  const handleDownloadReceipt = async (
+    e: MouseEvent<HTMLDivElement | HTMLButtonElement, globalThis.MouseEvent>,
+    shipment: Shipment
   ) => {
     e.stopPropagation();
-    // Hook this to real receipt download logic later
-    console.log("Download receipt clicked");
+    setDownloadingReceipt(shipment.id);
+    try {
+      const res = await fetch(`/api/shipments/${shipment.id}/receipt`);
+      if (!res.ok) throw new Error("Failed to generate receipt");
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `receipt-${shipment.tracking_number}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Receipt download error:", error);
+      alert("Failed to download receipt. Please try again.");
+    } finally {
+      setDownloadingReceipt(null);
+    }
   };
 
   const handleOpenTrackingUpdate = (
@@ -229,130 +288,180 @@ export const ShipmentsPage = ({ shipments }: ShipmentsPageProps) => {
     setUpdateSheetShipment(shipment);
   };
 
+  /** Delete — opens confirmation dialog first */
+  const handleDeleteClick = (
+    e: MouseEvent<HTMLDivElement | HTMLButtonElement, globalThis.MouseEvent>,
+    shipment: Shipment
+  ) => {
+    e.stopPropagation();
+    setShipmentToDelete(shipment);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!shipmentToDelete) return;
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/shipments/${shipmentToDelete.id}`, {
+        method: "DELETE",
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Failed to delete");
+      }
+      // Remove from local state immediately
+      setShipments((prev) =>
+        prev.filter((s) => s.id !== shipmentToDelete.id)
+      );
+      setDeleteDialogOpen(false);
+      setShipmentToDelete(null);
+    } catch (error: any) {
+      console.error("Delete error:", error);
+      alert(error.message || "Failed to delete shipment");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  // ─── FILTERING ───
+
   const filteredShipments = shipments.filter((shipment) => {
     const term = searchTerm.trim().toLowerCase();
 
     const matchesSearch =
       term.length === 0 ||
       shipment.tracking_number.toLowerCase().includes(term) ||
+      shipment.recipient.name.toLowerCase().includes(term) ||
       shipment.origin.toLowerCase().includes(term) ||
-      shipment.destination.toLowerCase().includes(term) ||
-      shipment.recipient.name.toLowerCase().includes(term);
+      shipment.destination.toLowerCase().includes(term);
 
     const matchesStatus =
-      statusFilter === "all" ? true : shipment.status === statusFilter;
+      statusFilter === "all" ||
+      shipment.status.toLowerCase() === statusFilter.toLowerCase();
 
-    const matchesTab =
-      activeTab === "all"
-        ? true
-        : activeTab === "active"
-        ? activeStatuses.includes(shipment.status)
-        : activeTab === "delivered"
-        ? shipment.status === "Delivered"
-        : shipment.status === "Pending" || shipment.status === "Proccessing";
+    let matchesTab = true;
+    if (activeTab === "active") {
+      matchesTab = activeStatuses.includes(shipment.status);
+    } else if (activeTab === "delivered") {
+      matchesTab = shipment.status === "Delivered";
+    } else if (activeTab === "pending") {
+      matchesTab =
+        shipment.status === "Pending" || shipment.status === "Proccessing";
+    }
 
     return matchesSearch && matchesStatus && matchesTab;
   });
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 p-4 lg:p-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">My Shipments</h1>
-          <p className="text-muted-foreground">
-            Manage and track all your shipments in one place.
+          <h1 className="text-2xl font-bold text-gray-900">Shipments</h1>
+          <p className="text-sm text-gray-500">
+            Manage and track all shipments
           </p>
         </div>
         <Button
           className="bg-secondary hover:bg-secondary hover:opacity-70"
           onClick={() => router.push("/shipments/create")}
         >
-          Create New Shipment
+          <Package className="mr-2 h-4 w-4" />
+          New Shipment
         </Button>
       </div>
 
-      {/* Quick stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      {/* Stats Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
-          <CardContent className="flex items-center justify-between p-4">
-            <div>
-              <p className="text-sm text-muted-foreground">Total Shipments</p>
-              <p className="text-2xl font-bold">{totalShipments}</p>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Total</p>
+                <p className="text-2xl font-bold">{totalShipments}</p>
+              </div>
+              <Package className="h-8 w-8 text-gray-300" />
             </div>
-            <Package className="h-6 w-6 text-secondary" />
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="flex items-center justify-between p-4">
-            <div>
-              <p className="text-sm text-muted-foreground">Active</p>
-              <p className="text-2xl font-bold">{activeShipments}</p>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Active</p>
+                <p className="text-2xl font-bold text-blue-600">
+                  {activeShipments}
+                </p>
+              </div>
+              <Truck className="h-8 w-8 text-blue-200" />
             </div>
-            <Truck className="h-6 w-6 text-blue-500" />
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="flex items-center justify-between p-4">
-            <div>
-              <p className="text-sm text-muted-foreground">Delivered</p>
-              <p className="text-2xl font-bold">{deliveredShipments}</p>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Delivered</p>
+                <p className="text-2xl font-bold text-green-600">
+                  {deliveredShipments}
+                </p>
+              </div>
+              <CheckCircle className="h-8 w-8 text-green-200" />
             </div>
-            <CheckCircle className="h-6 w-6 text-green-500" />
           </CardContent>
         </Card>
         <Card>
-          <CardContent className="flex items-center justify-between p-4">
-            <div>
-              <p className="text-sm text-muted-foreground">Pending</p>
-              <p className="text-2xl font-bold">{pendingShipments}</p>
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground">Pending</p>
+                <p className="text-2xl font-bold text-amber-600">
+                  {pendingShipments}
+                </p>
+              </div>
+              <Clock className="h-8 w-8 text-amber-200" />
             </div>
-            <Clock className="h-6 w-6 text-amber-500" />
           </CardContent>
         </Card>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
-        <div className="flex flex-1 items-center gap-2">
-          <div className="relative flex-1">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
+      {/* Search & Filter */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3 w-full sm:w-auto">
+          <div className="relative flex-1 sm:w-80">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
-              placeholder="Search by tracking number, recipient, or route"
-              className="pl-8"
+              placeholder="Search tracking no., recipient, route..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10"
             />
           </div>
-
-          <div className="flex items-center gap-2">
-            <Filter className="h-4 w-4 text-gray-400" />
-            <Select
-              value={statusFilter}
-              onValueChange={(value) =>
-                setStatusFilter(value as ShipmentStatus | "all")
-              }
-            >
-              <SelectTrigger className="w-[170px]">
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All statuses</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="in_transit">In Transit</SelectItem>
-                <SelectItem value="on_hold">On Hold</SelectItem>
-                <SelectItem value="delivered">Delivered</SelectItem>
-                <SelectItem value="returned">Returned</SelectItem>
-                <SelectItem value="picked_up">Picked Up</SelectItem>
-                <SelectItem value="failed">Failed</SelectItem>
-                <SelectItem value="information_received">
-                  Info Received
-                </SelectItem>
-                <SelectItem value="arrived">Arrived</SelectItem>
-                <SelectItem value="departed">Departed</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+          <Select
+            value={statusFilter}
+            onValueChange={(value) =>
+              setStatusFilter(value as ShipmentStatus | "all")
+            }
+          >
+            <SelectTrigger className="w-[170px]">
+              <SelectValue placeholder="Filter by status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All statuses</SelectItem>
+              <SelectItem value="Pending">Pending</SelectItem>
+              <SelectItem value="In_transit">In Transit</SelectItem>
+              <SelectItem value="On_hold">On Hold</SelectItem>
+              <SelectItem value="Delivered">Delivered</SelectItem>
+              <SelectItem value="Returned">Returned</SelectItem>
+              <SelectItem value="Picked_up">Picked Up</SelectItem>
+              <SelectItem value="Failed">Failed</SelectItem>
+              <SelectItem value="Information_received">
+                Info Received
+              </SelectItem>
+              <SelectItem value="Arrived">Arrived</SelectItem>
+              <SelectItem value="Departed">Departed</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="text-sm text-muted-foreground">
@@ -471,20 +580,33 @@ export const ShipmentsPage = ({ shipments }: ShipmentsPageProps) => {
                           </DropdownMenuItem>
 
                           <DropdownMenuItem
-                            onClick={(e) => handleDownloadReceipt(e)}
+                            onClick={(e) =>
+                              handleDownloadReceipt(e, shipment)
+                            }
+                            disabled={downloadingReceipt === shipment.id}
                           >
-                            <Download className="mr-2 h-4 w-4" />
+                            {downloadingReceipt === shipment.id ? (
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            ) : (
+                              <Download className="mr-2 h-4 w-4" />
+                            )}
                             Download Receipt
                           </DropdownMenuItem>
 
                           <DropdownMenuItem
-                            onClick={(e) => handleGenerateLabel(e, shipment)}
+                            onClick={(e) =>
+                              handleGenerateLabel(e, shipment)
+                            }
+                            disabled={downloadingLabel === shipment.id}
                           >
-                            <Printer className="mr-2 h-4 w-4" />
+                            {downloadingLabel === shipment.id ? (
+                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            ) : (
+                              <Printer className="mr-2 h-4 w-4" />
+                            )}
                             Generate Label
                           </DropdownMenuItem>
 
-                          {/* NEW: Update Tracking (uses your TrackingUpdateSheet.tsx) */}
                           <DropdownMenuItem
                             onClick={(e) =>
                               handleOpenTrackingUpdate(e, shipment)
@@ -492,6 +614,16 @@ export const ShipmentsPage = ({ shipments }: ShipmentsPageProps) => {
                           >
                             <Truck className="mr-2 h-4 w-4" />
                             Update Tracking
+                          </DropdownMenuItem>
+
+                          <DropdownMenuSeparator />
+
+                          <DropdownMenuItem
+                            onClick={(e) => handleDeleteClick(e, shipment)}
+                            className="text-red-600 focus:text-red-600 focus:bg-red-50"
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete Shipment
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -540,20 +672,10 @@ export const ShipmentsPage = ({ shipments }: ShipmentsPageProps) => {
         </div>
       )}
 
-      {/* Shipment Label Modal */}
-      {selectedShipment && (
-        <ShipmentLabelModal
-          shipment={selectedShipment}
-          isOpen={labelModalOpen}
-          onClose={() => setLabelModalOpen(false)}
-        />
-      )}
-
-      {/* Tracking Update Sheet – this is where your admin updates happen */}
+      {/* Tracking Update Sheet */}
       {updateSheetShipment && (
         <TrackingUpdateSheet
           shipment={{
-            // Adapt from this page's Shipment shape to TrackingUpdateSheet's Shipment shape
             id: updateSheetShipment.id,
             trackingNumber: updateSheetShipment.tracking_number,
             serviceType: updateSheetShipment.type,
@@ -561,6 +683,43 @@ export const ShipmentsPage = ({ shipments }: ShipmentsPageProps) => {
           onClose={() => setUpdateSheetShipment(null)}
         />
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Shipment</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete shipment{" "}
+              <span className="font-semibold text-gray-900">
+                {shipmentToDelete?.tracking_number}
+              </span>
+              ? This will permanently remove the shipment and all its tracking
+              updates. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDelete}
+              disabled={deleting}
+              className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
+            >
+              {deleting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete
+                </>
+              )}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
