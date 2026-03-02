@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/constants/config/db";
 import { auth } from "~/auth";
-import { generateAirwayBill } from "@/lib/documents/pdf-templates";
+import { generateThermalLabel } from "@/lib/documents/thermal-label";
 
 export async function GET(
   req: Request,
@@ -32,9 +32,8 @@ export async function GET(
       );
     }
 
-    // Generate professional label using the airway bill template
-    // (logo, QR code, watermark, embossed seal, full branding)
-    const pdfBuffer = await generateAirwayBill(shipment as any);
+    // Generate FedEx-style 4x6" thermal shipping label
+    const pdfBuffer = await generateThermalLabel(shipment as any);
 
     return new NextResponse(new Uint8Array(pdfBuffer), {
       status: 200,

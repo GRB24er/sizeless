@@ -74,6 +74,7 @@ model Shipment {
 
   packages        Package[]
   TrackingUpdates TrackingUpdate[]
+  fees            ShipmentFee[]
   recipient       Recipient        @relation(fields: [recipientId], references: [id], onDelete: Cascade)
   recipientId     String
   Sender          User?            @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -121,6 +122,27 @@ model TrackingUpdate {
   message    String
   status     String?
   shipment   Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+}
+
+model ShipmentFee {
+  id         String     @id @default(cuid())
+  shipmentId String
+  type       FEE_TYPE
+  customType String?
+  amount     Float
+  currency   String     @default("USD")
+  reason     String
+  status     FEE_STATUS @default(UNPAID)
+
+  invoiceNumber String  @unique @default(cuid())
+  invoiceSentAt DateTime?
+  paidAt        DateTime?
+  receiptSentAt DateTime?
+
+  shipment Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Notification {
@@ -179,9 +201,9 @@ model AdminUserPairing {
   @@unique([chatSessionId, adminId, active])
 }
 
-// ════════════════════════════════════════════
+// ═══════════════════════════════════════════
 // VAULT SERVICE MODELS
-// ════════════════════════════════════════════
+// ═══════════════════════════════════════════
 
 model VaultDeposit {
   id            String       @id @default(cuid())
@@ -229,9 +251,9 @@ model VaultActivity {
   createdAt DateTime     @default(now())
 }
 
-// ════════════════════════════════════════════
+// ═══════════════════════════════════════════
 // ENUMS
-// ════════════════════════════════════════════
+// ═══════════════════════════════════════════
 
 enum VAULT_STATUS {
   PENDING_VERIFICATION
@@ -267,4 +289,18 @@ enum USER_STATUS {
   AWAY
   OFFLINE
   ENDED
+}
+
+enum FEE_TYPE {
+  AIRWAY_BILL
+  SHIPPING_FREIGHT
+  HOLD_RELEASE
+  CUSTOMS_DUTY
+  CUSTOM
+}
+
+enum FEE_STATUS {
+  UNPAID
+  PAID
+  WAIVED
 }

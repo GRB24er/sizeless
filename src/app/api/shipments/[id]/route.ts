@@ -14,9 +14,11 @@ export async function DELETE(
 
     const { id } = await params;
 
-    // Delete related records first, then the shipment
+    // Delete related records first (including fees), then the shipment
     await prisma.$transaction([
+      prisma.shipmentFee.deleteMany({ where: { shipmentId: id } }),
       prisma.trackingUpdate.deleteMany({ where: { shipmentId: id } }),
+      prisma.notification.deleteMany({ where: { shipmentId: id } }),
       prisma.package.deleteMany({ where: { shipmentId: id } }),
       prisma.shipment.delete({ where: { id } }),
     ]);

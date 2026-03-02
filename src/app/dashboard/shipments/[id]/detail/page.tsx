@@ -1,9 +1,10 @@
-// app/shipment/[id]/page.tsx
+// src/app/dashboard/shipments/[id]/detail/page.tsx
 import { prisma } from "@/constants/config/db";
 import { format } from "date-fns";
 import { notFound, redirect } from "next/navigation";
 import { TrackingUpdateForm } from "./UpdateTrackingForm";
 import { auth } from "~/auth";
+import { FeesPanel } from "@/components/features/dashboard/shipments/FeesPanel";
 
 export default async function ShipmentDetailPage({
   params,
@@ -17,7 +18,7 @@ export default async function ShipmentDetailPage({
     return redirect("/");
   }
 
-  // Fetch the shipment along with related data
+  // Fetch the shipment along with related data including fees
   const shipment = await prisma.shipment.findUnique({
     where: { id },
     include: {
@@ -25,6 +26,9 @@ export default async function ShipmentDetailPage({
       packages: true,
       recipient: true,
       Sender: true,
+      fees: {
+        orderBy: { createdAt: "desc" },
+      },
     },
   });
 
@@ -37,6 +41,31 @@ export default async function ShipmentDetailPage({
     shipment.TrackingUpdates.length > 0
       ? shipment.TrackingUpdates[shipment.TrackingUpdates.length - 1].status
       : "No updates";
+
+  // Calculate totals
+  const totalWeight = shipment.packages.reduce((s, p) => s + p.weight, 0);
+  const totalValue = shipment.packages.reduce(
+    (s, p) => s + (p.declaredValue || 0),
+    0
+  );
+  const unpaidFees = shipment.fees.filter((f) => f.status === "UNPAID");
+  const totalUnpaidAmount = unpaidFees.reduce((s, f) => s + f.amount, 0);
+
+  // Serialize fees for client component
+  const serializedFees = shipment.fees.map((fee) => ({
+    id: fee.id,
+    type: fee.type,
+    customType: fee.customType,
+    amount: fee.amount,
+    currency: fee.currency,
+    reason: fee.reason,
+    status: fee.status,
+    invoiceNumber: fee.invoiceNumber,
+    invoiceSentAt: fee.invoiceSentAt?.toISOString() || null,
+    paidAt: fee.paidAt?.toISOString() || null,
+    receiptSentAt: fee.receiptSentAt?.toISOString() || null,
+    createdAt: fee.createdAt.toISOString(),
+  }));
 
   return (
     <div className="container mx-auto p-6 space-y-6">
@@ -53,7 +82,7 @@ export default async function ShipmentDetailPage({
                 <span className="font-medium">{shipment.trackingNumber}</span>
               </p>
             </div>
-            <div className="mt-3 sm:mt-0">
+            <div className="mt-3 sm:mt-0 flex items-center gap-2">
               <span
                 className={`inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium ${getStatusColor(
                   currentStatus
@@ -61,6 +90,20 @@ export default async function ShipmentDetailPage({
               >
                 {currentStatus}
               </span>
+              {/* Payment indicator */}
+              {shipment.isPaid ? (
+                <span className="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                  ✓ All Paid
+                </span>
+              ) : unpaidFees.length > 0 ? (
+                <span className="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-red-100 text-red-800">
+                  ${totalUnpaidAmount.toFixed(2)} Outstanding
+                </span>
+              ) : (
+                <span className="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800">
+                  {shipment.isPaid ? "Paid" : "Unpaid"}
+                </span>
+              )}
             </div>
           </div>
         </div>
@@ -140,6 +183,16 @@ export default async function ShipmentDetailPage({
                 {shipment.recipient.name}
               </dd>
             </div>
+            {shipment.recipient.email && (
+              <div>
+                <dt className="text-sm font-medium text-gray-500">
+                  Recipient Email
+                </dt>
+                <dd className="mt-1 text-sm text-gray-900">
+                  {shipment.recipient.email}
+                </dd>
+              </div>
+            )}
           </dl>
         </div>
 
@@ -148,6 +201,22 @@ export default async function ShipmentDetailPage({
           <h2 className="text-xl font-semibold text-gray-800">
             Package Details
           </h2>
+          <div className="mt-2 grid grid-cols-3 gap-4 mb-4">
+            <div className="bg-gray-50 rounded-lg p-3 text-center">
+              <p className="text-xs text-gray-500">Total Weight</p>
+              <p className="text-lg font-bold text-gray-900">{totalWeight} kg</p>
+            </div>
+            <div className="bg-gray-50 rounded-lg p-3 text-center">
+              <p className="text-xs text-gray-500">Total Pieces</p>
+              <p className="text-lg font-bold text-gray-900">
+                {shipment.packages.reduce((s, p) => s + p.pieces, 0)}
+              </p>
+            </div>
+            <div className="bg-gray-50 rounded-lg p-3 text-center">
+              <p className="text-xs text-gray-500">Declared Value</p>
+              <p className="text-lg font-bold text-gray-900">${totalValue}</p>
+            </div>
+          </div>
           <div className="mt-4 space-y-4">
             {shipment.packages.map((pkg) => (
               <div key={pkg.id} className="border p-4 rounded-lg">
@@ -202,6 +271,9 @@ export default async function ShipmentDetailPage({
           <TrackingUpdateForm shipmentId={shipment.id} />
         </div>
       </div>
+
+      {/* ═══ FEES & PAYMENTS PANEL ═══ */}
+      <FeesPanel shipmentId={shipment.id} fees={serializedFees} />
     </div>
   );
 }
