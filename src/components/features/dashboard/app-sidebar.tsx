@@ -1,9 +1,8 @@
 "use client";
-
 import * as React from "react";
 import {
   FileTextIcon, FolderIcon, Globe, HelpCircleIcon,
-  LayoutDashboardIcon, SettingsIcon, Vault, Users,
+  LayoutDashboardIcon, SettingsIcon, Vault, Users, DollarSign,
 } from "lucide-react";
 import { NavMain } from "./nav-main";
 import { NavSecondary } from "./nav-secondary";
@@ -13,13 +12,13 @@ import {
   SidebarMenu, SidebarMenuButton, SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { Logo } from "@/components/logo";
-
 const data = {
   user: { name: "Admin", email: "admin@aramexlogistics.org", avatar: "/avatars/admin.jpg" },
   navMain: [
     { title: "Dashboard", url: "/dashboard", icon: LayoutDashboardIcon },
     { title: "Website", url: "/", icon: Globe },
     { title: "Shipments", url: "/dashboard/shipments", icon: FolderIcon },
+    { title: "Fees & Payments", url: "/dashboard/fees", icon: DollarSign },
     { title: "Users", url: "/dashboard/users", icon: Users },
     { title: "Vault Management", url: "/dashboard/vault", icon: Vault },
     { title: "Documents", url: "/dashboard/documents", icon: FileTextIcon },
@@ -29,7 +28,6 @@ const data = {
     { title: "Get Help", url: "#", icon: HelpCircleIcon },
   ],
 };
-
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="offcanvas" {...props}>

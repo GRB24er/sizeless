@@ -64,11 +64,11 @@ export async function requestVaultDeposit(formData: FormData) {
 
   await prisma.vaultDeposit.create({
     data: {
-      depositNumber, assetType, description, weightGrams, purity,
+      depositNumber, assetType: assetType as any, description, weightGrams, purity,
       quantity, declaredValue, serialNumbers: serialNumbers || null,
       client: { connect: { id: session.user.id } },
       activities: {
-        create: { action: "DEPOSITED", description: `Deposit request submitted for ${quantity}x ${assetType} (${weightGrams}g)`, performedBy: session.user.name },
+        create: { action: "PLACED_IN_STORAGE" as any, description: `Deposit request submitted for ${quantity}x ${assetType} (${weightGrams}g)`, performedBy: session.user.name },
       },
     },
   });
@@ -112,7 +112,7 @@ export async function requestVaultRelease(depositId: string) {
     data: {
       status: "RELEASE_REQUESTED",
       activities: {
-        create: { action: "RELEASE_REQUESTED", description: "Client requested release of stored assets", performedBy: session.user.name },
+        create: { action: "WITHDRAWAL_REQUESTED" as any, description: "Client requested release of stored assets", performedBy: session.user.name },
       },
     },
   });
@@ -167,7 +167,7 @@ export async function adminUpdateVaultStatus(formData: FormData) {
     data: {
       ...updateData,
       activities: {
-        create: { action: newStatus, description: note || `Status updated to ${newStatus}`, performedBy: session.user.name || "Admin" },
+        create: { action: newStatus as any, description: note || `Status updated to ${newStatus}`, performedBy: session.user.name || "Admin" },
       },
     },
   });

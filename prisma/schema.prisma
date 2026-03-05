@@ -25,6 +25,8 @@ model User {
   Message       Message[]
   adminPairings AdminUserPairing[] @relation("AdminPairings")
   vaultDeposits VaultDeposit[]
+  vaultInvoices VaultInvoice[] @relation("VaultInvoices")
+  vaultKYC      VaultKYC[]
 }
 
 model Address {
@@ -201,68 +203,351 @@ model AdminUserPairing {
   @@unique([chatSessionId, adminId, active])
 }
 
-// ═══════════════════════════════════════════
-// VAULT SERVICE MODELS
-// ═══════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+// VAULT SERVICE MODELS (ENHANCED)
+// ═══════════════════════════════════════════════════════════════
 
-model VaultDeposit {
-  id            String       @id @default(cuid())
-  depositNumber String       @unique
-  status        VAULT_STATUS @default(PENDING_VERIFICATION)
+model VaultKYC {
+  id        String     @id @default(cuid())
+  clientId  String
+  status    KYC_STATUS @default(PENDING)
 
-  assetType     String
-  description   String
-  weightGrams   Float
-  purity        String?
-  quantity      Int          @default(1)
-  declaredValue Float
-  serialNumbers String?
+  idType          String?
+  idNumber        String?
+  idExpiryDate    DateTime?
+  idDocumentUrl   String?
 
-  vaultLocation String  @default("Ipswich Main Vault")
-  storageUnit   String?
+  addressDocType  String?
+  addressDocUrl   String?
 
-  insuredValue Float?
-  monthlyFee   Float?
-  insuranceFee Float?
+  sourceOfGold    String?
+  sourceDocUrl    String?
+  sourceNotes     String?
 
-  depositDate   DateTime  @default(now())
-  verifiedAt    DateTime?
-  releasedAt    DateTime?
-  releaseReason String?
+  corporateName   String?
+  corporateRegNo  String?
+  corporateDocUrl String?
 
-  client   User   @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  clientId String
+  sanctionsCheck    AML_RESULT @default(PENDING)
+  pepCheck          AML_RESULT @default(PENDING)
+  adverseMediaCheck AML_RESULT @default(PENDING)
+  amlNotes          String?
 
-  activities VaultActivity[]
+  reviewedBy      String?
+  reviewedAt      DateTime?
+  rejectionReason String?
+
+  client   User @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
+model VaultDeposit {
+  id            String       @id @default(cuid())
+  depositNumber String       @unique
+  status        VAULT_STATUS @default(KYC_REVIEW)
+
+  intakeMethod      INTAKE_METHOD @default(CLIENT_DELIVERY)
+  appointmentDate   DateTime?
+  appointmentNotes  String?
+  securityEscortRef String?
+
+  assetType       ASSET_TYPE @default(GOLD_BAR)
+  description     String
+  weightGrams     Float
+  purity          String?
+  fineness        Float?
+  quantity        Int        @default(1)
+  serialNumbers   String?
+  refinerName     String?
+  refinerStamp    String?
+  isLBMACertified Boolean    @default(false)
+
+  declaredValue      Float
+  verifiedValue      Float?
+  spotPriceAtDeposit Float?
+
+  assayStatus      ASSAY_STATUS @default(PENDING)
+  assayMethod      String?
+  assayResult      String?
+  assayPerformedBy String?
+  assayDate        DateTime?
+  assayReportUrl   String?
+  weightVerified   Float?
+  weightDiscrepancy Float?
+
+  storageType      STORAGE_TYPE @default(ALLOCATED)
+  vaultLocation    String       @default("London Main Vault")
+  storageUnit      String?
+  shelfPosition    String?
+  storageStartDate DateTime?
+  storageEndDate   DateTime?
+
+  insuredValue        Float?
+  insuranceProvider   String?
+  insurancePolicyNo   String?
+  insuranceCoverage   String?
+  insuranceExpiryDate DateTime?
+  insuranceCertUrl    String?
+
+  monthlyStorageFee Float?
+  insuranceFeeRate  Float?
+  assayFee          Float?
+  handlingFee       Float?
+  totalFeesCharged  Float      @default(0)
+
+  depositReceiptUrl   String?
+  storageAgreementUrl String?
+  custodyReferenceId  String?   @unique
+
+  depositDate        DateTime  @default(now())
+  kycApprovedAt      DateTime?
+  intakeCompletedAt  DateTime?
+  assayCompletedAt   DateTime?
+  verifiedAt         DateTime?
+  storedAt           DateTime?
+  releaseRequestedAt DateTime?
+  releaseApprovedAt  DateTime?
+  releasedAt         DateTime?
+  releaseReason      String?
+
+  client      User              @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  clientId    String
+  activities  VaultActivity[]
+  withdrawals VaultWithdrawal[]
+  invoices      VaultInvoice[]
+  transfers     VaultTransfer[]
+  beneficiaries VaultBeneficiary[]
+
+  // Source of Funds / AML
+  sourceOfFunds       String?
+  sourceOfFundsDetail String?
+  sourceOfFundsDocUrl String?
+  sourceOfWealth      String?
+
+  // Cash-specific
+  cashCurrency        String?
+  cashAmount          Float?
+  cashSerialTracking  String?
+  cashPackaging       String?
+
+  // Jewelry-specific
+  jewelryValuation    Float?
+  jewelryValuationCertUrl String?
+  jewelryPhotosUrl    String?
+
+  // Document-specific
+  documentTitle       String?
+  documentIssuingAuth String?
+  documentSerial      String?
+  documentEnvelopeSeal String?
+
+  // Chain of Custody
+  receivedByName      String?
+  receivedByTitle     String?
+  entryTimestamp      DateTime?
+  compartmentNumber   String?
+  securityOfficerName String?
+  cctvReferenceId     String?
+
+  // Access Authorization
+  authorizedPersons   String?
+  withdrawalAuthMethod String?
+  securityPin         String?
+
+  // Compliance Screening
+  sanctionsChecked    Boolean  @default(false)
+  pepScreened         Boolean  @default(false)
+  watchlistChecked    Boolean  @default(false)
+  complianceStatus    String?
+  complianceNotes     String?
+  complianceOfficer   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
 model VaultActivity {
-  id          String @id @default(cuid())
+  id          String       @id @default(cuid())
   depositId   String
-  action      String
+  action      VAULT_ACTION
   description String
   performedBy String?
+  ipAddress   String?
   metadata    String?
 
   deposit   VaultDeposit @relation(fields: [depositId], references: [id], onDelete: Cascade)
   createdAt DateTime     @default(now())
 }
 
-// ═══════════════════════════════════════════
+model VaultWithdrawal {
+  id          String            @id @default(cuid())
+  depositId   String
+  type        WITHDRAWAL_TYPE   @default(PHYSICAL)
+  status      WITHDRAWAL_STATUS @default(REQUESTED)
+
+  requestedBy     String
+  requestDate     DateTime       @default(now())
+  requestNotes    String?
+
+  authorizationDocUrl String?
+  identityVerified    Boolean    @default(false)
+  complianceCleared   Boolean    @default(false)
+  complianceNotes     String?
+
+  collectionMethod  INTAKE_METHOD?
+  collectionDate    DateTime?
+  securityEscortRef String?
+
+  bullionDealerName  String?
+  bullionDealerRef   String?
+  spotPriceAtSale    Float?
+  saleSpread         Float?
+  saleAmount         Float?
+  saleCurrency       String?    @default("USD")
+  bankAccountRef     String?
+  wireTransferRef    String?
+  fundsTransferredAt DateTime?
+
+  approvedBy      String?
+  approvedAt      DateTime?
+  rejectionReason String?
+  completedAt     DateTime?
+
+  deposit VaultDeposit @relation(fields: [depositId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ═══════════════════════════════════════════════════════════════
 // ENUMS
-// ═══════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
 
 enum VAULT_STATUS {
+  KYC_REVIEW
+  KYC_APPROVED
+  KYC_REJECTED
+  INTAKE_SCHEDULED
+  INTAKE_IN_PROGRESS
   PENDING_VERIFICATION
-  VERIFIED
+  ASSAY_IN_PROGRESS
+  VERIFICATION_COMPLETE
+  DOCUMENTED
   IN_STORAGE
   RELEASE_REQUESTED
   RELEASE_APPROVED
   RELEASED
+  LIQUIDATION_IN_PROGRESS
+  LIQUIDATED
   SUSPENDED
+}
+
+enum KYC_STATUS {
+  PENDING
+  UNDER_REVIEW
+  APPROVED
+  REJECTED
+  EXPIRED
+}
+
+enum AML_RESULT {
+  PENDING
+  CLEAR
+  FLAGGED
+  FAILED
+}
+
+enum ASSAY_STATUS {
+  PENDING
+  IN_PROGRESS
+  PASSED
+  FAILED
+  WAIVED
+}
+
+enum STORAGE_TYPE {
+  ALLOCATED
+  SEGREGATED
+  UNALLOCATED
+}
+
+enum ASSET_TYPE {
+  GOLD_BAR
+  GOLD_KILOBAR
+  GOLD_COINS
+  GOLD_DUST
+  GOLD_DORE
+  SILVER_BAR
+  PLATINUM
+  PALLADIUM
+  JEWELRY
+  PRECIOUS_STONES
+  MIXED
+}
+
+enum INTAKE_METHOD {
+  CLIENT_DELIVERY
+  ARMORED_TRANSPORT
+  VAULT_TRANSFER
+}
+
+enum VAULT_ACTION {
+  KYC_SUBMITTED
+  KYC_UNDER_REVIEW
+  KYC_APPROVED
+  KYC_REJECTED
+  INTAKE_SCHEDULED
+  INTAKE_STARTED
+  INTAKE_COMPLETED
+  PHYSICAL_INSPECTION
+  ASSAY_STARTED
+  ASSAY_COMPLETED
+  ASSAY_FAILED
+  WEIGHT_VERIFIED
+  SERIAL_VERIFIED
+  DEPOSIT_RECEIPT_ISSUED
+  STORAGE_AGREEMENT_SIGNED
+  INSURANCE_CERTIFICATE_ISSUED
+  CUSTODY_REF_ASSIGNED
+  PLACED_IN_STORAGE
+  STORAGE_TYPE_CHANGED
+  STORAGE_LOCATION_CHANGED
+  INSURANCE_ACTIVATED
+  INSURANCE_RENEWED
+  INSURANCE_EXPIRED
+  FEE_CHARGED
+  FEE_PAID
+  WITHDRAWAL_REQUESTED
+  WITHDRAWAL_APPROVED
+  WITHDRAWAL_REJECTED
+  WITHDRAWAL_COMPLETED
+  LIQUIDATION_STARTED
+  LIQUIDATION_COMPLETED
+  FUNDS_TRANSFERRED
+  STATUS_CHANGED
+  NOTE_ADDED
+  DEPOSIT_SUSPENDED
+  DEPOSIT_REACTIVATED
+  AUDIT_REQUESTED
+  AUDIT_COMPLETED
+}
+
+enum WITHDRAWAL_TYPE {
+  PHYSICAL
+  LIQUIDATION
+  VAULT_TRANSFER
+}
+
+enum WITHDRAWAL_STATUS {
+  REQUESTED
+  IDENTITY_VERIFIED
+  COMPLIANCE_REVIEW
+  APPROVED
+  SCHEDULED
+  IN_PROGRESS
+  COMPLETED
+  REJECTED
 }
 
 enum ChatRole {
@@ -303,4 +588,148 @@ enum FEE_STATUS {
   UNPAID
   PAID
   WAIVED
+}
+
+enum INVOICE_STATUS {
+  DRAFT
+  SENT
+  PAID
+  OVERDUE
+  CANCELLED
+  REFUNDED
+}
+
+enum INVOICE_ITEM_TYPE {
+  STORAGE_FEE
+  INTAKE_FEE
+  ASSAY_FEE
+  INSURANCE_FEE
+  ESCORT_FEE
+  TAMPER_SEAL_FEE
+  WITHDRAWAL_FEE
+  LIQUIDATION_COMMISSION
+  WIRE_TRANSFER_FEE
+  KYC_FEE
+  DOCUMENTATION_FEE
+  LATE_FEE
+  OTHER
+}
+
+model VaultInvoice {
+  id              String          @id @default(cuid())
+  invoiceNumber   String          @unique
+  depositId       String
+  clientId        String
+  issueDate       DateTime        @default(now())
+  dueDate         DateTime
+  paidAt          DateTime?
+  periodStart     DateTime?
+  periodEnd       DateTime?
+  subtotal        Float           @default(0)
+  taxRate         Float           @default(0)
+  taxAmount       Float           @default(0)
+  total           Float           @default(0)
+  amountPaid      Float           @default(0)
+  balanceDue      Float           @default(0)
+  status          INVOICE_STATUS  @default(DRAFT)
+  paymentMethod   String?
+  paymentRef      String?
+  notes           String?
+  deposit         VaultDeposit    @relation(fields: [depositId], references: [id], onDelete: Cascade)
+  client          User            @relation("VaultInvoices", fields: [clientId], references: [id])
+  items           VaultInvoiceItem[]
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+}
+
+model VaultInvoiceItem {
+  id          String              @id @default(cuid())
+  invoiceId   String
+  type        INVOICE_ITEM_TYPE
+  description String
+  quantity    Float               @default(1)
+  unitPrice   Float
+  amount      Float
+  invoice     VaultInvoice        @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+}
+
+enum TRANSFER_STATUS {
+  INITIATED
+  COMPLIANCE_CHECK
+  APPROVED
+  IN_TRANSIT
+  RECEIVED
+  COMPLETED
+  CANCELLED
+}
+
+enum BENEFICIARY_STATUS {
+  PENDING
+  VERIFIED
+  REJECTED
+  REVOKED
+}
+
+model VaultTransfer {
+  id                   String          @id @default(cuid())
+  depositId            String
+  transferNumber       String          @unique
+  sourceVault          String
+  sourceUnit           String?
+  destinationVault     String
+  destinationUnit      String?
+  destinationCustodian String?
+  destinationContact   String?
+  status               TRANSFER_STATUS @default(INITIATED)
+  transferType         String          @default("FULL")
+  weightTransferred    Float
+  itemsTransferred     String?
+  estimatedArrival     DateTime?
+  actualArrival        DateTime?
+  securityEscortRef    String?
+  sealNumbers          String?
+  chainOfCustodyDoc    String?
+  transitInsured       Boolean         @default(true)
+  transitInsuredValue  Float?
+  transitInsurer       String?
+  transferFee          Float?
+  insuranceFee         Float?
+  initiatedBy          String
+  initiatedAt          DateTime        @default(now())
+  approvedBy           String?
+  approvedAt           DateTime?
+  completedBy          String?
+  completedAt          DateTime?
+  cancellationReason   String?
+  notes                String?
+  deposit              VaultDeposit    @relation(fields: [depositId], references: [id], onDelete: Cascade)
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
+}
+
+model VaultBeneficiary {
+  id                String             @id @default(cuid())
+  depositId         String
+  name              String
+  relationship      String
+  email             String?
+  phone             String?
+  address           String?
+  dateOfBirth       DateTime?
+  idType            String?
+  idNumber          String?
+  idExpiryDate      DateTime?
+  idDocumentUrl     String?
+  allocationPercent Float              @default(100)
+  status            BENEFICIARY_STATUS @default(PENDING)
+  verifiedBy        String?
+  verifiedAt        DateTime?
+  rejectionReason   String?
+  powerOfAttorney   Boolean            @default(false)
+  poaDocumentUrl    String?
+  authorizedActions String?
+  notes             String?
+  deposit           VaultDeposit       @relation(fields: [depositId], references: [id], onDelete: Cascade)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
 }

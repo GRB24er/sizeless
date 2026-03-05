@@ -36,6 +36,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import KYCReviewPanel from "@/components/features/dashboard/shipments/KYCReviewPanel";
+import VaultPanel from "@/components/features/dashboard/shipments/VaultPanel";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Table,
@@ -481,8 +483,16 @@ export const ShipmentsPage = ({
           <TabsTrigger value="active">Active</TabsTrigger>
           <TabsTrigger value="delivered">Delivered</TabsTrigger>
           <TabsTrigger value="pending">Pending</TabsTrigger>
+          <TabsTrigger value="vault">Vault Custody</TabsTrigger>
+          <TabsTrigger value="kyc">KYC Reviews</TabsTrigger>
         </TabsList>
         <TabsContent value="all" className="mt-4" />
+        <TabsContent value="kyc" className="mt-4">
+          <KYCReviewPanel />
+        </TabsContent>
+        <TabsContent value="vault" className="mt-4">
+          <VaultPanel adminId="admin" />
+        </TabsContent>
       </Tabs>
 
       {/* Shipments Table */}

@@ -1194,6 +1194,421 @@ export async function generateInsuranceCertificate(data: ShipmentData): Promise<
 }
 
 // ═══════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════
+// VAULT PDF ADDITIONS — Append to src/lib/documents/pdf-templates.ts
+// Add these functions BEFORE the "EXPORT MAP" section
+// ═══════════════════════════════════════════════════════════════
+
+// ─── VAULT-SPECIFIC TYPES ────────────────────────────────────
+
+type VaultAssayData = {
+  depositNumber: string;
+  assetType: string;
+  description: string;
+  weightGrams: number;
+  weightVerified: number | null;
+  weightDiscrepancy: number | null;
+  purity: string | null;
+  quantity: number;
+  serialNumbers: string | null;
+  refinerName: string | null;
+  isLBMACertified: boolean;
+  assayMethod: string | null;
+  assayResult: string | null;
+  assayPerformedBy: string | null;
+  assayStatus: string;
+  declaredValue: number;
+  verifiedValue: number | null;
+  vaultLocation: string;
+  client: { name: string; email: string; phone: string };
+};
+
+type VaultStorageData = {
+  depositNumber: string;
+  custodyReferenceId: string | null;
+  assetType: string;
+  description: string;
+  weightGrams: number;
+  purity: string | null;
+  quantity: number;
+  serialNumbers: string | null;
+  declaredValue: number;
+  storageType: string;
+  storageUnit: string | null;
+  shelfPosition: string | null;
+  vaultLocation: string;
+  monthlyStorageFee: number | null;
+  depositDate: string | Date;
+  insuredValue: number | null;
+  insuranceProvider: string | null;
+  insurancePolicyNo: string | null;
+  client: { name: string; email: string; phone: string };
+};
+
+type VaultInsuranceData = {
+  depositNumber: string;
+  custodyReferenceId: string | null;
+  assetType: string;
+  description: string;
+  weightGrams: number;
+  purity: string | null;
+  declaredValue: number;
+  insuredValue: number | null;
+  insuranceProvider: string | null;
+  insurancePolicyNo: string | null;
+  insuranceCoverage: string | null;
+  insuranceExpiryDate: string | Date | null;
+  storageType: string;
+  vaultLocation: string;
+  storageUnit: string | null;
+  depositDate: string | Date;
+  client: { name: string; email: string; phone: string };
+};
+
+// ═══════════════════════════════════════════════════════════════
+// 9. ASSAY REPORT
+// ═══════════════════════════════════════════════════════════════
+
+export async function generateAssayReport(data: VaultAssayData): Promise<Buffer> {
+  const doc = new jsPDF();
+  const docId = genDocId();
+  const qr = await generateVaultQR(data.depositNumber);
+
+  drawWatermark(doc);
+
+  // Header — purple-accented for assay
+  doc.setFillColor(...NAVY); doc.rect(0, 0, 210, 36, "F");
+  doc.setFillColor(147, 51, 234); doc.rect(0, 36, 210, 2, "F"); // purple
+  doc.setFillColor(...GOLD); doc.rect(0, 38, 210, 0.5, "F");
+
+  const logo = getLogoBase64();
+  if (logo) {
+    try { doc.addImage(logo, getLogoFormat(), 12, 5, 50, 17); } catch {}
+  } else {
+    doc.setTextColor(...WHITE); doc.setFontSize(16); doc.setFont("helvetica", "bold");
+    doc.text("ARAMEXLOGISTICS", 15, 16);
+  }
+  doc.setTextColor(180, 190, 200); doc.setFontSize(7); doc.setFont("helvetica", "normal");
+  doc.text("Vault Assay & Verification Division  |  LBMA Approved Laboratory", 15, 27);
+  doc.text("admin@aramexlogistics.org  |  +44 020 1412 251", 15, 31);
+
+  doc.setFontSize(13); doc.setFont("helvetica", "bold"); doc.setTextColor(147, 51, 234);
+  doc.text("ASSAY VERIFICATION REPORT", 195, 14, { align: "right" });
+  doc.setFontSize(8); doc.setTextColor(180, 190, 200); doc.setFont("helvetica", "normal");
+  doc.text(`Report: ${docId}`, 195, 22, { align: "right" });
+  doc.text(`Date: ${fmtDate(new Date())}`, 195, 28, { align: "right" });
+
+  drawQR(doc, qr, 168, 44, 28);
+
+  let y = 48;
+
+  // Deposit number box
+  doc.setFillColor(245, 243, 255); doc.roundedRect(15, y - 2, 145, 20, 2, 2, "F");
+  doc.setDrawColor(147, 51, 234); doc.roundedRect(15, y - 2, 145, 20, 2, 2, "S");
+  doc.setFontSize(7); doc.setTextColor(147, 51, 234); doc.setFont("helvetica", "normal");
+  doc.text("DEPOSIT NUMBER", 20, y + 4);
+  doc.setFontSize(16); doc.setFont("helvetica", "bold"); doc.setTextColor(...NAVY);
+  doc.text(data.depositNumber, 20, y + 14);
+
+  // Result badge
+  const passed = data.assayStatus === "PASSED" || data.assayStatus === "WAIVED";
+  if (passed) {
+    doc.setFillColor(236, 253, 245); doc.roundedRect(120, y - 1, 40, 18, 2, 2, "F");
+    doc.setDrawColor(16, 185, 129); doc.roundedRect(120, y - 1, 40, 18, 2, 2, "S");
+    doc.setFontSize(11); doc.setFont("helvetica", "bold"); doc.setTextColor(5, 150, 105);
+    doc.text("✓ PASSED", 125, y + 11);
+  } else {
+    doc.setFillColor(254, 242, 242); doc.roundedRect(120, y - 1, 40, 18, 2, 2, "F");
+    doc.setDrawColor(239, 68, 68); doc.roundedRect(120, y - 1, 40, 18, 2, 2, "S");
+    doc.setFontSize(11); doc.setFont("helvetica", "bold"); doc.setTextColor(220, 38, 38);
+    doc.text("✗ FAILED", 125, y + 11);
+  }
+
+  y += 28;
+  y = drawSectionTitle(doc, "Client", y);
+  drawKeyValue(doc, "Name", data.client.name, 22, y);
+  drawKeyValue(doc, "Email", data.client.email, 80, y);
+  drawKeyValue(doc, "Phone", data.client.phone, 145, y);
+
+  y += 16;
+  y = drawGoldSectionTitle(doc, "Asset Under Test", y);
+  drawKeyValue(doc, "Asset Type", data.assetType, 22, y);
+  drawKeyValue(doc, "Quantity", `${data.quantity}`, 80, y);
+  drawKeyValue(doc, "Purity (Declared)", data.purity || "N/A", 130, y);
+  y += 14;
+  drawKeyValue(doc, "Description", data.description, 22, y);
+  y += 14;
+  if (data.serialNumbers) { drawKeyValue(doc, "Serial Numbers", data.serialNumbers, 22, y); y += 14; }
+  if (data.refinerName) { drawKeyValue(doc, "Refiner / Source", data.refinerName, 22, y); y += 14; }
+  drawKeyValue(doc, "LBMA Certified", data.isLBMACertified ? "Yes" : "No", 22, y);
+
+  y += 16;
+  y = drawSectionTitle(doc, "Assay Results", y);
+  drawKeyValue(doc, "Test Method", data.assayMethod || "N/A", 22, y);
+  drawKeyValue(doc, "Performed By", data.assayPerformedBy || "N/A", 100, y);
+  y += 14;
+
+  // Weight verification box
+  doc.setFillColor(249, 250, 251); doc.roundedRect(15, y - 2, 180, 28, 2, 2, "F");
+  doc.setDrawColor(229, 231, 235); doc.roundedRect(15, y - 2, 180, 28, 2, 2, "S");
+  drawKeyValue(doc, "Declared Weight", `${data.weightGrams}g`, 22, y + 4);
+  drawKeyValue(doc, "Verified Weight", data.weightVerified ? `${data.weightVerified}g` : "Pending", 80, y + 4);
+  if (data.weightDiscrepancy !== null && data.weightDiscrepancy !== undefined) {
+    const disc = data.weightDiscrepancy;
+    const discPct = ((disc / data.weightGrams) * 100).toFixed(3);
+    drawKeyValue(doc, "Discrepancy", `${disc > 0 ? "+" : ""}${disc.toFixed(2)}g (${disc > 0 ? "+" : ""}${discPct}%)`, 140, y + 4);
+  }
+  drawKeyValue(doc, "Declared Value", fmtCurrency(data.declaredValue), 22, y + 18);
+  if (data.verifiedValue) drawKeyValue(doc, "Verified Value", fmtCurrency(data.verifiedValue), 100, y + 18);
+
+  y += 36;
+  // Assay notes
+  if (data.assayResult) {
+    y = drawSectionTitle(doc, "Laboratory Notes", y);
+    doc.setFontSize(7.5); doc.setFont("helvetica", "normal"); doc.setTextColor(...TEXT_MED);
+    const splitNotes = doc.splitTextToSize(data.assayResult, 170);
+    doc.text(splitNotes, 22, y + 2);
+    y += splitNotes.length * 4 + 6;
+  }
+
+  // Certification statement
+  y += 4;
+  doc.setFillColor(245, 243, 255); doc.roundedRect(15, y, 180, 18, 2, 2, "F");
+  doc.setDrawColor(147, 51, 234); doc.roundedRect(15, y, 180, 18, 2, 2, "S");
+  doc.setFontSize(6.5); doc.setFont("helvetica", "italic"); doc.setTextColor(...TEXT_MED);
+  doc.text("This report certifies the assay and verification results for the assets described above. Testing was performed", 20, y + 5, { maxWidth: 170 });
+  doc.text("in accordance with LBMA Good Delivery standards. Results are valid for 12 months from date of issue.", 20, y + 10, { maxWidth: 170 });
+  doc.text("Disputes must be raised within 30 days. Re-assay available upon request.", 20, y + 15, { maxWidth: 170 });
+
+  drawSignatureBlock(doc, 218, { showSeal: true, sealX: 172, sealY: 240 });
+  drawFooter(doc);
+  return Buffer.from(doc.output("arraybuffer"));
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 10. STORAGE AGREEMENT
+// ═══════════════════════════════════════════════════════════════
+
+export async function generateStorageAgreement(data: VaultStorageData): Promise<Buffer> {
+  const doc = new jsPDF();
+  const docId = genDocId();
+  const qr = await generateVaultQR(data.depositNumber);
+
+  drawWatermark(doc);
+
+  // Header
+  doc.setFillColor(...NAVY); doc.rect(0, 0, 210, 36, "F");
+  doc.setFillColor(...GOLD); doc.rect(0, 36, 210, 2, "F");
+  doc.setFillColor(...EMERALD); doc.rect(0, 38, 210, 0.5, "F");
+
+  const logo = getLogoBase64();
+  if (logo) {
+    try { doc.addImage(logo, getLogoFormat(), 12, 5, 50, 17); } catch {}
+  } else {
+    doc.setTextColor(...WHITE); doc.setFontSize(16); doc.setFont("helvetica", "bold");
+    doc.text("ARAMEXLOGISTICS", 15, 16);
+  }
+  doc.setTextColor(180, 190, 200); doc.setFontSize(7); doc.setFont("helvetica", "normal");
+  doc.text("Vault Services Division  |  Secure Custody & Storage", 15, 27);
+  doc.text("admin@aramexlogistics.org  |  +44 020 1412 251", 15, 31);
+
+  doc.setFontSize(13); doc.setFont("helvetica", "bold"); doc.setTextColor(...GOLD);
+  doc.text("STORAGE AGREEMENT", 195, 14, { align: "right" });
+  doc.setFontSize(8); doc.setTextColor(180, 190, 200); doc.setFont("helvetica", "normal");
+  doc.text(`Agreement: ${docId}`, 195, 22, { align: "right" });
+  doc.text(`Effective: ${fmtDate(new Date())}`, 195, 28, { align: "right" });
+
+  drawQR(doc, qr, 168, 44, 28);
+
+  let y = 48;
+
+  // Custody reference box
+  doc.setFillColor(255, 251, 235); doc.roundedRect(15, y - 2, 145, 20, 2, 2, "F");
+  doc.setDrawColor(...GOLD); doc.roundedRect(15, y - 2, 145, 20, 2, 2, "S");
+  doc.setFontSize(7); doc.setTextColor(...GOLD); doc.setFont("helvetica", "normal");
+  doc.text("CUSTODY REFERENCE", 20, y + 4);
+  doc.setFontSize(14); doc.setFont("helvetica", "bold"); doc.setTextColor(...NAVY);
+  doc.text(data.custodyReferenceId || data.depositNumber, 20, y + 14);
+
+  y += 28;
+  y = drawSectionTitle(doc, "Parties", y);
+  doc.setFontSize(7); doc.setFont("helvetica", "bold"); doc.setTextColor(...TEXT_DARK);
+  doc.text("Custodian:", 22, y + 2);
+  doc.setFont("helvetica", "normal"); doc.setTextColor(...TEXT_MED);
+  doc.text("AramexLogistics Vault Services Ltd.", 22, y + 7);
+  doc.text("LBMA Approved Vault Operator | Registered in England & Wales", 22, y + 12);
+
+  doc.setFont("helvetica", "bold"); doc.setTextColor(...TEXT_DARK);
+  doc.text("Depositor:", 110, y + 2);
+  doc.setFont("helvetica", "normal"); doc.setTextColor(...TEXT_MED);
+  doc.text(data.client.name, 110, y + 7);
+  doc.text(`${data.client.email} | ${data.client.phone}`, 110, y + 12);
+
+  y += 22;
+  y = drawGoldSectionTitle(doc, "Assets in Custody", y);
+  drawKeyValue(doc, "Asset Type", data.assetType, 22, y);
+  drawKeyValue(doc, "Qty", `${data.quantity}`, 80, y);
+  drawKeyValue(doc, "Purity", data.purity || "N/A", 110, y);
+  drawKeyValue(doc, "Weight", `${data.weightGrams}g`, 150, y);
+  y += 14;
+  drawKeyValue(doc, "Description", data.description, 22, y);
+  drawKeyValue(doc, "Declared Value", fmtCurrency(data.declaredValue), 130, y);
+  y += 14;
+  if (data.serialNumbers) { drawKeyValue(doc, "Serial Numbers", data.serialNumbers, 22, y); y += 14; }
+
+  y += 4;
+  y = drawSectionTitle(doc, "Storage Terms", y);
+
+  const storageLabels: Record<string, string> = {
+    ALLOCATED: "Allocated (Dedicated cage/unit)",
+    SEGREGATED: "Segregated (Shared vault, separate inventory)",
+    UNALLOCATED: "Unallocated (Pooled storage)",
+  };
+
+  drawKeyValue(doc, "Storage Type", storageLabels[data.storageType] || data.storageType, 22, y);
+  y += 14;
+  drawKeyValue(doc, "Vault Location", data.vaultLocation, 22, y);
+  drawKeyValue(doc, "Unit / Cage", data.storageUnit || "TBD", 80, y);
+  drawKeyValue(doc, "Position", data.shelfPosition || "—", 140, y);
+  y += 14;
+  drawKeyValue(doc, "Commencement", fmtDate(data.depositDate), 22, y);
+  drawKeyValue(doc, "Monthly Fee", data.monthlyStorageFee ? fmtCurrency(data.monthlyStorageFee) : "TBD", 80, y);
+  drawKeyValue(doc, "Billing Cycle", "1st of each month", 140, y);
+
+  y += 16;
+  // Insurance summary
+  if (data.insuredValue) {
+    y = drawGoldSectionTitle(doc, "Insurance", y);
+    drawKeyValue(doc, "Insured Value", fmtCurrency(data.insuredValue), 22, y);
+    drawKeyValue(doc, "Provider", data.insuranceProvider || "—", 80, y);
+    drawKeyValue(doc, "Policy No.", data.insurancePolicyNo || "—", 140, y);
+    y += 16;
+  }
+
+  // Terms
+  doc.setFillColor(249, 250, 251); doc.roundedRect(15, y, 180, 32, 2, 2, "F");
+  doc.setDrawColor(229, 231, 235); doc.roundedRect(15, y, 180, 32, 2, 2, "S");
+  doc.setFontSize(7); doc.setFont("helvetica", "bold"); doc.setTextColor(...TEXT_DARK);
+  doc.text("Terms & Conditions", 20, y + 5);
+  doc.setFontSize(6); doc.setFont("helvetica", "normal"); doc.setTextColor(...TEXT_MED);
+  const terms = [
+    "1. The Custodian shall hold the Assets in secure storage and maintain adequate insurance at all times.",
+    "2. The Depositor shall pay the monthly storage fee on or before the 1st of each month. Late payments incur 1.5% interest per month.",
+    "3. Withdrawal requires 5 business days notice and presentation of this agreement or valid custody reference.",
+    "4. The Custodian shall provide quarterly inventory confirmations and annual independent audit reports.",
+    "5. Either party may terminate with 30 days written notice. Outstanding fees must be settled before asset release.",
+    "6. All disputes shall be governed by the laws of England and Wales, subject to LBMA arbitration procedures.",
+  ];
+  terms.forEach((t, i) => {
+    doc.text(t, 20, y + 10 + i * 3.5, { maxWidth: 170 });
+  });
+
+  drawSignatureBlock(doc, 218, { showSeal: true, sealX: 172, sealY: 240 });
+  drawFooter(doc);
+  return Buffer.from(doc.output("arraybuffer"));
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 11. VAULT INSURANCE CERTIFICATE
+// ═══════════════════════════════════════════════════════════════
+
+export async function generateVaultInsuranceCertificate(data: VaultInsuranceData): Promise<Buffer> {
+  const doc = new jsPDF();
+  const docId = genDocId();
+  const qr = await generateVaultQR(data.depositNumber);
+
+  drawWatermark(doc);
+
+  // Header — blue-accented for insurance
+  doc.setFillColor(...NAVY); doc.rect(0, 0, 210, 36, "F");
+  doc.setFillColor(37, 99, 235); doc.rect(0, 36, 210, 2, "F"); // blue
+  doc.setFillColor(...GOLD); doc.rect(0, 38, 210, 0.5, "F");
+
+  const logo = getLogoBase64();
+  if (logo) {
+    try { doc.addImage(logo, getLogoFormat(), 12, 5, 50, 17); } catch {}
+  } else {
+    doc.setTextColor(...WHITE); doc.setFontSize(16); doc.setFont("helvetica", "bold");
+    doc.text("ARAMEXLOGISTICS", 15, 16);
+  }
+  doc.setTextColor(180, 190, 200); doc.setFontSize(7); doc.setFont("helvetica", "normal");
+  doc.text("Vault Insurance Services  |  Underwritten by Lloyd's of London", 15, 27);
+  doc.text("admin@aramexlogistics.org  |  +44 020 1412 251", 15, 31);
+
+  doc.setFontSize(13); doc.setFont("helvetica", "bold"); doc.setTextColor(37, 99, 235);
+  doc.text("VAULT INSURANCE CERTIFICATE", 195, 14, { align: "right" });
+  doc.setFontSize(8); doc.setTextColor(180, 190, 200); doc.setFont("helvetica", "normal");
+  doc.text(`Certificate: ${docId}`, 195, 22, { align: "right" });
+  doc.text(`Issued: ${fmtDate(new Date())}`, 195, 28, { align: "right" });
+
+  drawQR(doc, qr, 168, 44, 28);
+
+  let y = 48;
+
+  // Policy box
+  doc.setFillColor(239, 246, 255); doc.roundedRect(15, y - 2, 145, 20, 2, 2, "F");
+  doc.setDrawColor(37, 99, 235); doc.roundedRect(15, y - 2, 145, 20, 2, 2, "S");
+  doc.setFontSize(7); doc.setTextColor(37, 99, 235); doc.setFont("helvetica", "normal");
+  doc.text("POLICY NUMBER", 20, y + 4);
+  doc.setFontSize(14); doc.setFont("helvetica", "bold"); doc.setTextColor(...NAVY);
+  doc.text(data.insurancePolicyNo || "Pending", 20, y + 14);
+
+  y += 28;
+  y = drawSectionTitle(doc, "Insured Party", y);
+  drawKeyValue(doc, "Name", data.client.name, 22, y);
+  drawKeyValue(doc, "Email", data.client.email, 80, y);
+  drawKeyValue(doc, "Phone", data.client.phone, 145, y);
+
+  y += 16;
+  y = drawGoldSectionTitle(doc, "Insured Assets", y);
+  drawKeyValue(doc, "Deposit Number", data.depositNumber, 22, y);
+  drawKeyValue(doc, "Custody Ref", data.custodyReferenceId || "Pending", 100, y);
+  y += 14;
+  drawKeyValue(doc, "Asset Type", data.assetType, 22, y);
+  drawKeyValue(doc, "Weight", `${data.weightGrams}g`, 80, y);
+  drawKeyValue(doc, "Purity", data.purity || "N/A", 130, y);
+  y += 14;
+  drawKeyValue(doc, "Description", data.description, 22, y);
+
+  y += 16;
+  // Big coverage box
+  doc.setFillColor(239, 246, 255); doc.roundedRect(15, y, 180, 36, 2, 2, "F");
+  doc.setDrawColor(37, 99, 235); doc.roundedRect(15, y, 180, 36, 2, 2, "S");
+  doc.setFontSize(7); doc.setFont("helvetica", "bold"); doc.setTextColor(37, 99, 235);
+  doc.text("COVERAGE DETAILS", 20, y + 6);
+
+  const coverageLabels: Record<string, string> = {
+    ALL_RISK: "All-Risk Coverage (theft, fire, flood, natural disaster, transit)",
+    THEFT_FIRE: "Theft & Fire Coverage",
+    BASIC: "Basic Coverage (fire only)",
+  };
+
+  drawKeyValue(doc, "Coverage Type", coverageLabels[data.insuranceCoverage || ""] || data.insuranceCoverage || "—", 22, y + 14);
+  drawKeyValue(doc, "Declared Value", fmtCurrency(data.declaredValue), 22, y + 24);
+  drawKeyValue(doc, "Insured Value", data.insuredValue ? fmtCurrency(data.insuredValue) : "Pending", 80, y + 24);
+  drawKeyValue(doc, "Provider", data.insuranceProvider || "—", 140, y + 14);
+  drawKeyValue(doc, "Expiry", fmtDate(data.insuranceExpiryDate as any), 140, y + 24);
+
+  y += 44;
+  y = drawSectionTitle(doc, "Storage Location", y);
+  drawKeyValue(doc, "Vault", data.vaultLocation, 22, y);
+  drawKeyValue(doc, "Unit", data.storageUnit || "TBD", 80, y);
+  drawKeyValue(doc, "Storage Type", data.storageType, 140, y);
+
+  y += 18;
+  // Claims notice
+  doc.setFillColor(240, 253, 244); doc.roundedRect(15, y, 180, 22, 2, 2, "F");
+  doc.setDrawColor(187, 247, 208); doc.roundedRect(15, y, 180, 22, 2, 2, "S");
+  doc.setFontSize(6.5); doc.setFont("helvetica", "italic"); doc.setTextColor(...TEXT_MED);
+  doc.text("This certificate confirms that the assets described above are insured while in custody at the specified vault.", 20, y + 5, { maxWidth: 170 });
+  doc.text("Coverage is continuous and renews automatically. Claims must be reported within 48 hours of discovery.", 20, y + 10, { maxWidth: 170 });
+  doc.text("For claims: claims@aramexlogistics.org | For policy queries: vault@aramexlogistics.org | +44 020 1412 251", 20, y + 16, { maxWidth: 170 });
+
+  drawSignatureBlock(doc, 218, { showSeal: true, sealX: 172, sealY: 240 });
+  drawFooter(doc);
+  return Buffer.from(doc.output("arraybuffer"));
+}
+
 // EXPORT MAP
 // ═══════════════════════════════════════════
 export const DOCUMENT_TYPES = {
@@ -1204,6 +1619,9 @@ export const DOCUMENT_TYPES = {
   "delivery-note": { label: "Delivery Note", generator: generateDeliveryNote, requiresShipment: true },
   "proof-of-delivery": { label: "Proof of Delivery", generator: generateProofOfDelivery, requiresShipment: true },
   "vault-certificate": { label: "Vault Certificate", generator: generateVaultCertificate, requiresShipment: false },
+  "assay-report": { label: "Assay Report", generator: generateAssayReport, requiresShipment: false },
+  "storage-agreement": { label: "Storage Agreement", generator: generateStorageAgreement, requiresShipment: false },
+  "vault-insurance": { label: "Vault Insurance Certificate", generator: generateVaultInsuranceCertificate, requiresShipment: false },
   "insurance-certificate": { label: "Insurance Certificate", generator: generateInsuranceCertificate, requiresShipment: true },
 } as const;
 
