@@ -7,7 +7,7 @@ import { auth } from "~/auth";
 import { revalidatePath } from "next/cache";
 import transporter from "@/lib/verify-mail";
 
-const FROM_EMAIL = "AramexLogistics <admin@aramexlogistics.org>";
+const FROM_EMAIL = "Aegis Cargo <admin@aegiscargo.org>";
 
 const updateTrackingStatusSchema = z.object({
   shipmentId: z.string().nonempty(),
@@ -24,22 +24,22 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 const STATUS_COLORS: Record<string, string> = {
-  pending: "#6b7280", on_hold: "#f59e0b", in_transit: "#3b82f6", delivered: "#059669",
+  pending: "#6b7280", on_hold: "#f59e0b", in_transit: "#3b82f6", delivered: "#1E3A5F",
   returned: "#ef4444", failed: "#ef4444", picked_up: "#8b5cf6",
   information_received: "#6b7280", arrived: "#8b5cf6", departed: "#3b82f6",
 };
 
 async function sendStatusEmail(email: string, name: string, trackingNumber: string, status: string, message: string, location: string | null) {
   const statusLabel = STATUS_LABELS[status] || status;
-  const statusColor = STATUS_COLORS[status] || "#059669";
+  const statusColor = STATUS_COLORS[status] || "#1E3A5F";
   const isDelivered = status === "delivered";
   try {
     await transporter.sendMail({
       from: FROM_EMAIL, to: email,
-      subject: `${isDelivered ? "✅ " : "📦 "}Shipment ${statusLabel} — ${trackingNumber} | AramexLogistics`,
+      subject: `${isDelivered ? "✅ " : "📦 "}Shipment ${statusLabel} — ${trackingNumber} | Aegis Cargo`,
       html: `<div style="font-family:'Segoe UI',Arial,sans-serif;max-width:600px;margin:0 auto;background:#fff;">
         <div style="background:linear-gradient(135deg,#0A1628 0%,#0D1F35 100%);padding:32px;text-align:center;">
-          <img src="https://www.aramexlogistics.org/images/logo.png" alt="AramexLogistics" style="height:48px;margin-bottom:16px;" />
+          <img src="https://www.aegiscargo.org/images/logo.png" alt="Aegis Cargo" style="height:48px;margin-bottom:16px;" />
           <h1 style="color:#fff;font-size:22px;margin:0;font-weight:600;">Shipment Update</h1>
         </div>
         <div style="padding:32px;">
@@ -48,15 +48,15 @@ async function sendStatusEmail(email: string, name: string, trackingNumber: stri
           <div style="text-align:center;margin:24px 0;"><span style="display:inline-block;background:${statusColor}15;color:${statusColor};border:1px solid ${statusColor}30;padding:10px 24px;border-radius:50px;font-weight:600;font-size:16px;">${statusLabel}</span></div>
           <div style="background:#f9fafb;border-radius:12px;padding:20px;margin:24px 0;">
             <table style="width:100%;border-collapse:collapse;">
-              <tr><td style="padding:10px 0;color:#6b7280;font-size:14px;border-bottom:1px solid #e5e7eb;">Tracking Number</td><td style="padding:10px 0;color:#059669;font-size:14px;font-weight:600;text-align:right;border-bottom:1px solid #e5e7eb;">${trackingNumber}</td></tr>
+              <tr><td style="padding:10px 0;color:#6b7280;font-size:14px;border-bottom:1px solid #e5e7eb;">Tracking Number</td><td style="padding:10px 0;color:#1E3A5F;font-size:14px;font-weight:600;text-align:right;border-bottom:1px solid #e5e7eb;">${trackingNumber}</td></tr>
               <tr><td style="padding:10px 0;color:#6b7280;font-size:14px;border-bottom:1px solid #e5e7eb;">Update</td><td style="padding:10px 0;color:#111827;font-size:14px;font-weight:500;text-align:right;border-bottom:1px solid #e5e7eb;">${message}</td></tr>
               ${location ? `<tr><td style="padding:10px 0;color:#6b7280;font-size:14px;">Location</td><td style="padding:10px 0;color:#111827;font-size:14px;font-weight:500;text-align:right;">${location}</td></tr>` : ""}
             </table>
           </div>
-          <div style="text-align:center;margin:32px 0;"><a href="https://www.aramexlogistics.org/track" style="display:inline-block;background:#059669;color:#fff;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:600;font-size:14px;">Track Shipment</a></div>
-          ${isDelivered ? `<div style="background:#f0fdf4;border:1px solid #a7f3d0;border-radius:12px;padding:20px;text-align:center;margin:24px 0;"><p style="color:#065F46;font-size:16px;font-weight:600;margin:0 0 4px 0;">✅ Delivered Successfully</p><p style="color:#059669;font-size:13px;margin:0;">Thank you for choosing AramexLogistics!</p></div>` : ""}
+          <div style="text-align:center;margin:32px 0;"><a href="https://www.aegiscargo.org/track" style="display:inline-block;background:#1E3A5F;color:#fff;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:600;font-size:14px;">Track Shipment</a></div>
+          ${isDelivered ? `<div style="background:#EEF2F7;border:1px solid #B3C7DB;border-radius:12px;padding:20px;text-align:center;margin:24px 0;"><p style="color:#162D4A;font-size:16px;font-weight:600;margin:0 0 4px 0;">✅ Delivered Successfully</p><p style="color:#1E3A5F;font-size:13px;margin:0;">Thank you for choosing Aegis Cargo!</p></div>` : ""}
         </div>
-        <div style="background:#f9fafb;padding:24px 32px;border-top:1px solid #e5e7eb;text-align:center;"><p style="color:#9ca3af;font-size:12px;margin:0;">&copy; ${new Date().getFullYear()} AramexLogistics | admin@aramexlogistics.org | +44 020 1412 251</p></div>
+        <div style="background:#f9fafb;padding:24px 32px;border-top:1px solid #e5e7eb;text-align:center;"><p style="color:#9ca3af;font-size:12px;margin:0;">&copy; ${new Date().getFullYear()} Aegis Cargo | admin@aegiscargo.org | +44 020 1412 251</p></div>
       </div>`,
     });
   } catch (error) { console.error("Failed to send status update email:", error); }

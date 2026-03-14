@@ -24,7 +24,7 @@ export default function Loading() {
         <div className="absolute inset-0" style={{ backgroundImage: `linear-gradient(rgba(5,150,105,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(5,150,105,0.08) 1px, transparent 1px)`, backgroundSize: "60px 60px", animation: "gridMove 20s linear infinite" }} />
       </div>
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-600/15 rounded-full blur-[120px] animate-pulse" />
-      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-[#D4A853]/10 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: "1s" }} />
+      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-[#8C9EAF]/10 rounded-full blur-[100px] animate-pulse" style={{ animationDelay: "1s" }} />
 
       <div className="relative z-10 text-center">
         <div className="mb-12">
@@ -37,9 +37,9 @@ export default function Loading() {
             </div>
           </div>
         </div>
-        <h1 className="text-2xl font-light tracking-[0.3em] text-white/90 mb-2">ARAMEX<span className="text-[#D4A853]">LOGISTICS</span></h1>
+        <h1 className="text-2xl font-light tracking-[0.3em] text-white/90 mb-2">AEGIS<span className="text-[#8C9EAF]">CARGO</span></h1>
         <p className="text-xs tracking-[0.5em] text-emerald-400/80 uppercase mb-12">Shipping & Vault Services</p>
-        <div className="w-80 mx-auto mb-6"><div className="h-[2px] bg-slate-800 rounded-full overflow-hidden"><div className="h-full bg-gradient-to-r from-emerald-600 via-[#D4A853] to-emerald-600 rounded-full transition-all duration-300 ease-out" style={{ width: `${progress}%` }} /></div></div>
+        <div className="w-80 mx-auto mb-6"><div className="h-[2px] bg-slate-800 rounded-full overflow-hidden"><div className="h-full bg-gradient-to-r from-emerald-600 via-[#8C9EAF] to-emerald-600 rounded-full transition-all duration-300 ease-out" style={{ width: `${progress}%` }} /></div></div>
         <p className="text-sm text-slate-400 font-light tracking-wide min-h-[20px]">{statusText}</p>
         <div className="mt-10 flex items-center justify-center gap-2 text-slate-500">
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>

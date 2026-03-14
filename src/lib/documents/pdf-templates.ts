@@ -51,7 +51,7 @@ function fmtCurrency(n: number): string { return `$${n.toLocaleString("en-US", {
 function genDocId(): string { return "DOC-" + Math.random().toString(36).substring(2, 10).toUpperCase(); }
 
 // ═══════════════════════════════════════════
-// WATERMARK — Diagonal "ARAMEXLOGISTICS" across page
+// WATERMARK — Diagonal "AEGIS CARGO" across page
 // ═══════════════════════════════════════════
 function drawWatermark(doc: jsPDF) {
   doc.saveGraphicsState();
@@ -63,7 +63,7 @@ function drawWatermark(doc: jsPDF) {
   // Rotate and draw diagonal watermark
   const centerX = 105;
   const centerY = 148;
-  doc.text("ARAMEXLOGISTICS", centerX, centerY, {
+  doc.text("AEGIS CARGO", centerX, centerY, {
     align: "center",
     angle: 45,
   });
@@ -110,12 +110,12 @@ function drawEmbossedSeal(doc: jsPDF, x: number, y: number, size: number = 22) {
     doc.circle(sx, sy, 0.8, "F");
   });
 
-  // Top curved text — "ARAMEXLOGISTICS LTD"
+  // Top curved text — "AEGIS CARGO LTD"
   doc.setGState(new (doc as any).GState({ opacity: 0.18 }));
   doc.setFontSize(5.5);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(...NAVY);
-  const topText = "ARAMEXLOGISTICS LTD";
+  const topText = "AEGIS CARGO LTD";
   const topRadius = r - 7;
   const startAngle = -Math.PI / 2 - ((topText.length * 0.09) / 2);
   for (let i = 0; i < topText.length; i++) {
@@ -141,7 +141,7 @@ function drawEmbossedSeal(doc: jsPDF, x: number, y: number, size: number = 22) {
   doc.setFontSize(6);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(...NAVY);
-  doc.text("ARAMEX", x, y - 3, { align: "center" });
+  doc.text("AEGIS", x, y - 3, { align: "center" });
   doc.text("LOGISTICS", x, y + 1, { align: "center" });
 
   // Gold line separator
@@ -187,14 +187,14 @@ function drawHeader(doc: jsPDF, title: string, docNumber: string) {
       doc.setTextColor(...WHITE);
       doc.setFontSize(16);
       doc.setFont("helvetica", "bold");
-      doc.text("ARAMEXLOGISTICS", 15, 16);
+      doc.text("AEGIS CARGO", 15, 16);
     }
   } else {
     // Text fallback
     doc.setTextColor(...WHITE);
     doc.setFontSize(16);
     doc.setFont("helvetica", "bold");
-    doc.text("ARAMEX", 15, 14);
+    doc.text("AEGIS", 15, 14);
     doc.setTextColor(...EMERALD);
     doc.text("LOGISTICS", 48, 14);
   }
@@ -204,7 +204,7 @@ function drawHeader(doc: jsPDF, title: string, docNumber: string) {
   doc.setFontSize(7);
   doc.setFont("helvetica", "normal");
   doc.text("Global Logistics & Vault Services", 15, 27);
-  doc.text("admin@aramexlogistics.org  |  +44 020 1412 251", 15, 31);
+  doc.text("admin@aegiscargo.org  |  +44 020 1412 251", 15, 31);
 
   // Document title on right
   doc.setFontSize(13);
@@ -245,12 +245,12 @@ function drawFooter(doc: jsPDF, page: number = 1) {
   doc.setFontSize(6);
   doc.setTextColor(...GRAY);
   doc.setFont("helvetica", "italic");
-  doc.text("This is an official document of AramexLogistics Ltd. Verify authenticity by scanning the QR code or visiting aramexlogistics.org/verify", 105, y + 4, { align: "center" });
+  doc.text("This is an official document of Aegis Cargo Ltd. Verify authenticity by scanning the QR code or visiting aegiscargo.org/verify", 105, y + 4, { align: "center" });
 
   // Company info
   doc.setFont("helvetica", "normal");
   doc.setFontSize(6.5);
-  doc.text("AramexLogistics Ltd  |  Registered in England & Wales  |  47 Mark Lane, Ipswich, Suffolk IP1 2DA, United Kingdom", 105, y + 8, { align: "center" });
+  doc.text("Aegis Cargo Ltd  |  Registered in England & Wales  |  47 Mark Lane, Ipswich, Suffolk IP1 2DA, United Kingdom", 105, y + 8, { align: "center" });
 
   // Certifications bar
   doc.setFillColor(...NAVY);
@@ -264,7 +264,7 @@ function drawFooter(doc: jsPDF, page: number = 1) {
   doc.setFontSize(5.5);
   doc.setTextColor(...GRAY);
   doc.setFont("helvetica", "normal");
-  doc.text(`Page ${page}  |  © ${new Date().getFullYear()} AramexLogistics. All rights reserved.`, 105, y + 19, { align: "center" });
+  doc.text(`Page ${page}  |  © ${new Date().getFullYear()} Aegis Cargo. All rights reserved.`, 105, y + 19, { align: "center" });
 }
 
 // ═══════════════════════════════════════════
@@ -311,7 +311,7 @@ function drawSignatureBlock(doc: jsPDF, y: number, options: { showSeal?: boolean
   doc.setFontSize(6);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(...NAVY);
-  doc.text("AramexLogistics Ltd.", 95, y + 40);
+  doc.text("Aegis Cargo Ltd.", 95, y + 40);
   doc.setFont("helvetica", "normal");
   doc.setFontSize(5.5);
   doc.setTextColor(...GRAY);
@@ -452,7 +452,7 @@ export async function generateAirwayBill(data: ShipmentData): Promise<Buffer> {
   doc.setFontSize(7); doc.setFont("helvetica", "normal");
   doc.text("Global Logistics & Vault Services", 12, 22);
   doc.setFontSize(5.5);
-  doc.text("admin@aramexlogistics.org  |  +44 020 1412 251  |  aramexlogistics.org", 12, 26);
+  doc.text("admin@aegiscargo.org  |  +44 020 1412 251  |  aegiscargo.org", 12, 26);
 
   // Document title right side
   doc.setFontSize(16); doc.setFont("helvetica", "bold"); doc.setTextColor(...WHITE);
@@ -671,7 +671,7 @@ export async function generateAirwayBill(data: ShipmentData): Promise<Buffer> {
   doc.text("CARRIER / FLIGHT INFORMATION", cx + 3, y + 3.5);
   doc.setDrawColor(200, 205, 210); doc.rect(cx, y + 5, halfW, boxH, "S");
   doc.setFontSize(8); doc.setFont("helvetica", "bold"); doc.setTextColor(...NAVY);
-  doc.text("AramexLogistics Ltd", cx + 3, y + 11);
+  doc.text("Aegis Cargo Ltd", cx + 3, y + 11);
   doc.setFontSize(6.5); doc.setFont("helvetica", "normal"); doc.setTextColor(...GRAY);
   doc.text("IATA Code: AML  |  License: UK-AIR-2024-0891", cx + 3, y + 15.5);
   doc.text("17 Bluestem Rd, Ipswich IP3 9RR, United Kingdom", cx + 3, y + 19.5);
@@ -709,7 +709,7 @@ export async function generateAirwayBill(data: ShipmentData): Promise<Buffer> {
 
   // Company stamp area
   doc.setFontSize(7); doc.setFont("helvetica", "bold"); doc.setTextColor(...NAVY);
-  doc.text("AramexLogistics Ltd.", L + 72, y + 32);
+  doc.text("Aegis Cargo Ltd.", L + 72, y + 32);
   doc.setFontSize(5.5); doc.setFont("helvetica", "normal"); doc.setTextColor(...GRAY);
   doc.text("Authorized Document Issuer", L + 72, y + 36);
 
@@ -728,11 +728,11 @@ export async function generateAirwayBill(data: ShipmentData): Promise<Buffer> {
 
   // Authentication
   doc.setFontSize(5); doc.setTextColor(...GRAY); doc.setFont("helvetica", "italic");
-  doc.text("This is an official document of AramexLogistics Ltd. Verify authenticity by scanning the QR code or visiting aramexlogistics.org/verify", 105, y + 1, { align: "center" });
+  doc.text("This is an official document of Aegis Cargo Ltd. Verify authenticity by scanning the QR code or visiting aegiscargo.org/verify", 105, y + 1, { align: "center" });
 
   // Company details
   doc.setFont("helvetica", "normal"); doc.setFontSize(5.5);
-  doc.text("AramexLogistics Ltd  |  Registered in England & Wales  |  47 Mark Lane, Ipswich, Suffolk IP1 2DA, United Kingdom", 105, y + 5, { align: "center" });
+  doc.text("Aegis Cargo Ltd  |  Registered in England & Wales  |  47 Mark Lane, Ipswich, Suffolk IP1 2DA, United Kingdom", 105, y + 5, { align: "center" });
 
   // Certifications bar
   doc.setFillColor(...NAVY);
@@ -742,7 +742,7 @@ export async function generateAirwayBill(data: ShipmentData): Promise<Buffer> {
 
   // Copyright
   doc.setFontSize(4.5); doc.setTextColor(...GRAY); doc.setFont("helvetica", "normal");
-  doc.text(`Generated: ${fmtDateTime(new Date())}  |  Page 1  |  © ${new Date().getFullYear()} AramexLogistics. All rights reserved.`, 105, y + 15, { align: "center" });
+  doc.text(`Generated: ${fmtDateTime(new Date())}  |  Page 1  |  © ${new Date().getFullYear()} Aegis Cargo. All rights reserved.`, 105, y + 15, { align: "center" });
 
   return Buffer.from(doc.output("arraybuffer"));
 }
@@ -884,7 +884,7 @@ export async function generateShippingLabel(data: ShipmentData): Promise<Buffer>
     try { doc.addImage(logo, getLogoFormat(), 3, 2, 35, 12); } catch {}
   } else {
     doc.setTextColor(...WHITE); doc.setFontSize(10); doc.setFont("helvetica", "bold");
-    doc.text("ARAMEXLOGISTICS", 5, 10);
+    doc.text("AEGIS CARGO", 5, 10);
   }
   doc.setTextColor(...GOLD); doc.setFontSize(6); doc.setFont("helvetica", "bold");
   doc.text(data.serviceType.toUpperCase(), 5, 16);
@@ -940,7 +940,7 @@ export async function generateShippingLabel(data: ShipmentData): Promise<Buffer>
   // Footer
   doc.setFillColor(...GOLD); doc.rect(0, 147, 100, 0.5, "F");
   doc.setFontSize(4.5); doc.setTextColor(...GRAY); doc.setFont("helvetica", "normal");
-  doc.text("AramexLogistics Ltd  |  aramexlogistics.org  |  ISO 9001", 50, 149, { align: "center" });
+  doc.text("Aegis Cargo Ltd  |  aegiscargo.org  |  ISO 9001", 50, 149, { align: "center" });
 
   return Buffer.from(doc.output("arraybuffer"));
 }
@@ -1074,11 +1074,11 @@ export async function generateVaultCertificate(data: VaultData): Promise<Buffer>
     try { doc.addImage(logo, getLogoFormat(), 12, 5, 50, 17); } catch {}
   } else {
     doc.setTextColor(...WHITE); doc.setFontSize(16); doc.setFont("helvetica", "bold");
-    doc.text("ARAMEXLOGISTICS", 15, 16);
+    doc.text("AEGIS CARGO", 15, 16);
   }
   doc.setTextColor(180, 190, 200); doc.setFontSize(7); doc.setFont("helvetica", "normal");
   doc.text("Vault Services Division  |  LBMA Approved", 15, 27);
-  doc.text("admin@aramexlogistics.org  |  +44 020 1412 251", 15, 31);
+  doc.text("admin@aegiscargo.org  |  +44 020 1412 251", 15, 31);
 
   doc.setFontSize(13); doc.setFont("helvetica", "bold"); doc.setTextColor(...GOLD);
   doc.text("VAULT DEPOSIT CERTIFICATE", 195, 14, { align: "right" });
@@ -1127,7 +1127,7 @@ export async function generateVaultCertificate(data: VaultData): Promise<Buffer>
   doc.setFillColor(255, 251, 235); doc.roundedRect(15, y, 180, 20, 2, 2, "F");
   doc.setDrawColor(...GOLD); doc.roundedRect(15, y, 180, 20, 2, 2, "S");
   doc.setFontSize(6.5); doc.setFont("helvetica", "italic"); doc.setTextColor(...TEXT_MED);
-  doc.text("This certifies that the assets described above have been received and are held in secure custody by AramexLogistics", 20, y + 5, { maxWidth: 170 });
+  doc.text("This certifies that the assets described above have been received and are held in secure custody by Aegis Cargo", 20, y + 5, { maxWidth: 170 });
   doc.text("Vault Services in accordance with LBMA standards. Assets are fully insured and subject to quarterly independent audits.", 20, y + 10, { maxWidth: 170 });
   doc.text("This certificate must be presented for any release or transfer requests.", 20, y + 15, { maxWidth: 170 });
 
@@ -1185,7 +1185,7 @@ export async function generateInsuranceCertificate(data: ShipmentData): Promise<
   doc.setFontSize(6.5); doc.setFont("helvetica", "italic"); doc.setTextColor(...TEXT_MED);
   doc.text("This certificate confirms that the goods described above are insured against loss or damage during transit.", 20, y + 5, { maxWidth: 170 });
   doc.text("Coverage applies from the point of pickup to final delivery. Claims must be reported within 72 hours of delivery.", 20, y + 10, { maxWidth: 170 });
-  doc.text("For claims: claims@aramexlogistics.org  |  +44 020 1412 251", 20, y + 16, { maxWidth: 170 });
+  doc.text("For claims: claims@aegiscargo.org  |  +44 020 1412 251", 20, y + 16, { maxWidth: 170 });
 
   drawSignatureBlock(doc, 218, { showSeal: true, sealX: 172, sealY: 240 });
 
@@ -1286,11 +1286,11 @@ export async function generateAssayReport(data: VaultAssayData): Promise<Buffer>
     try { doc.addImage(logo, getLogoFormat(), 12, 5, 50, 17); } catch {}
   } else {
     doc.setTextColor(...WHITE); doc.setFontSize(16); doc.setFont("helvetica", "bold");
-    doc.text("ARAMEXLOGISTICS", 15, 16);
+    doc.text("AEGIS CARGO", 15, 16);
   }
   doc.setTextColor(180, 190, 200); doc.setFontSize(7); doc.setFont("helvetica", "normal");
   doc.text("Vault Assay & Verification Division  |  LBMA Approved Laboratory", 15, 27);
-  doc.text("admin@aramexlogistics.org  |  +44 020 1412 251", 15, 31);
+  doc.text("admin@aegiscargo.org  |  +44 020 1412 251", 15, 31);
 
   doc.setFontSize(13); doc.setFont("helvetica", "bold"); doc.setTextColor(147, 51, 234);
   doc.text("ASSAY VERIFICATION REPORT", 195, 14, { align: "right" });
@@ -1406,11 +1406,11 @@ export async function generateStorageAgreement(data: VaultStorageData): Promise<
     try { doc.addImage(logo, getLogoFormat(), 12, 5, 50, 17); } catch {}
   } else {
     doc.setTextColor(...WHITE); doc.setFontSize(16); doc.setFont("helvetica", "bold");
-    doc.text("ARAMEXLOGISTICS", 15, 16);
+    doc.text("AEGIS CARGO", 15, 16);
   }
   doc.setTextColor(180, 190, 200); doc.setFontSize(7); doc.setFont("helvetica", "normal");
   doc.text("Vault Services Division  |  Secure Custody & Storage", 15, 27);
-  doc.text("admin@aramexlogistics.org  |  +44 020 1412 251", 15, 31);
+  doc.text("admin@aegiscargo.org  |  +44 020 1412 251", 15, 31);
 
   doc.setFontSize(13); doc.setFont("helvetica", "bold"); doc.setTextColor(...GOLD);
   doc.text("STORAGE AGREEMENT", 195, 14, { align: "right" });
@@ -1435,7 +1435,7 @@ export async function generateStorageAgreement(data: VaultStorageData): Promise<
   doc.setFontSize(7); doc.setFont("helvetica", "bold"); doc.setTextColor(...TEXT_DARK);
   doc.text("Custodian:", 22, y + 2);
   doc.setFont("helvetica", "normal"); doc.setTextColor(...TEXT_MED);
-  doc.text("AramexLogistics Vault Services Ltd.", 22, y + 7);
+  doc.text("Aegis Cargo Vault Services Ltd.", 22, y + 7);
   doc.text("LBMA Approved Vault Operator | Registered in England & Wales", 22, y + 12);
 
   doc.setFont("helvetica", "bold"); doc.setTextColor(...TEXT_DARK);
@@ -1529,11 +1529,11 @@ export async function generateVaultInsuranceCertificate(data: VaultInsuranceData
     try { doc.addImage(logo, getLogoFormat(), 12, 5, 50, 17); } catch {}
   } else {
     doc.setTextColor(...WHITE); doc.setFontSize(16); doc.setFont("helvetica", "bold");
-    doc.text("ARAMEXLOGISTICS", 15, 16);
+    doc.text("AEGIS CARGO", 15, 16);
   }
   doc.setTextColor(180, 190, 200); doc.setFontSize(7); doc.setFont("helvetica", "normal");
   doc.text("Vault Insurance Services  |  Underwritten by Lloyd's of London", 15, 27);
-  doc.text("admin@aramexlogistics.org  |  +44 020 1412 251", 15, 31);
+  doc.text("admin@aegiscargo.org  |  +44 020 1412 251", 15, 31);
 
   doc.setFontSize(13); doc.setFont("helvetica", "bold"); doc.setTextColor(37, 99, 235);
   doc.text("VAULT INSURANCE CERTIFICATE", 195, 14, { align: "right" });
@@ -1602,7 +1602,7 @@ export async function generateVaultInsuranceCertificate(data: VaultInsuranceData
   doc.setFontSize(6.5); doc.setFont("helvetica", "italic"); doc.setTextColor(...TEXT_MED);
   doc.text("This certificate confirms that the assets described above are insured while in custody at the specified vault.", 20, y + 5, { maxWidth: 170 });
   doc.text("Coverage is continuous and renews automatically. Claims must be reported within 48 hours of discovery.", 20, y + 10, { maxWidth: 170 });
-  doc.text("For claims: claims@aramexlogistics.org | For policy queries: vault@aramexlogistics.org | +44 020 1412 251", 20, y + 16, { maxWidth: 170 });
+  doc.text("For claims: claims@aegiscargo.org | For policy queries: vault@aegiscargo.org | +44 020 1412 251", 20, y + 16, { maxWidth: 170 });
 
   drawSignatureBlock(doc, 218, { showSeal: true, sealX: 172, sealY: 240 });
   drawFooter(doc);

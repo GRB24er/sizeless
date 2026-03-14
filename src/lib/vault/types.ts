@@ -274,7 +274,7 @@ export const INSURANCE_OPTIONS = [
   {
     id: "BASIC",
     label: "Basic Storage Coverage",
-    provider: "AramexLogistics Underwriter",
+    provider: "Aegis Cargo Underwriter",
     description:
       "Basic coverage for loss due to vault facility failure. Limited to storage premises only.",
     ratePercent: 0.05,

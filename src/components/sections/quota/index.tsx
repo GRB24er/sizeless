@@ -40,7 +40,7 @@ export const Quota = () => {
 
               <div className="flex items-center gap-6 text-sm">
                 <a href="tel:+440201412251" className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors"><Phone className="w-4 h-4 text-emerald-400" />+44 020 1412 251</a>
-                <a href="mailto:admin@aramexlogistics.org" className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors"><Mail className="w-4 h-4 text-emerald-400" />admin@aramexlogistics.org</a>
+                <a href="mailto:admin@aegiscargo.org" className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors"><Mail className="w-4 h-4 text-emerald-400" />admin@aegiscargo.org</a>
               </div>
             </div>
 

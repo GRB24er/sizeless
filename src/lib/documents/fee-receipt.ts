@@ -2,9 +2,9 @@ import jsPDF from "jspdf";
 import { getLogoBase64, getLogoFormat } from "./logo-loader";
 import { generateTrackingQR } from "./qr-generator";
 
-const NAVY = [10, 22, 40] as const;
-const EMERALD = [5, 150, 105] as const;
-const GOLD = [212, 168, 83] as const;
+const NAVY = [15, 29, 47] as const;
+const EMERALD = [30, 58, 95] as const;
+const GOLD = [140, 158, 175] as const;
 const WHITE = [255, 255, 255] as const;
 const GRAY = [107, 114, 128] as const;
 const TEXT_DARK = [17, 24, 39] as const;
@@ -71,7 +71,7 @@ export async function generateFeeReceiptPDF(
   doc.setFontSize(50);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(...NAVY);
-  doc.text("ARAMEXLOGISTICS", 105, 148, { align: "center", angle: 45 });
+  doc.text("AEGIS CARGO", 105, 148, { align: "center", angle: 45 });
   doc.setFontSize(25);
   doc.text("PAYMENT RECEIPT", 105, 178, { align: "center", angle: 45 });
   doc.restoreGraphicsState();
@@ -94,13 +94,13 @@ export async function generateFeeReceiptPDF(
     doc.setTextColor(...WHITE);
     doc.setFontSize(16);
     doc.setFont("helvetica", "bold");
-    doc.text("ARAMEXLOGISTICS", 15, 16);
+    doc.text("AEGIS CARGO", 15, 16);
   }
   doc.setTextColor(180, 190, 200);
   doc.setFontSize(7);
   doc.setFont("helvetica", "normal");
   doc.text("Global Logistics & Vault Services", 15, 27);
-  doc.text("admin@aramexlogistics.org  |  +44 020 1412 251", 15, 31);
+  doc.text("admin@aegiscargo.org  |  +44 020 1412 251", 15, 31);
 
   // Title
   doc.setFontSize(14);
@@ -138,7 +138,7 @@ export async function generateFeeReceiptPDF(
   doc.setGState(new (doc as any).GState({ opacity: 0.15 }));
   doc.setFontSize(48);
   doc.setFont("helvetica", "bold");
-  doc.setTextColor(5, 150, 105);
+  doc.setTextColor(30, 58, 95);
   doc.text("PAID", 105, 160, { align: "center", angle: 30 });
   doc.restoreGraphicsState();
 
@@ -146,7 +146,7 @@ export async function generateFeeReceiptPDF(
   let y = 48;
 
   // Big amount box
-  doc.setFillColor(240, 253, 244);
+  doc.setFillColor(238, 242, 247);
   doc.roundedRect(15, y, 145, 26, 2, 2, "F");
   doc.setDrawColor(...EMERALD);
   doc.setLineWidth(0.5);
@@ -239,21 +239,21 @@ export async function generateFeeReceiptPDF(
   y += 20;
 
   // Confirmation statement
-  doc.setFillColor(240, 253, 244);
+  doc.setFillColor(238, 242, 247);
   doc.roundedRect(15, y, 180, 18, 2, 2, "F");
-  doc.setDrawColor(167, 243, 208);
+  doc.setDrawColor(179, 199, 219);
   doc.roundedRect(15, y, 180, 18, 2, 2, "S");
   doc.setFontSize(6.5);
   doc.setFont("helvetica", "italic");
   doc.setTextColor(...TEXT_MED);
   doc.text(
-    "This receipt confirms that payment has been received and processed by AramexLogistics Ltd.",
+    "This receipt confirms that payment has been received and processed by Aegis Cargo Ltd.",
     20,
     y + 6,
     { maxWidth: 170 }
   );
   doc.text(
-    "This is an official document. For any queries, contact admin@aramexlogistics.org or +44 020 1412 251.",
+    "This is an official document. For any queries, contact admin@aegiscargo.org or +44 020 1412 251.",
     20,
     y + 12,
     { maxWidth: 170 }
@@ -268,7 +268,7 @@ export async function generateFeeReceiptPDF(
   doc.setTextColor(...GRAY);
   doc.setFont("helvetica", "italic");
   doc.text(
-    "This is an official document of AramexLogistics Ltd. Verify authenticity by scanning the QR code or visiting aramexlogistics.org/verify",
+    "This is an official document of Aegis Cargo Ltd. Verify authenticity by scanning the QR code or visiting aegiscargo.org/verify",
     105,
     fy + 4,
     { align: "center" }
@@ -277,7 +277,7 @@ export async function generateFeeReceiptPDF(
   doc.setFont("helvetica", "normal");
   doc.setFontSize(6.5);
   doc.text(
-    "AramexLogistics Ltd  |  Registered in England & Wales  |  47 Mark Lane, Ipswich, Suffolk IP1 2DA, United Kingdom",
+    "Aegis Cargo Ltd  |  Registered in England & Wales  |  47 Mark Lane, Ipswich, Suffolk IP1 2DA, United Kingdom",
     105,
     fy + 8,
     { align: "center" }
@@ -299,7 +299,7 @@ export async function generateFeeReceiptPDF(
   doc.setTextColor(...GRAY);
   doc.setFont("helvetica", "normal");
   doc.text(
-    `Page 1  |  © ${new Date().getFullYear()} AramexLogistics. All rights reserved.`,
+    `Page 1  |  © ${new Date().getFullYear()} Aegis Cargo. All rights reserved.`,
     105,
     fy + 19,
     { align: "center" }

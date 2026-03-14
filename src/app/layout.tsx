@@ -7,14 +7,14 @@ import "./globals.css";
 const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "AramexLogistics — Global Shipping & Vault Services",
+  title: "Aegis Cargo — Global Shipping & Vault Services",
   description: "Enterprise-grade logistics, worldwide shipping, real-time tracking, and secure gold vault storage. Trusted by businesses across 190+ countries.",
   icons: { icon: "/favicon.ico" },
   openGraph: {
-    title: "AramexLogistics — Global Shipping & Vault Services",
+    title: "Aegis Cargo — Global Shipping & Vault Services",
     description: "Enterprise-grade logistics, worldwide shipping, real-time tracking, and secure gold vault storage.",
-    url: "https://www.aramexlogistics.org",
-    siteName: "AramexLogistics",
+    url: "https://www.aegiscargo.org",
+    siteName: "Aegis Cargo",
     type: "website",
   },
 };

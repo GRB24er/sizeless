@@ -55,7 +55,7 @@ export default function Loading() {
       {/* Floating orbs — emerald + gold */}
       <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-emerald-600/15 rounded-full blur-[120px] animate-pulse" />
       <div
-        className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-[#D4A853]/10 rounded-full blur-[100px] animate-pulse"
+        className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-[#8C9EAF]/10 rounded-full blur-[100px] animate-pulse"
         style={{ animationDelay: "1s" }}
       />
       <div
@@ -115,7 +115,7 @@ export default function Loading() {
           className="text-2xl font-light tracking-[0.3em] text-white/90 mb-2"
           style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}
         >
-          ARAMEX<span className="text-[#D4A853]">LOGISTICS</span>
+          AEGIS<span className="text-[#8C9EAF]">CARGO</span>
         </h1>
         <p className="text-xs tracking-[0.5em] text-emerald-400/80 uppercase mb-12">
           Shipping & Vault Services
@@ -125,7 +125,7 @@ export default function Loading() {
         <div className="w-80 mx-auto mb-6">
           <div className="h-[2px] bg-slate-800 rounded-full overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-emerald-600 via-[#D4A853] to-emerald-600 rounded-full transition-all duration-300 ease-out relative"
+              className="h-full bg-gradient-to-r from-emerald-600 via-[#8C9EAF] to-emerald-600 rounded-full transition-all duration-300 ease-out relative"
               style={{ width: `${progress}%` }}
             >
               <div

@@ -1,6 +1,6 @@
 import QRCode from "qrcode";
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://www.aramexlogistics.org";
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://www.aegiscargo.org";
 
 export async function generateTrackingQR(trackingNumber: string): Promise<string> {
   const url = `${BASE_URL}/track/${encodeURIComponent(trackingNumber)}`;

@@ -58,29 +58,29 @@ export const Header = () => {
     <header className="fixed top-0 left-0 right-0 z-50">
       {/* Top bar */}
       <div className={cn(
-        "hidden lg:block transition-all duration-300 overflow-hidden bg-[#0A1628]/95 backdrop-blur-xl border-b border-emerald-900/30",
+        "hidden lg:block transition-all duration-300 overflow-hidden bg-[#0F1D2F]/95 backdrop-blur-xl border-b border-[#0F1D2F]/30",
         isScrolled ? "h-0 opacity-0" : "h-10 opacity-100"
       )}>
         <div className="container mx-auto px-4 h-full">
           <div className="flex justify-between items-center h-full">
             <div className="flex items-center gap-8">
               <div className="flex items-center gap-2 text-slate-400 text-xs">
-                <MapPin className="w-3.5 h-3.5 text-emerald-400" />
+                <MapPin className="w-3.5 h-3.5 text-[#8C9EAF]" />
                 <span>17 Bluestem Rd, Ipswich IP3 9RR, United Kingdom</span>
               </div>
               <div className="w-px h-4 bg-slate-700" />
               <div className="flex items-center gap-2 text-slate-400 text-xs">
-                <Mail className="w-3.5 h-3.5 text-emerald-400" />
-                <span>admin@aramexlogistics.org</span>
+                <Mail className="w-3.5 h-3.5 text-[#8C9EAF]" />
+                <span>admin@aegiscargo.org</span>
               </div>
               <div className="w-px h-4 bg-slate-700" />
               <div className="flex items-center gap-2 text-slate-400 text-xs">
-                <Clock className="w-3.5 h-3.5 text-emerald-400" />
+                <Clock className="w-3.5 h-3.5 text-[#8C9EAF]" />
                 <span>Mon - Sat: 8:00 AM - 5:00 PM</span>
               </div>
             </div>
             <div className="flex items-center gap-6">
-              <Link href="/vault" className="text-xs text-[#D4A853] hover:text-[#F5DEB3] transition-colors font-medium">Vault Services</Link>
+              <Link href="/vault" className="text-xs text-[#8C9EAF] hover:text-[#C8D3DD] transition-colors font-medium">Vault Services</Link>
               <Link href="/support" className="text-xs text-slate-400 hover:text-white transition-colors">Help Center</Link>
             </div>
           </div>
@@ -91,8 +91,8 @@ export const Header = () => {
       <nav className={cn(
         "transition-all duration-300",
         isScrolled
-          ? "bg-[#0A1628]/95 backdrop-blur-xl border-b border-emerald-900/30 shadow-lg shadow-[#0A1628]/50"
-          : "bg-[#0A1628]/80 backdrop-blur-md"
+          ? "bg-[#0F1D2F]/95 backdrop-blur-xl border-b border-[#0F1D2F]/30 shadow-lg shadow-[#0F1D2F]/50"
+          : "bg-[#0F1D2F]/80 backdrop-blur-md"
       )}>
         <div className="container mx-auto px-4">
           <div className="flex h-16 items-center justify-between">
@@ -106,10 +106,10 @@ export const Header = () => {
                 return (
                   <InstantNavLink key={item.href} href={item.href} className={cn(
                     "relative px-4 py-2 text-sm font-medium transition-colors rounded-lg",
-                    isActive ? "text-white" : isVault ? "text-[#D4A853] hover:text-[#F5DEB3] hover:bg-[#D4A853]/10" : "text-slate-400 hover:text-white hover:bg-slate-800/50"
+                    isActive ? "text-white" : isVault ? "text-[#8C9EAF] hover:text-[#C8D3DD] hover:bg-[#8C9EAF]/10" : "text-slate-400 hover:text-white hover:bg-slate-800/50"
                   )}>
                     {item.label}
-                    {isActive && <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-emerald-500" />}
+                    {isActive && <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#1E3A5F]" />}
                   </InstantNavLink>
                 );
               })}
@@ -121,22 +121,22 @@ export const Header = () => {
                 <>
                   <Notifications />
                   <ActiveShipment />
-                  <InstantNavLink href="/shipments/create" className="px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-600 to-emerald-700 text-white text-sm font-medium hover:from-emerald-500 hover:to-emerald-600 transition-all shadow-lg shadow-emerald-600/25">
+                  <InstantNavLink href="/shipments/create" className="px-4 py-2 rounded-lg bg-gradient-to-r from-[#1E3A5F] to-[#162D4A] text-white text-sm font-medium hover:from-[#1E3A5F] hover:to-[#1E3A5F] transition-all shadow-lg shadow-[#1E3A5F]/25">
                     Create Shipment
                   </InstantNavLink>
                   <DropdownMenu modal={false}>
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" className="gap-2 text-slate-300 hover:text-white hover:bg-slate-800/50">
-                        <div className="w-8 h-8 rounded-full bg-emerald-900/50 border border-emerald-700/50 flex items-center justify-center">
-                          <User className="w-4 h-4 text-emerald-400" />
+                        <div className="w-8 h-8 rounded-full bg-[#0F1D2F]/50 border border-[#162D4A]/50 flex items-center justify-center">
+                          <User className="w-4 h-4 text-[#8C9EAF]" />
                         </div>
                         <span className="max-w-24 truncate text-sm">{session?.user?.name || "Account"}</span>
                         <ChevronDown className="w-4 h-4" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-56 bg-[#0A1628] border-emerald-900/50">
+                    <DropdownMenuContent align="end" className="w-56 bg-[#0F1D2F] border-[#0F1D2F]/50">
                       <DropdownMenuLabel className="text-slate-300">My Account</DropdownMenuLabel>
-                      <DropdownMenuSeparator className="bg-emerald-900/30" />
+                      <DropdownMenuSeparator className="bg-[#0F1D2F]/30" />
                       {session?.user?.role === "ADMIN" && (
                         <DropdownMenuItem asChild>
                           <InstantNavLink href="/dashboard" className="flex items-center gap-2 text-slate-300 hover:text-white"><LayoutDashboard className="w-4 h-4" />Dashboard</InstantNavLink>
@@ -150,7 +150,7 @@ export const Header = () => {
                           </DropdownMenuItem>
                         );
                       })}
-                      <DropdownMenuSeparator className="bg-emerald-900/30" />
+                      <DropdownMenuSeparator className="bg-[#0F1D2F]/30" />
                       <DropdownMenuItem onClick={handleSignOut} className="flex items-center gap-2 text-red-400 hover:text-red-300 cursor-pointer">
                         <LogOut className="w-4 h-4" />Logout
                       </DropdownMenuItem>
@@ -158,7 +158,7 @@ export const Header = () => {
                   </DropdownMenu>
                 </>
               ) : (
-                <InstantNavLink href="/login" className="px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-600 to-emerald-700 text-white text-sm font-medium hover:from-emerald-500 hover:to-emerald-600 transition-all shadow-lg shadow-emerald-600/25">
+                <InstantNavLink href="/login" className="px-4 py-2 rounded-lg bg-gradient-to-r from-[#1E3A5F] to-[#162D4A] text-white text-sm font-medium hover:from-[#1E3A5F] hover:to-[#1E3A5F] transition-all shadow-lg shadow-[#1E3A5F]/25">
                   Login
                 </InstantNavLink>
               )}
@@ -169,16 +169,16 @@ export const Header = () => {
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" className="lg:hidden text-slate-300 hover:text-white hover:bg-slate-800/50"><Menu className="w-5 h-5" /></Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-full max-w-sm bg-[#0A1628] border-emerald-900/30 p-0">
+              <SheetContent side="right" className="w-full max-w-sm bg-[#0F1D2F] border-[#0F1D2F]/30 p-0">
                 <div className="flex flex-col h-full">
-                  <div className="flex items-center justify-between p-4 border-b border-emerald-900/30">
+                  <div className="flex items-center justify-between p-4 border-b border-[#0F1D2F]/30">
                     <SheetHeader><SheetTitle><Logo /></SheetTitle></SheetHeader>
                   </div>
-                  <div className="p-4 bg-[#0D1F35]/50 border-b border-emerald-900/30">
+                  <div className="p-4 bg-[#132640]/50 border-b border-[#0F1D2F]/30">
                     <div className="space-y-3">
-                      <div className="flex items-center gap-3 text-sm text-slate-400"><MapPin className="w-4 h-4 text-emerald-400" /><span>17 Bluestem Rd, Ipswich IP3 9RR, UK</span></div>
-                      <div className="flex items-center gap-3 text-sm text-slate-400"><Mail className="w-4 h-4 text-emerald-400" /><span>admin@aramexlogistics.org</span></div>
-                      <div className="flex items-center gap-3 text-sm text-slate-400"><Clock className="w-4 h-4 text-emerald-400" /><span>Mon - Sat: 8:00 AM - 5:00 PM</span></div>
+                      <div className="flex items-center gap-3 text-sm text-slate-400"><MapPin className="w-4 h-4 text-[#8C9EAF]" /><span>17 Bluestem Rd, Ipswich IP3 9RR, UK</span></div>
+                      <div className="flex items-center gap-3 text-sm text-slate-400"><Mail className="w-4 h-4 text-[#8C9EAF]" /><span>admin@aegiscargo.org</span></div>
+                      <div className="flex items-center gap-3 text-sm text-slate-400"><Clock className="w-4 h-4 text-[#8C9EAF]" /><span>Mon - Sat: 8:00 AM - 5:00 PM</span></div>
                     </div>
                   </div>
                   <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
@@ -188,14 +188,14 @@ export const Header = () => {
                         <SheetClose key={item.href} asChild>
                           <InstantNavLink href={item.href} className={cn(
                             "flex items-center px-4 py-3 rounded-lg text-sm font-medium transition-colors",
-                            isActive ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" : "text-slate-300 hover:bg-slate-800/50 hover:text-white"
+                            isActive ? "bg-[#1E3A5F]/10 text-[#8C9EAF] border border-[#1E3A5F]/20" : "text-slate-300 hover:bg-slate-800/50 hover:text-white"
                           )}>
                             {item.label}
                           </InstantNavLink>
                         </SheetClose>
                       );
                     })}
-                    <div className="my-4 h-px bg-emerald-900/30" />
+                    <div className="my-4 h-px bg-[#0F1D2F]/30" />
                     {isAuthenticated ? (
                       <>
                         <div className="px-4 py-2 mb-4">
@@ -205,7 +205,7 @@ export const Header = () => {
                         <div className="space-y-2 px-4 mb-4">
                           <ActiveShipment />
                           <SheetClose asChild>
-                            <InstantNavLink href="/shipments/create" className="flex items-center justify-center w-full px-4 py-3 rounded-lg bg-gradient-to-r from-emerald-600 to-emerald-700 text-white text-sm font-medium">Create Shipment</InstantNavLink>
+                            <InstantNavLink href="/shipments/create" className="flex items-center justify-center w-full px-4 py-3 rounded-lg bg-gradient-to-r from-[#1E3A5F] to-[#162D4A] text-white text-sm font-medium">Create Shipment</InstantNavLink>
                           </SheetClose>
                         </div>
                         {session?.user?.role === "ADMIN" && (
@@ -219,7 +219,7 @@ export const Header = () => {
                       </>
                     ) : (
                       <SheetClose asChild>
-                        <InstantNavLink href="/login" className="flex items-center justify-center w-full px-4 py-3 rounded-lg bg-gradient-to-r from-emerald-600 to-emerald-700 text-white text-sm font-medium">Login</InstantNavLink>
+                        <InstantNavLink href="/login" className="flex items-center justify-center w-full px-4 py-3 rounded-lg bg-gradient-to-r from-[#1E3A5F] to-[#162D4A] text-white text-sm font-medium">Login</InstantNavLink>
                       </SheetClose>
                     )}
                   </nav>

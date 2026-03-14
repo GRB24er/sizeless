@@ -7,7 +7,7 @@ import { shipmentSchema } from "@/store/schema";
 import { auth } from "~/auth";
 import transporter from "@/lib/verify-mail";
 
-const FROM_EMAIL = "AramexLogistics <admin@aramexlogistics.org>";
+const FROM_EMAIL = "Aegis Cargo <admin@aegiscargo.org>";
 
 function generateTrackingNumber(): string {
   return "AML-" + Math.random().toString(36).substring(2, 10).toUpperCase();
@@ -30,10 +30,10 @@ async function notifySender(email: string, name: string, trackingNumber: string,
   try {
     await transporter.sendMail({
       from: FROM_EMAIL, to: email,
-      subject: `Shipment Created — ${trackingNumber} | AramexLogistics`,
+      subject: `Shipment Created — ${trackingNumber} | Aegis Cargo`,
       html: `<div style="font-family:'Segoe UI',Arial,sans-serif;max-width:600px;margin:0 auto;background:#fff;">
         <div style="background:linear-gradient(135deg,#0A1628 0%,#0D1F35 100%);padding:32px;text-align:center;">
-          <img src="https://www.aramexlogistics.org/images/logo.png" alt="AramexLogistics" style="height:48px;margin-bottom:16px;" />
+          <img src="https://www.aegiscargo.org/images/logo.png" alt="Aegis Cargo" style="height:48px;margin-bottom:16px;" />
           <h1 style="color:#fff;font-size:22px;margin:0;font-weight:600;">Shipment Confirmation</h1>
         </div>
         <div style="padding:32px;">
@@ -49,9 +49,9 @@ async function notifySender(email: string, name: string, trackingNumber: string,
               <tr><td style="padding:8px 0;color:#6b7280;font-size:14px;">Status</td><td style="padding:8px 0;color:#059669;font-size:14px;font-weight:500;text-align:right;">Processing</td></tr>
             </table>
           </div>
-          <div style="text-align:center;margin:32px 0;"><a href="https://www.aramexlogistics.org/track" style="display:inline-block;background:#059669;color:#fff;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:600;font-size:14px;">Track Your Shipment</a></div>
+          <div style="text-align:center;margin:32px 0;"><a href="https://www.aegiscargo.org/track" style="display:inline-block;background:#059669;color:#fff;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:600;font-size:14px;">Track Your Shipment</a></div>
         </div>
-        <div style="background:#f9fafb;padding:24px 32px;border-top:1px solid #e5e7eb;text-align:center;"><p style="color:#9ca3af;font-size:12px;margin:0;">&copy; ${new Date().getFullYear()} AramexLogistics | admin@aramexlogistics.org | +44 020 1412 251</p></div>
+        <div style="background:#f9fafb;padding:24px 32px;border-top:1px solid #e5e7eb;text-align:center;"><p style="color:#9ca3af;font-size:12px;margin:0;">&copy; ${new Date().getFullYear()} Aegis Cargo | admin@aegiscargo.org | +44 020 1412 251</p></div>
       </div>`,
     });
   } catch (error) { console.error("Failed to send sender notification:", error); }
@@ -61,23 +61,23 @@ async function notifyRecipient(email: string, recipientName: string, senderName:
   try {
     await transporter.sendMail({
       from: FROM_EMAIL, to: email,
-      subject: `Package Incoming — ${trackingNumber} | AramexLogistics`,
+      subject: `Package Incoming — ${trackingNumber} | Aegis Cargo`,
       html: `<div style="font-family:'Segoe UI',Arial,sans-serif;max-width:600px;margin:0 auto;background:#fff;">
         <div style="background:linear-gradient(135deg,#0A1628 0%,#0D1F35 100%);padding:32px;text-align:center;">
-          <img src="https://www.aramexlogistics.org/images/logo.png" alt="AramexLogistics" style="height:48px;margin-bottom:16px;" />
+          <img src="https://www.aegiscargo.org/images/logo.png" alt="Aegis Cargo" style="height:48px;margin-bottom:16px;" />
           <h1 style="color:#fff;font-size:22px;margin:0;font-weight:600;">Package On Its Way!</h1>
         </div>
         <div style="padding:32px;">
           <p style="color:#374151;font-size:15px;line-height:1.6;">Dear <strong>${recipientName}</strong>,</p>
-          <p style="color:#374151;font-size:15px;line-height:1.6;">A package from <strong>${senderName}</strong> has been dispatched to you via AramexLogistics.</p>
+          <p style="color:#374151;font-size:15px;line-height:1.6;">A package from <strong>${senderName}</strong> has been dispatched to you via Aegis Cargo.</p>
           <div style="background:linear-gradient(135deg,#f0fdf4 0%,#ecfdf5 100%);border:1px solid #a7f3d0;border-radius:12px;padding:24px;margin:24px 0;text-align:center;">
             <p style="color:#065F46;font-size:12px;text-transform:uppercase;letter-spacing:2px;margin:0 0 8px 0;">Tracking Number</p>
             <p style="color:#059669;font-size:24px;font-weight:700;margin:0;letter-spacing:1px;">${trackingNumber}</p>
           </div>
-          <div style="text-align:center;margin:32px 0;"><a href="https://www.aramexlogistics.org/track" style="display:inline-block;background:#059669;color:#fff;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:600;font-size:14px;">Track Package</a></div>
-          <p style="color:#6b7280;font-size:13px;line-height:1.6;">Questions? Contact us at <a href="mailto:admin@aramexlogistics.org" style="color:#059669;">admin@aramexlogistics.org</a>.</p>
+          <div style="text-align:center;margin:32px 0;"><a href="https://www.aegiscargo.org/track" style="display:inline-block;background:#059669;color:#fff;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:600;font-size:14px;">Track Package</a></div>
+          <p style="color:#6b7280;font-size:13px;line-height:1.6;">Questions? Contact us at <a href="mailto:admin@aegiscargo.org" style="color:#059669;">admin@aegiscargo.org</a>.</p>
         </div>
-        <div style="background:#f9fafb;padding:24px 32px;border-top:1px solid #e5e7eb;text-align:center;"><p style="color:#9ca3af;font-size:12px;margin:0;">&copy; ${new Date().getFullYear()} AramexLogistics | admin@aramexlogistics.org | +44 020 1412 251</p></div>
+        <div style="background:#f9fafb;padding:24px 32px;border-top:1px solid #e5e7eb;text-align:center;"><p style="color:#9ca3af;font-size:12px;margin:0;">&copy; ${new Date().getFullYear()} Aegis Cargo | admin@aegiscargo.org | +44 020 1412 251</p></div>
       </div>`,
     });
   } catch (error) { console.error("Failed to send recipient notification:", error); }

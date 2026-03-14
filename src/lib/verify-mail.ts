@@ -5,13 +5,13 @@ export const transporter = nodemailer.createTransport({
   port: 465,
   secure: true,
   auth: {
-    user: "admin@aramexlogistics.org",
+    user: "admin@aegiscargo.org",
     pass: "Valmont15#Benjamin2010",
   },
   tls: { rejectUnauthorized: false },
 });
 
-export const FROM_EMAIL = "AramexLogistics <admin@aramexlogistics.org>";
+export const FROM_EMAIL = "Aegis Cargo <admin@aegiscargo.org>";
 
 // Verify on startup
 transporter.verify((error) => {

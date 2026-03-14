@@ -59,7 +59,7 @@ export const Choice = () => {
                 <span className="bg-gradient-to-r from-emerald-400 to-amber-400 bg-clip-text text-transparent">Performance</span>
               </motion.h2>
               <motion.p variants={fadeInUp} className="text-lg text-slate-400 leading-relaxed">
-                At AramexLogistics, we&apos;re committed to delivering top-tier logistics and vault services with unmatched reliability. Our comprehensive approach combines advanced technology, expert teams, and sustainable practices.
+                At Aegis Cargo, we&apos;re committed to delivering top-tier logistics and vault services with unmatched reliability. Our comprehensive approach combines advanced technology, expert teams, and sustainable practices.
               </motion.p>
             </div>
 

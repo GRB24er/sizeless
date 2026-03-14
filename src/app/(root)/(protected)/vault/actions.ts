@@ -5,7 +5,7 @@ import { auth } from "~/auth";
 import { revalidatePath } from "next/cache";
 import transporter from "@/lib/verify-mail";
 
-const FROM_EMAIL = "AramexLogistics Vault <admin@aramexlogistics.org>";
+const FROM_EMAIL = "Aegis Cargo Vault <admin@aegiscargo.org>";
 
 function generateDepositNumber(): string {
   return "VLT-" + Math.random().toString(36).substring(2, 10).toUpperCase();
@@ -17,7 +17,7 @@ async function sendVaultEmail(email: string, name: string, subject: string, body
       from: FROM_EMAIL, to: email, subject,
       html: `<div style="font-family:'Segoe UI',Arial,sans-serif;max-width:600px;margin:0 auto;background:#fff;">
         <div style="background:linear-gradient(135deg,#0A1628 0%,#0D1F35 100%);padding:32px;text-align:center;">
-          <img src="https://www.aramexlogistics.org/images/logo.png" alt="AramexLogistics" style="height:48px;margin-bottom:16px;" />
+          <img src="https://www.aegiscargo.org/images/logo.png" alt="Aegis Cargo" style="height:48px;margin-bottom:16px;" />
           <h1 style="color:#D4A853;font-size:22px;margin:0;font-weight:600;">Vault Services</h1>
         </div>
         <div style="padding:32px;">
@@ -25,7 +25,7 @@ async function sendVaultEmail(email: string, name: string, subject: string, body
           ${bodyHtml}
         </div>
         <div style="background:#f9fafb;padding:24px 32px;border-top:1px solid #e5e7eb;text-align:center;">
-          <p style="color:#9ca3af;font-size:12px;margin:0;">&copy; ${new Date().getFullYear()} AramexLogistics Vault Services | admin@aramexlogistics.org</p>
+          <p style="color:#9ca3af;font-size:12px;margin:0;">&copy; ${new Date().getFullYear()} Aegis Cargo Vault Services | admin@aegiscargo.org</p>
         </div>
       </div>`,
     });
@@ -75,7 +75,7 @@ export async function requestVaultDeposit(formData: FormData) {
 
   const user = await prisma.user.findUnique({ where: { id: session.user.id } });
   if (user?.email) {
-    await sendVaultEmail(user.email, user.name, `Vault Deposit Request — ${depositNumber} | AramexLogistics`,
+    await sendVaultEmail(user.email, user.name, `Vault Deposit Request — ${depositNumber} | Aegis Cargo`,
       `<p style="color:#374151;font-size:15px;line-height:1.6;">Your vault deposit request has been submitted and is pending verification.</p>
       <div style="background:linear-gradient(135deg,#fffbeb 0%,#fef3c7 100%);border:1px solid #D4A853;border-radius:12px;padding:24px;margin:24px 0;text-align:center;">
         <p style="color:#92400e;font-size:12px;text-transform:uppercase;letter-spacing:2px;margin:0 0 8px 0;">Deposit Number</p>
@@ -119,9 +119,9 @@ export async function requestVaultRelease(depositId: string) {
 
   const user = await prisma.user.findUnique({ where: { id: session.user.id } });
   if (user?.email) {
-    await sendVaultEmail(user.email, user.name, `Release Request — ${deposit.depositNumber} | AramexLogistics`,
+    await sendVaultEmail(user.email, user.name, `Release Request — ${deposit.depositNumber} | Aegis Cargo`,
       `<p style="color:#374151;font-size:15px;line-height:1.6;">Your release request for deposit <strong>${deposit.depositNumber}</strong> has been submitted. Our team will process this within 48 hours.</p>
-      <div style="text-align:center;margin:24px 0;"><a href="https://www.aramexlogistics.org/my-vault" style="display:inline-block;background:#D4A853;color:#0A1628;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:600;font-size:14px;">View Vault Dashboard</a></div>`
+      <div style="text-align:center;margin:24px 0;"><a href="https://www.aegiscargo.org/my-vault" style="display:inline-block;background:#D4A853;color:#0A1628;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:600;font-size:14px;">View Vault Dashboard</a></div>`
     );
   }
 
@@ -179,7 +179,7 @@ export async function adminUpdateVaultStatus(formData: FormData) {
 
   if (deposit.client?.email) {
     await sendVaultEmail(deposit.client.email, deposit.client.name,
-      `Vault Update — ${deposit.depositNumber} | AramexLogistics`,
+      `Vault Update — ${deposit.depositNumber} | Aegis Cargo`,
       `<p style="color:#374151;font-size:15px;line-height:1.6;">There has been an update on your vault deposit:</p>
       <div style="text-align:center;margin:24px 0;">
         <span style="display:inline-block;background:#D4A85315;color:#D4A853;border:1px solid #D4A85330;padding:10px 24px;border-radius:50px;font-weight:600;font-size:16px;">${STATUS_LABELS[newStatus] || newStatus}</span>

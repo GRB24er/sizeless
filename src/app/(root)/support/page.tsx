@@ -28,7 +28,7 @@ const staggerContainer = { hidden: { opacity: 0 }, visible: { opacity: 1, transi
 
 const contactMethods = [
   { icon: Phone, title: "Call Us", description: "Speak directly with our support team", value: "+44 020 1412 251", action: "tel:+440201412251" },
-  { icon: Mail, title: "Email Us", description: "Get a response within 24 hours", value: "admin@aramexlogistics.org", action: "mailto:admin@aramexlogistics.org" },
+  { icon: Mail, title: "Email Us", description: "Get a response within 24 hours", value: "admin@aegiscargo.org", action: "mailto:admin@aegiscargo.org" },
   { icon: MessageCircle, title: "Live Chat", description: "Chat with us in real-time", value: "Available 24/7", action: "#chat" },
 ];
 

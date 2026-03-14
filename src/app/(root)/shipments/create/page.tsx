@@ -1211,7 +1211,7 @@ export default function CreateShipmentPage() {
                       </Button>
                     </div>
                     <p className="text-[10px] text-gray-400 text-center leading-relaxed">
-                      By creating this shipment you agree to AramexLogistics
+                      By creating this shipment you agree to Aegis Cargo
                       terms of service, insurance policy, and LBMA
                       chain-of-custody requirements.
                     </p>

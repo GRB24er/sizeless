@@ -88,7 +88,7 @@ export function AdminUserPanel({ users: initialUsers }: { users: User[] }) {
 
   const copyFullCredentials = () => {
     if (!credentials) return;
-    const text = `AramexLogistics Login Credentials\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nName: ${credentials.name}\nEmail: ${credentials.email}\nPassword: ${credentials.password}\nRole: ${credentials.role}\nLogin: https://www.aramexlogistics.org/login`;
+    const text = `Aegis Cargo Login Credentials\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━\nName: ${credentials.name}\nEmail: ${credentials.email}\nPassword: ${credentials.password}\nRole: ${credentials.role}\nLogin: https://www.aegiscargo.org/login`;
     navigator.clipboard.writeText(text);
     toast.success("Full credentials copied to clipboard");
   };
@@ -407,7 +407,7 @@ export function AdminUserPanel({ users: initialUsers }: { users: User[] }) {
                   { label: "Email", value: credentials.email },
                   { label: "Password", value: credentials.password },
                   { label: "Role", value: credentials.role },
-                  { label: "Login URL", value: "https://www.aramexlogistics.org/login" },
+                  { label: "Login URL", value: "https://www.aegiscargo.org/login" },
                 ].map(item => (
                   <div key={item.label} className="flex items-center justify-between">
                     <div>

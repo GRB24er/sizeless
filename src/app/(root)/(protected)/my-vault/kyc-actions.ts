@@ -10,7 +10,7 @@ import { prisma } from "@/constants/config/db";
 import { auth } from "~/auth";
 import transporter from "@/lib/verify-mail";
 
-const FROM_EMAIL = "AramexLogistics Vault <admin@aramexlogistics.org>";
+const FROM_EMAIL = "Aegis Cargo Vault <admin@aegiscargo.org>";
 
 // ─── HELPER: Send styled vault email ─────────────────────────
 
@@ -27,7 +27,7 @@ async function sendVaultEmail(
       subject,
       html: `<div style="font-family:'Segoe UI',Arial,sans-serif;max-width:600px;margin:0 auto;background:#fff;">
         <div style="background:linear-gradient(135deg,#0A1628 0%,#0D1F35 100%);padding:32px;text-align:center;">
-          <img src="https://www.aramexlogistics.org/images/logo.png" alt="AramexLogistics" style="height:48px;margin-bottom:16px;" />
+          <img src="https://www.aegiscargo.org/images/logo.png" alt="Aegis Cargo" style="height:48px;margin-bottom:16px;" />
           <h1 style="color:#D4A853;font-size:22px;margin:0;font-weight:600;">Vault KYC Verification</h1>
         </div>
         <div style="padding:32px;">
@@ -35,7 +35,7 @@ async function sendVaultEmail(
           ${bodyHtml}
         </div>
         <div style="background:#f9fafb;padding:24px 32px;border-top:1px solid #e5e7eb;text-align:center;">
-          <p style="color:#9ca3af;font-size:12px;margin:0;">&copy; ${new Date().getFullYear()} AramexLogistics Vault Services | admin@aramexlogistics.org</p>
+          <p style="color:#9ca3af;font-size:12px;margin:0;">&copy; ${new Date().getFullYear()} Aegis Cargo Vault Services | admin@aegiscargo.org</p>
         </div>
       </div>`,
     });
@@ -121,7 +121,7 @@ export async function submitKYC(data: {
       await sendVaultEmail(
         user.email,
         user.name,
-        "KYC Application Received — AramexLogistics Vault",
+        "KYC Application Received — Aegis Cargo Vault",
         `<p style="color:#374151;font-size:15px;line-height:1.6;">Your KYC verification application has been received and is now under review.</p>
         <div style="background:linear-gradient(135deg,#fffbeb 0%,#fef3c7 100%);border:1px solid #D4A853;border-radius:12px;padding:24px;margin:24px 0;text-align:center;">
           <p style="color:#92400e;font-size:12px;text-transform:uppercase;letter-spacing:2px;margin:0 0 8px 0;">Application Status</p>
@@ -136,9 +136,9 @@ export async function submitKYC(data: {
 
     // Email admin notification
     await sendVaultEmail(
-      "admin@aramexlogistics.org",
+      "admin@aegiscargo.org",
       "Admin",
-      `New KYC Submission — ${user?.name || "Client"} | AramexLogistics`,
+      `New KYC Submission — ${user?.name || "Client"} | Aegis Cargo`,
       `<p style="color:#374151;font-size:15px;line-height:1.6;">A new KYC application has been submitted and requires review.</p>
       <div style="background:#f9fafb;border-radius:8px;padding:20px;margin:24px 0;">
         <table style="width:100%;border-collapse:collapse;">
@@ -149,7 +149,7 @@ export async function submitKYC(data: {
         </table>
       </div>
       <div style="text-align:center;margin:24px 0;">
-        <a href="https://www.aramexlogistics.org/dashboard/shipments" style="display:inline-block;background:#D4A853;color:#0A1628;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:600;font-size:14px;">Review in Dashboard</a>
+        <a href="https://www.aegiscargo.org/dashboard/shipments" style="display:inline-block;background:#D4A853;color:#0A1628;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:600;font-size:14px;">Review in Dashboard</a>
       </div>`
     );
 
@@ -209,7 +209,7 @@ export async function adminApproveKYC(kycId: string, notes?: string) {
       await sendVaultEmail(
         kyc.client.email,
         kyc.client.name,
-        "KYC Approved — You're Cleared for Vault Services | AramexLogistics",
+        "KYC Approved — You're Cleared for Vault Services | Aegis Cargo",
         `<p style="color:#374151;font-size:15px;line-height:1.6;">Great news! Your identity verification has been approved.</p>
         <div style="background:linear-gradient(135deg,#ecfdf5 0%,#d1fae5 100%);border:1px solid #10b981;border-radius:12px;padding:24px;margin:24px 0;text-align:center;">
           <p style="color:#065f46;font-size:12px;text-transform:uppercase;letter-spacing:2px;margin:0 0 8px 0;">Verification Status</p>
@@ -217,7 +217,7 @@ export async function adminApproveKYC(kycId: string, notes?: string) {
         </div>
         <p style="color:#374151;font-size:15px;line-height:1.6;">You can now submit vault deposit requests through your dashboard. All deposits are fully insured and stored in our LBMA-compliant high-security vaults.</p>
         <div style="text-align:center;margin:24px 0;">
-          <a href="https://www.aramexlogistics.org/my-vault" style="display:inline-block;background:#D4A853;color:#0A1628;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:600;font-size:14px;">Go to My Vault</a>
+          <a href="https://www.aegiscargo.org/my-vault" style="display:inline-block;background:#D4A853;color:#0A1628;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:600;font-size:14px;">Go to My Vault</a>
         </div>`
       );
     }
@@ -254,7 +254,7 @@ export async function adminRejectKYC(kycId: string, reason: string) {
       await sendVaultEmail(
         kyc.client.email,
         kyc.client.name,
-        "KYC Verification Update — AramexLogistics Vault",
+        "KYC Verification Update — Aegis Cargo Vault",
         `<p style="color:#374151;font-size:15px;line-height:1.6;">We were unable to verify your identity with the documents provided.</p>
         <div style="background:#fef2f2;border:1px solid #ef4444;border-radius:12px;padding:24px;margin:24px 0;">
           <p style="color:#991b1b;font-size:12px;text-transform:uppercase;letter-spacing:2px;margin:0 0 8px 0;">Reason</p>
@@ -262,7 +262,7 @@ export async function adminRejectKYC(kycId: string, reason: string) {
         </div>
         <p style="color:#374151;font-size:15px;line-height:1.6;">Please review the reason above and resubmit your KYC application with the corrected documents.</p>
         <div style="text-align:center;margin:24px 0;">
-          <a href="https://www.aramexlogistics.org/my-vault/kyc" style="display:inline-block;background:#D4A853;color:#0A1628;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:600;font-size:14px;">Resubmit KYC</a>
+          <a href="https://www.aegiscargo.org/my-vault/kyc" style="display:inline-block;background:#D4A853;color:#0A1628;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:600;font-size:14px;">Resubmit KYC</a>
         </div>`
       );
     }

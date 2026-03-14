@@ -13,8 +13,8 @@ import {
 } from "@/lib/documents/pdf-templates";
 import { generateTrackingQR, generateVaultQR } from "@/lib/documents/qr-generator";
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://www.aramexlogistics.org";
-const FROM_EMAIL = process.env.SMTP_USER || "admin@aramexlogistics.org";
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://www.aegiscargo.org";
+const FROM_EMAIL = process.env.SMTP_USER || "admin@aegiscargo.org";
 
 // ═══════════════════════════════════════════
 // GET SHIPMENT DATA
@@ -126,7 +126,7 @@ function buildEmailHTML(params: {
           <tr><td style="background:#0A1628;padding:28px 32px;">
             <table width="100%" cellpadding="0" cellspacing="0">
               <tr>
-                <td><span style="color:#ffffff;font-size:20px;font-weight:bold;letter-spacing:0.5px;">ARAMEX</span><span style="color:#059669;font-size:20px;font-weight:bold;">LOGISTICS</span></td>
+                <td><span style="color:#ffffff;font-size:20px;font-weight:bold;letter-spacing:0.5px;">AEGIS</span><span style="color:#1E3A5F;font-size:20px;font-weight:bold;">CARGO</span></td>
                 <td align="right"><span style="color:#D4A853;font-size:11px;letter-spacing:1px;">DOCUMENT DELIVERY</span></td>
               </tr>
             </table>
@@ -152,7 +152,7 @@ function buildEmailHTML(params: {
                 <table width="100%" cellpadding="0" cellspacing="0">
                   <tr>
                     <td>
-                      <p style="color:#059669;font-size:11px;font-weight:bold;letter-spacing:1px;margin:0 0 4px 0;">TRACKING NUMBER</p>
+                      <p style="color:#1E3A5F;font-size:11px;font-weight:bold;letter-spacing:1px;margin:0 0 4px 0;">TRACKING NUMBER</p>
                       <p style="color:#0A1628;font-size:22px;font-weight:bold;margin:0;font-family:monospace;letter-spacing:2px;">${trackingNumber}</p>
                     </td>
                     <td align="right" width="100">
@@ -167,7 +167,7 @@ function buildEmailHTML(params: {
             <!-- CTA Button -->
             <table width="100%" cellpadding="0" cellspacing="0" style="margin:0 0 24px 0;">
               <tr><td align="center">
-                <a href="${trackingUrl}" style="display:inline-block;background:#059669;color:#ffffff;padding:14px 36px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:14px;">
+                <a href="${trackingUrl}" style="display:inline-block;background:#1E3A5F;color:#ffffff;padding:14px 36px;border-radius:8px;text-decoration:none;font-weight:bold;font-size:14px;">
                   Track Your Shipment →
                 </a>
               </td></tr>
@@ -175,7 +175,7 @@ function buildEmailHTML(params: {
             
             <p style="color:#9CA3AF;font-size:12px;line-height:1.5;margin:0;">
               The attached PDF contains a QR code for instant verification. If you have questions about this shipment, 
-              contact our support team at <a href="mailto:admin@aramexlogistics.org" style="color:#059669;">admin@aramexlogistics.org</a> 
+              contact our support team at <a href="mailto:admin@aegiscargo.org" style="color:#1E3A5F;">admin@aegiscargo.org</a> 
               or call <strong>+44 020 1412 251</strong>.
             </p>
           </td></tr>
@@ -184,7 +184,7 @@ function buildEmailHTML(params: {
           <tr><td style="background:#f9fafb;border-top:1px solid #e5e7eb;padding:20px 32px;">
             <table width="100%" cellpadding="0" cellspacing="0">
               <tr>
-                <td><p style="color:#9CA3AF;font-size:11px;margin:0;">© ${new Date().getFullYear()} AramexLogistics Ltd.</p>
+                <td><p style="color:#9CA3AF;font-size:11px;margin:0;">© ${new Date().getFullYear()} Aegis Cargo Ltd.</p>
                 <p style="color:#9CA3AF;font-size:10px;margin:4px 0 0 0;">47 Mark Lane, Ipswich, Suffolk IP1 2DA, UK</p></td>
                 <td align="right"><p style="color:#9CA3AF;font-size:10px;margin:0;">ISO 9001 Certified | LBMA Approved</p></td>
               </tr>
@@ -265,9 +265,9 @@ export async function sendShipmentDocuments(formData: FormData) {
     for (const target of emailTargets) {
       try {
         await transporter.sendMail({
-          from: `"AramexLogistics" <${FROM_EMAIL}>`,
+          from: `"Aegis Cargo" <${FROM_EMAIL}>`,
           to: target.email,
-          subject: `${documentLabel} — ${trackingNumber} | AramexLogistics`,
+          subject: `${documentLabel} — ${trackingNumber} | Aegis Cargo`,
           html: buildEmailHTML({
             recipientName: target.name,
             trackingNumber,
@@ -347,9 +347,9 @@ export async function sendVaultCertificate(formData: FormData) {
     const qrBase64 = await generateVaultQR(depositNumber);
 
     await transporter.sendMail({
-      from: `"AramexLogistics Vault" <${FROM_EMAIL}>`,
+      from: `"Aegis Cargo Vault" <${FROM_EMAIL}>`,
       to: deposit.client.email,
-      subject: `Vault Deposit Certificate — ${depositNumber} | AramexLogistics`,
+      subject: `Vault Deposit Certificate — ${depositNumber} | Aegis Cargo`,
       html: buildEmailHTML({
         recipientName: vaultData.client.name,
         trackingNumber: depositNumber,

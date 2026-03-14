@@ -9,7 +9,7 @@ const LABEL_H = 152.4;
 const BLACK = [0, 0, 0] as const;
 const WHITE = [255, 255, 255] as const;
 const GRAY = [120, 120, 120] as const;
-const NAVY = [10, 22, 40] as const;
+const NAVY = [15, 29, 47] as const;
 
 type LabelData = {
   trackingNumber: string;
@@ -86,7 +86,7 @@ export async function generateThermalLabel(
     doc.setTextColor(...WHITE);
     doc.setFontSize(8);
     doc.setFont("helvetica", "bold");
-    doc.text("ARAMEXLOGISTICS", 4, 8);
+    doc.text("AEGIS CARGO", 4, 8);
   }
 
   // Service type badge
@@ -135,7 +135,7 @@ export async function generateThermalLabel(
   doc.setFontSize(7);
   doc.setFont("helvetica", "bold");
   doc.setTextColor(...BLACK);
-  doc.text(data.Sender?.name || "AramexLogistics", L + 2, y + 8);
+  doc.text(data.Sender?.name || "Aegis Cargo", L + 2, y + 8);
 
   doc.setFontSize(5.5);
   doc.setFont("helvetica", "normal");
@@ -315,7 +315,7 @@ export async function generateThermalLabel(
 
   doc.setFontSize(3.5);
   doc.setFont("helvetica", "normal");
-  doc.text("aramexlogistics.org  |  +44 020 1412 251", LABEL_W / 2, LABEL_H - 2.5, {
+  doc.text("aegiscargo.org  |  +44 020 1412 251", LABEL_W / 2, LABEL_H - 2.5, {
     align: "center",
   });
 

@@ -107,8 +107,8 @@ export default function AdvancedTrackingResult({ data }: TrackingResultProps) {
   const getStatusStyle = (status: string | null) => {
     if (!status) return { bg: "bg-slate-100", text: "text-slate-700", border: "border-slate-200", label: "Processing" };
     switch (status.toLowerCase()) {
-      case "delivered": return { bg: "bg-emerald-50", text: "text-emerald-700", border: "border-emerald-200", label: "Delivered" };
-      case "in_transit": return { bg: "bg-emerald-50", text: "text-emerald-700", border: "border-emerald-200", label: "In Transit" };
+      case "delivered": return { bg: "bg-[#EEF2F7]", text: "text-[#162D4A]", border: "border-[#C8D3DD]", label: "Delivered" };
+      case "in_transit": return { bg: "bg-[#EEF2F7]", text: "text-[#162D4A]", border: "border-[#C8D3DD]", label: "In Transit" };
       case "out_for_delivery": return { bg: "bg-amber-50", text: "text-amber-700", border: "border-amber-200", label: "Out for Delivery" };
       case "exception": case "failed": return { bg: "bg-red-50", text: "text-red-700", border: "border-red-200", label: "Exception" };
       case "picked_up": return { bg: "bg-blue-50", text: "text-blue-700", border: "border-blue-200", label: "Picked Up" };
@@ -174,15 +174,15 @@ export default function AdvancedTrackingResult({ data }: TrackingResultProps) {
   return (
     <div className="min-h-screen bg-[#f8f9fa]">
       {/* ═══════════════ TOP HEADER BAR ═══════════════ */}
-      <div className="bg-gradient-to-r from-[#0A1628] via-[#0D1F35] to-[#0A1628] border-b-4 border-emerald-500">
+      <div className="bg-gradient-to-r from-[#0F1D2F] via-[#132640] to-[#0F1D2F] border-b-4 border-[#1E3A5F]">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div className="flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-emerald-500/15 border border-emerald-500/25">
-                <PackageIcon className="h-7 w-7 text-emerald-400" />
+              <div className="p-3 rounded-xl bg-[#1E3A5F]/15 border border-[#1E3A5F]/25">
+                <PackageIcon className="h-7 w-7 text-[#8C9EAF]" />
               </div>
               <div>
-                <p className="text-emerald-400 text-xs font-semibold tracking-[0.2em] uppercase mb-1">Shipment Tracking</p>
+                <p className="text-[#8C9EAF] text-xs font-semibold tracking-[0.2em] uppercase mb-1">Shipment Tracking</p>
                 <div className="flex items-center gap-3 flex-wrap">
                   <h1 className="text-2xl sm:text-3xl font-bold text-white font-mono tracking-wider">{data.trackingNumber}</h1>
                   <Badge className={`${statusStyle.bg} ${statusStyle.text} ${statusStyle.border} border text-xs font-semibold px-3 py-1`}>
@@ -224,18 +224,18 @@ export default function AdvancedTrackingResult({ data }: TrackingResultProps) {
                   <div className="flex flex-col items-center">
                     <div className={`w-10 h-10 rounded-full flex items-center justify-center transition-all ${
                       isCompleted
-                        ? isCurrent ? "bg-emerald-600 text-white shadow-lg shadow-emerald-600/30 ring-4 ring-emerald-100" : "bg-emerald-600 text-white"
+                        ? isCurrent ? "bg-[#1E3A5F] text-white shadow-lg shadow-[#1E3A5F]/30 ring-4 ring-[#E8EDF2]" : "bg-[#1E3A5F] text-white"
                         : "bg-gray-100 text-gray-400"
                     }`}>
                       <StepIcon className="w-5 h-5" />
                     </div>
                     <span className={`text-xs mt-2 font-medium text-center max-w-[80px] leading-tight ${
-                      isCompleted ? "text-emerald-700" : "text-gray-400"
+                      isCompleted ? "text-[#162D4A]" : "text-gray-400"
                     }`}>{step.label}</span>
                   </div>
                   {i < STATUS_STEPS.length - 1 && (
                     <div className={`flex-1 h-1 mx-2 rounded-full mt-[-20px] ${
-                      i < stepIndex ? "bg-emerald-500" : "bg-gray-200"
+                      i < stepIndex ? "bg-[#1E3A5F]" : "bg-gray-200"
                     }`} />
                   )}
                 </div>
@@ -250,8 +250,8 @@ export default function AdvancedTrackingResult({ data }: TrackingResultProps) {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-5">
           <div className="flex items-center justify-between max-w-2xl mx-auto">
             <div className="text-center flex-1">
-              <div className="w-12 h-12 rounded-full bg-emerald-50 border-2 border-emerald-200 flex items-center justify-center mx-auto mb-2">
-                <Home className="w-5 h-5 text-emerald-600" />
+              <div className="w-12 h-12 rounded-full bg-[#EEF2F7] border-2 border-[#C8D3DD] flex items-center justify-center mx-auto mb-2">
+                <Home className="w-5 h-5 text-[#1E3A5F]" />
               </div>
               <p className="font-bold text-sm text-gray-900">{data.originCity}</p>
               <p className="text-xs text-gray-500">{data.originState}, {data.originCountry}</p>
@@ -260,17 +260,17 @@ export default function AdvancedTrackingResult({ data }: TrackingResultProps) {
 
             <div className="flex-1 flex items-center justify-center px-4">
               <div className="flex items-center gap-1 w-full">
-                <div className="h-0.5 flex-1 bg-gradient-to-r from-emerald-400 to-emerald-300 rounded" />
-                <div className="px-3 py-1.5 bg-emerald-50 border border-emerald-200 rounded-full">
-                  <Plane className="w-4 h-4 text-emerald-600" />
+                <div className="h-0.5 flex-1 bg-gradient-to-r from-[#8C9EAF] to-[#B3C7DB] rounded" />
+                <div className="px-3 py-1.5 bg-[#EEF2F7] border border-[#C8D3DD] rounded-full">
+                  <Plane className="w-4 h-4 text-[#1E3A5F]" />
                 </div>
-                <div className="h-0.5 flex-1 bg-gradient-to-r from-emerald-300 to-emerald-400 rounded" />
+                <div className="h-0.5 flex-1 bg-gradient-to-r from-[#B3C7DB] to-[#8C9EAF] rounded" />
               </div>
             </div>
 
             <div className="text-center flex-1">
-              <div className="w-12 h-12 rounded-full bg-[#D4A853]/10 border-2 border-[#D4A853]/30 flex items-center justify-center mx-auto mb-2">
-                <MapPin className="w-5 h-5 text-[#D4A853]" />
+              <div className="w-12 h-12 rounded-full bg-[#8C9EAF]/10 border-2 border-[#8C9EAF]/30 flex items-center justify-center mx-auto mb-2">
+                <MapPin className="w-5 h-5 text-[#8C9EAF]" />
               </div>
               <p className="font-bold text-sm text-gray-900">{data.destinationCity}</p>
               <p className="text-xs text-gray-500">{data.destinationState}, {data.destinationCountry}</p>
@@ -293,9 +293,9 @@ export default function AdvancedTrackingResult({ data }: TrackingResultProps) {
                   {isAfter(new Date(), data.estimatedDelivery) && !isDelivered && (
                     <p className="text-xs text-red-500 font-medium mt-0.5">Overdue</p>
                   )}
-                  {isDelivered && <p className="text-xs text-emerald-600 font-medium mt-0.5">Delivered</p>}
+                  {isDelivered && <p className="text-xs text-[#1E3A5F] font-medium mt-0.5">Delivered</p>}
                 </div>
-                <div className="p-2.5 rounded-lg bg-emerald-50"><Calendar className="w-5 h-5 text-emerald-600" /></div>
+                <div className="p-2.5 rounded-lg bg-[#EEF2F7]"><Calendar className="w-5 h-5 text-[#1E3A5F]" /></div>
               </div>
             </CardContent>
           </Card>
@@ -321,7 +321,7 @@ export default function AdvancedTrackingResult({ data }: TrackingResultProps) {
                   <p className="text-lg font-bold text-gray-900 mt-1">{formatCurrency(totalValue)}</p>
                   <p className="text-xs text-gray-500 mt-0.5">{totalPieces} piece{totalPieces !== 1 ? "s" : ""}</p>
                 </div>
-                <div className="p-2.5 rounded-lg bg-[#D4A853]/10"><DollarSign className="w-5 h-5 text-[#D4A853]" /></div>
+                <div className="p-2.5 rounded-lg bg-[#8C9EAF]/10"><DollarSign className="w-5 h-5 text-[#8C9EAF]" /></div>
               </div>
             </CardContent>
           </Card>
@@ -346,19 +346,19 @@ export default function AdvancedTrackingResult({ data }: TrackingResultProps) {
             {/* Latest Location Banner */}
             {data.TrackingUpdates.length > 0 && (
               <Card className="border-0 shadow-sm overflow-hidden">
-                <div className="bg-gradient-to-r from-emerald-600 to-emerald-700 px-6 py-4">
+                <div className="bg-gradient-to-r from-[#1E3A5F] to-[#162D4A] px-6 py-4">
                   <div className="flex items-center gap-3">
                     <div className="p-2 bg-white/20 rounded-lg">
                       <MapPin className="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <p className="text-emerald-100 text-xs font-semibold uppercase tracking-wider">Current Location</p>
+                      <p className="text-[#E8EDF2] text-xs font-semibold uppercase tracking-wider">Current Location</p>
                       <p className="text-white text-lg font-bold">
                         {data.TrackingUpdates[data.TrackingUpdates.length - 1].location || "Processing"}
                       </p>
                     </div>
                     <div className="ml-auto text-right hidden sm:block">
-                      <p className="text-emerald-100 text-xs">Last scanned</p>
+                      <p className="text-[#E8EDF2] text-xs">Last scanned</p>
                       <p className="text-white text-sm font-semibold">{formatShortDate(data.TrackingUpdates[data.TrackingUpdates.length - 1].timestamp)}</p>
                     </div>
                   </div>
@@ -371,7 +371,7 @@ export default function AdvancedTrackingResult({ data }: TrackingResultProps) {
               <CardHeader className="border-b bg-gray-50/50 px-6 py-4">
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-base font-semibold flex items-center gap-2">
-                    <Navigation className="w-4 h-4 text-emerald-600" /> Shipment History
+                    <Navigation className="w-4 h-4 text-[#1E3A5F]" /> Shipment History
                   </CardTitle>
                   <span className="text-xs text-gray-500">{data.TrackingUpdates.length} event{data.TrackingUpdates.length !== 1 ? "s" : ""}</span>
                 </div>
@@ -383,12 +383,12 @@ export default function AdvancedTrackingResult({ data }: TrackingResultProps) {
                     const isFirst = idx === 0;
                     const isLatest = idx === data.TrackingUpdates.length - 1;
                     return (
-                      <div key={event.id} className={`flex gap-4 px-6 py-4 transition-colors ${isLatest ? "bg-emerald-50/50" : "hover:bg-gray-50/50"}`}>
+                      <div key={event.id} className={`flex gap-4 px-6 py-4 transition-colors ${isLatest ? "bg-[#EEF2F7]/50" : "hover:bg-gray-50/50"}`}>
                         {/* Icon + Line */}
                         <div className="flex flex-col items-center pt-1">
                           <div className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 ${
-                            isLatest ? "bg-emerald-600 text-white shadow-md shadow-emerald-200" :
-                            isFirst ? "bg-emerald-100 text-emerald-600" :
+                            isLatest ? "bg-[#1E3A5F] text-white shadow-md shadow-[#C8D3DD]" :
+                            isFirst ? "bg-[#E8EDF2] text-[#1E3A5F]" :
                             "bg-gray-100 text-gray-500"
                           }`}>
                             <EventIcon className="w-4 h-4" />
@@ -402,13 +402,13 @@ export default function AdvancedTrackingResult({ data }: TrackingResultProps) {
                         <div className="flex-1 pb-1">
                           <div className="flex items-start justify-between gap-2">
                             <div>
-                              <p className={`font-semibold text-sm ${isLatest ? "text-emerald-700" : "text-gray-900"}`}>
+                              <p className={`font-semibold text-sm ${isLatest ? "text-[#162D4A]" : "text-gray-900"}`}>
                                 {event.status ? event.status.replace(/_/g, " ").replace(/\b\w/g, l => l.toUpperCase()) : "Update"}
                               </p>
                               <p className="text-sm text-gray-600 mt-0.5">{event.message}</p>
                             </div>
                             {event.signedBy && (
-                              <Badge variant="outline" className="text-xs bg-emerald-50 text-emerald-700 border-emerald-200 flex-shrink-0">
+                              <Badge variant="outline" className="text-xs bg-[#EEF2F7] text-[#162D4A] border-[#C8D3DD] flex-shrink-0">
                                 ✓ Signed
                               </Badge>
                             )}
@@ -417,7 +417,7 @@ export default function AdvancedTrackingResult({ data }: TrackingResultProps) {
                           <div className="flex items-center gap-4 mt-2 flex-wrap">
                             {event.location && (
                               <span className="inline-flex items-center gap-1 text-xs font-medium text-gray-700 bg-gray-100 px-2.5 py-1 rounded-full">
-                                <MapPin className="w-3 h-3 text-emerald-500" /> {event.location}
+                                <MapPin className="w-3 h-3 text-[#1E3A5F]" /> {event.location}
                               </span>
                             )}
                             <span className="text-xs text-gray-400">
@@ -439,7 +439,7 @@ export default function AdvancedTrackingResult({ data }: TrackingResultProps) {
                 {data.TrackingUpdates.length > 5 && (
                   <div className="px-6 py-3 border-t bg-gray-50/50">
                     <button onClick={() => setShowAllEvents(!showAllEvents)}
-                      className="flex items-center gap-1 text-sm font-medium text-emerald-600 hover:text-emerald-700 transition-colors">
+                      className="flex items-center gap-1 text-sm font-medium text-[#1E3A5F] hover:text-[#162D4A] transition-colors">
                       {showAllEvents ? <><ChevronUp className="w-4 h-4" /> Show less</> : <><ChevronDown className="w-4 h-4" /> Show all {data.TrackingUpdates.length} events</>}
                     </button>
                   </div>
@@ -464,7 +464,7 @@ export default function AdvancedTrackingResult({ data }: TrackingResultProps) {
             <Card className="border-0 shadow-sm">
               <CardHeader className="border-b bg-gray-50/50 px-6 py-4">
                 <CardTitle className="text-base font-semibold flex items-center gap-2">
-                  <PackageIcon className="w-4 h-4 text-emerald-600" /> Package Details
+                  <PackageIcon className="w-4 h-4 text-[#1E3A5F]" /> Package Details
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-0 divide-y">
@@ -476,7 +476,7 @@ export default function AdvancedTrackingResult({ data }: TrackingResultProps) {
                         <div className="flex gap-2 mt-1">
                           <Badge variant="outline" className="text-xs">{pkg.packageType}</Badge>
                           {pkg.dangerous && <Badge variant="destructive" className="text-xs">Dangerous</Badge>}
-                          {pkg.insurance && <Badge variant="outline" className="text-xs bg-emerald-50 text-emerald-700 border-emerald-200">Insured</Badge>}
+                          {pkg.insurance && <Badge variant="outline" className="text-xs bg-[#EEF2F7] text-[#162D4A] border-[#C8D3DD]">Insured</Badge>}
                         </div>
                       </div>
                       <div className="text-right">
@@ -499,7 +499,7 @@ export default function AdvancedTrackingResult({ data }: TrackingResultProps) {
               <Card className="border-0 shadow-sm">
                 <CardHeader className="border-b bg-gray-50/50 px-6 py-4">
                   <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                    <Home className="w-4 h-4 text-emerald-600" /> Sender
+                    <Home className="w-4 h-4 text-[#1E3A5F]" /> Sender
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-5 space-y-3 text-sm">
@@ -518,7 +518,7 @@ export default function AdvancedTrackingResult({ data }: TrackingResultProps) {
               <Card className="border-0 shadow-sm">
                 <CardHeader className="border-b bg-gray-50/50 px-6 py-4">
                   <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-[#D4A853]" /> Recipient
+                    <MapPin className="w-4 h-4 text-[#8C9EAF]" /> Recipient
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="p-5 space-y-3 text-sm">
@@ -545,7 +545,7 @@ export default function AdvancedTrackingResult({ data }: TrackingResultProps) {
                 <CardTitle className="text-sm font-semibold">Quick Actions</CardTitle>
               </CardHeader>
               <CardContent className="p-4 space-y-2">
-                <Button onClick={handleDownloadAirwayBill} className="w-full justify-start bg-emerald-600 hover:bg-emerald-700 text-white" size="sm">
+                <Button onClick={handleDownloadAirwayBill} className="w-full justify-start bg-[#1E3A5F] hover:bg-[#162D4A] text-white" size="sm">
                   <Download className="h-4 w-4 mr-2" /> Download Airway Bill
                 </Button>
                 <Button variant="outline" onClick={handleShare} className="w-full justify-start" size="sm">
@@ -578,7 +578,7 @@ export default function AdvancedTrackingResult({ data }: TrackingResultProps) {
                   <div className="flex justify-between"><span className="text-gray-500">Value</span><span className="font-semibold">{formatCurrency(totalValue)}</span></div>
                   <Separator />
                   <div className="flex justify-between"><span className="text-gray-500">Payment</span>
-                    <Badge className="bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs">{data.isPaid ? "Paid" : "Pending"}</Badge>
+                    <Badge className="bg-[#EEF2F7] text-[#162D4A] border border-[#C8D3DD] text-xs">{data.isPaid ? "Paid" : "Pending"}</Badge>
                   </div>
                   <Separator />
                   <div className="flex justify-between"><span className="text-gray-500">Created</span><span className="font-medium text-xs">{formatShortDate(data.createdAt)}</span></div>
@@ -593,7 +593,7 @@ export default function AdvancedTrackingResult({ data }: TrackingResultProps) {
               </CardHeader>
               <CardContent className="p-4 space-y-2">
                 <button onClick={handleDownloadAirwayBill} className="w-full flex items-center gap-3 p-3 rounded-lg border border-gray-100 hover:bg-gray-50 transition-colors text-left">
-                  <div className="p-2 rounded-lg bg-emerald-50"><FileText className="w-4 h-4 text-emerald-600" /></div>
+                  <div className="p-2 rounded-lg bg-[#EEF2F7]"><FileText className="w-4 h-4 text-[#1E3A5F]" /></div>
                   <div className="flex-1">
                     <p className="text-sm font-medium">Airway Bill</p>
                     <p className="text-xs text-gray-500">PDF Document</p>
@@ -602,7 +602,7 @@ export default function AdvancedTrackingResult({ data }: TrackingResultProps) {
                 </button>
                 {isDelivered && (
                   <button className="w-full flex items-center gap-3 p-3 rounded-lg border border-gray-100 hover:bg-gray-50 transition-colors text-left">
-                    <div className="p-2 rounded-lg bg-emerald-50"><CheckCircle2 className="w-4 h-4 text-emerald-600" /></div>
+                    <div className="p-2 rounded-lg bg-[#EEF2F7]"><CheckCircle2 className="w-4 h-4 text-[#1E3A5F]" /></div>
                     <div className="flex-1">
                       <p className="text-sm font-medium">Proof of Delivery</p>
                       <p className="text-xs text-gray-500">Signed document</p>
@@ -614,16 +614,16 @@ export default function AdvancedTrackingResult({ data }: TrackingResultProps) {
             </Card>
 
             {/* Need Help? */}
-            <Card className="border-0 shadow-sm bg-gradient-to-br from-[#0A1628] to-[#0D1F35] text-white">
+            <Card className="border-0 shadow-sm bg-gradient-to-br from-[#0F1D2F] to-[#132640] text-white">
               <CardContent className="p-5">
                 <h3 className="font-semibold text-sm mb-2">Need Help?</h3>
                 <p className="text-xs text-gray-400 mb-4">Our logistics team is available 24/7</p>
                 <div className="space-y-2">
-                  <a href="tel:+440201412251" className="flex items-center gap-2 text-xs text-emerald-300 hover:text-emerald-200">
+                  <a href="tel:+440201412251" className="flex items-center gap-2 text-xs text-[#B3C7DB] hover:text-[#C8D3DD]">
                     <Phone className="w-3.5 h-3.5" /> +44 020 1412 251
                   </a>
-                  <a href="mailto:admin@aramexlogistics.org" className="flex items-center gap-2 text-xs text-emerald-300 hover:text-emerald-200">
-                    <Mail className="w-3.5 h-3.5" /> admin@aramexlogistics.org
+                  <a href="mailto:admin@aegiscargo.org" className="flex items-center gap-2 text-xs text-[#B3C7DB] hover:text-[#C8D3DD]">
+                    <Mail className="w-3.5 h-3.5" /> admin@aegiscargo.org
                   </a>
                 </div>
               </CardContent>

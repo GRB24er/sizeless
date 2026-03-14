@@ -136,12 +136,12 @@ export default function VaultPage() {
             <div className="relative z-10">
               <Vault className="w-12 h-12 text-[#D4A853] mx-auto mb-6" />
               <h2 className="text-3xl font-bold text-white mb-4">Start Securing Your Assets Today</h2>
-              <p className="text-slate-400 max-w-xl mx-auto mb-8">Join institutional and private clients who trust AramexLogistics for secure precious metals custody.</p>
+              <p className="text-slate-400 max-w-xl mx-auto mb-8">Join institutional and private clients who trust Aegis Cargo for secure precious metals custody.</p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/login" className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-r from-[#D4A853] to-[#C09740] text-[#0A1628] font-semibold text-sm hover:from-[#F5DEB3] hover:to-[#D4A853] transition-all shadow-lg shadow-[#D4A853]/25">
                   Get Started <ArrowRight className="w-4 h-4" />
                 </Link>
-                <a href="mailto:admin@aramexlogistics.org" className="inline-flex items-center gap-2 px-8 py-4 rounded-xl border border-[#D4A853]/30 text-[#D4A853] font-semibold text-sm hover:bg-[#D4A853]/10 transition-all">
+                <a href="mailto:admin@aegiscargo.org" className="inline-flex items-center gap-2 px-8 py-4 rounded-xl border border-[#D4A853]/30 text-[#D4A853] font-semibold text-sm hover:bg-[#D4A853]/10 transition-all">
                   <Mail className="w-4 h-4" /> Contact Us
                 </a>
               </div>

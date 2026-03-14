@@ -11,7 +11,7 @@ export default async function Page() {
     <div>
       <div className="px-4 lg:px-6 py-4">
         <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-sm text-gray-500">AramexLogistics Operations Overview</p>
+        <p className="text-sm text-gray-500">Aegis Cargo Operations Overview</p>
       </div>
       <SectionCards />
       <div className="px-4 lg:px-6">

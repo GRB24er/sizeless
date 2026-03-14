@@ -45,7 +45,7 @@ export default function Loading() {
             </div>
           </div>
         </div>
-        <h1 className="text-2xl font-light tracking-[0.3em] text-white/90 mb-2" style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}>ARAMEXLOGISTICS</h1>
+        <h1 className="text-2xl font-light tracking-[0.3em] text-white/90 mb-2" style={{ fontFamily: "system-ui, -apple-system, sans-serif" }}>AEGIS CARGO</h1>
         <p className="text-xs tracking-[0.5em] text-emerald-400/80 uppercase mb-12">Global Logistics & Vault Services</p>
         <div className="w-80 mx-auto mb-6">
           <div className="h-[2px] bg-slate-800 rounded-full overflow-hidden">

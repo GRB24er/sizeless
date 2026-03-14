@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/sidebar";
 import { Logo } from "@/components/logo";
 const data = {
-  user: { name: "Admin", email: "admin@aramexlogistics.org", avatar: "/avatars/admin.jpg" },
+  user: { name: "Admin", email: "admin@aegiscargo.org", avatar: "/avatars/admin.jpg" },
   navMain: [
     { title: "Dashboard", url: "/dashboard", icon: LayoutDashboardIcon },
     { title: "Website", url: "/", icon: Globe },

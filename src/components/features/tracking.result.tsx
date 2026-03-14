@@ -135,7 +135,7 @@ export default function AdvancedTrackingResult({ data }: TrackingResultProps) {
   };
 
   const handleShare = async () => {
-    const shareData = { title: `Track Shipment — ${data.trackingNumber}`, text: `Track shipment ${data.trackingNumber} on AramexLogistics`, url: window.location.href };
+    const shareData = { title: `Track Shipment — ${data.trackingNumber}`, text: `Track shipment ${data.trackingNumber} on Aegis Cargo`, url: window.location.href };
     if (navigator.share) {
       try { await navigator.share(shareData); } catch {}
     } else {
@@ -641,7 +641,7 @@ export default function AdvancedTrackingResult({ data }: TrackingResultProps) {
       <div className="text-center py-4">
         <div className="inline-flex items-center gap-2 text-slate-500">
           <Shield className="w-4 h-4" />
-          <span className="text-xs tracking-wider uppercase">Secured by AramexLogistics — 256-bit Encrypted</span>
+          <span className="text-xs tracking-wider uppercase">Secured by Aegis Cargo — 256-bit Encrypted</span>
         </div>
       </div>
     </div>
