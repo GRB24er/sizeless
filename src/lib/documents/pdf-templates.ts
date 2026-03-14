@@ -250,7 +250,7 @@ function drawFooter(doc: jsPDF, page: number = 1) {
   // Company info
   doc.setFont("helvetica", "normal");
   doc.setFontSize(6.5);
-  doc.text("Aegis Cargo Ltd  |  Registered in England & Wales  |  47 Mark Lane, Ipswich, Suffolk IP1 2DA, United Kingdom", 105, y + 8, { align: "center" });
+  doc.text("Aegis Cargo Ltd  |  Registered in Romania  |  Strada Bulevardul Unirii 72, Floor 3, Office 12, 030833 Bucharest, Romania", 105, y + 8, { align: "center" });
 
   // Certifications bar
   doc.setFillColor(...NAVY);
@@ -674,7 +674,7 @@ export async function generateAirwayBill(data: ShipmentData): Promise<Buffer> {
   doc.text("Aegis Cargo Ltd", cx + 3, y + 11);
   doc.setFontSize(6.5); doc.setFont("helvetica", "normal"); doc.setTextColor(...GRAY);
   doc.text("IATA Code: AML  |  License: UK-AIR-2024-0891", cx + 3, y + 15.5);
-  doc.text("17 Bluestem Rd, Ipswich IP3 9RR, United Kingdom", cx + 3, y + 19.5);
+  doc.text("Strada Bulevardul Unirii 72, Floor 3, Office 12, 030833 Bucharest, Romania", cx + 3, y + 19.5);
 
   y += boxH + 7;
 
@@ -732,7 +732,7 @@ export async function generateAirwayBill(data: ShipmentData): Promise<Buffer> {
 
   // Company details
   doc.setFont("helvetica", "normal"); doc.setFontSize(5.5);
-  doc.text("Aegis Cargo Ltd  |  Registered in England & Wales  |  47 Mark Lane, Ipswich, Suffolk IP1 2DA, United Kingdom", 105, y + 5, { align: "center" });
+  doc.text("Aegis Cargo Ltd  |  Registered in Romania  |  Strada Bulevardul Unirii 72, Floor 3, Office 12, 030833 Bucharest, Romania", 105, y + 5, { align: "center" });
 
   // Certifications bar
   doc.setFillColor(...NAVY);
@@ -1436,7 +1436,7 @@ export async function generateStorageAgreement(data: VaultStorageData): Promise<
   doc.text("Custodian:", 22, y + 2);
   doc.setFont("helvetica", "normal"); doc.setTextColor(...TEXT_MED);
   doc.text("Aegis Cargo Vault Services Ltd.", 22, y + 7);
-  doc.text("LBMA Approved Vault Operator | Registered in England & Wales", 22, y + 12);
+  doc.text("LBMA Approved Vault Operator | Registered in Romania", 22, y + 12);
 
   doc.setFont("helvetica", "bold"); doc.setTextColor(...TEXT_DARK);
   doc.text("Depositor:", 110, y + 2);

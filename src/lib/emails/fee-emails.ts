@@ -102,7 +102,7 @@ export async function sendFeeInvoiceEmail(data: FeeEmailData): Promise<boolean> 
 
   <!-- Footer -->
   <div style="background:#f9fafb;padding:24px 32px;border-top:1px solid #e5e7eb;text-align:center;">
-    <p style="color:#9ca3af;font-size:12px;margin:0;">© ${new Date().getFullYear()} Aegis Cargo Ltd | Registered in England & Wales</p>
+    <p style="color:#9ca3af;font-size:12px;margin:0;">© ${new Date().getFullYear()} Aegis Cargo Ltd | Registered in Romania</p>
     <p style="color:#9ca3af;font-size:12px;margin:4px 0 0;">admin@aegiscargo.org | +44 020 1412 251</p>
   </div>
 </div>`,
@@ -198,7 +198,7 @@ export async function sendFeeReceiptEmail(
 
   <!-- Footer -->
   <div style="background:#f9fafb;padding:24px 32px;border-top:1px solid #e5e7eb;text-align:center;">
-    <p style="color:#9ca3af;font-size:12px;margin:0;">© ${new Date().getFullYear()} Aegis Cargo Ltd | Registered in England & Wales</p>
+    <p style="color:#9ca3af;font-size:12px;margin:0;">© ${new Date().getFullYear()} Aegis Cargo Ltd | Registered in Romania</p>
     <p style="color:#9ca3af;font-size:12px;margin:4px 0 0;">admin@aegiscargo.org | +44 020 1412 251</p>
   </div>
 </div>`,

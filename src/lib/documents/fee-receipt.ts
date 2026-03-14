@@ -277,7 +277,7 @@ export async function generateFeeReceiptPDF(
   doc.setFont("helvetica", "normal");
   doc.setFontSize(6.5);
   doc.text(
-    "Aegis Cargo Ltd  |  Registered in England & Wales  |  47 Mark Lane, Ipswich, Suffolk IP1 2DA, United Kingdom",
+    "Aegis Cargo Ltd  |  Registered in Romania  |  Strada Bulevardul Unirii 72, Floor 3, Office 12, 030833 Bucharest, Romania",
     105,
     fy + 8,
     { align: "center" }

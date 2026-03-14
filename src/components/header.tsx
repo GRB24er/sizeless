@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import {
   Menu, User, Package, LogOut, LayoutDashboard,
-  MapPin, Mail, Clock, ChevronDown, Vault,
+  ChevronDown, Vault,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -56,36 +56,6 @@ export const Header = () => {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50">
-      {/* Top bar */}
-      <div className={cn(
-        "hidden lg:block transition-all duration-300 overflow-hidden bg-[#0F1D2F]/95 backdrop-blur-xl border-b border-[#0F1D2F]/30",
-        isScrolled ? "h-0 opacity-0" : "h-10 opacity-100"
-      )}>
-        <div className="container mx-auto px-4 h-full">
-          <div className="flex justify-between items-center h-full">
-            <div className="flex items-center gap-8">
-              <div className="flex items-center gap-2 text-slate-400 text-xs">
-                <MapPin className="w-3.5 h-3.5 text-[#8C9EAF]" />
-                <span>17 Bluestem Rd, Ipswich IP3 9RR, United Kingdom</span>
-              </div>
-              <div className="w-px h-4 bg-slate-700" />
-              <div className="flex items-center gap-2 text-slate-400 text-xs">
-                <Mail className="w-3.5 h-3.5 text-[#8C9EAF]" />
-                <span>admin@aegiscargo.org</span>
-              </div>
-              <div className="w-px h-4 bg-slate-700" />
-              <div className="flex items-center gap-2 text-slate-400 text-xs">
-                <Clock className="w-3.5 h-3.5 text-[#8C9EAF]" />
-                <span>Mon - Sat: 8:00 AM - 5:00 PM</span>
-              </div>
-            </div>
-            <div className="flex items-center gap-6">
-              <Link href="/vault" className="text-xs text-[#8C9EAF] hover:text-[#C8D3DD] transition-colors font-medium">Vault Services</Link>
-              <Link href="/support" className="text-xs text-slate-400 hover:text-white transition-colors">Help Center</Link>
-            </div>
-          </div>
-        </div>
-      </div>
 
       {/* Main Navigation */}
       <nav className={cn(
@@ -173,13 +143,6 @@ export const Header = () => {
                 <div className="flex flex-col h-full">
                   <div className="flex items-center justify-between p-4 border-b border-[#0F1D2F]/30">
                     <SheetHeader><SheetTitle><Logo /></SheetTitle></SheetHeader>
-                  </div>
-                  <div className="p-4 bg-[#132640]/50 border-b border-[#0F1D2F]/30">
-                    <div className="space-y-3">
-                      <div className="flex items-center gap-3 text-sm text-slate-400"><MapPin className="w-4 h-4 text-[#8C9EAF]" /><span>17 Bluestem Rd, Ipswich IP3 9RR, UK</span></div>
-                      <div className="flex items-center gap-3 text-sm text-slate-400"><Mail className="w-4 h-4 text-[#8C9EAF]" /><span>admin@aegiscargo.org</span></div>
-                      <div className="flex items-center gap-3 text-sm text-slate-400"><Clock className="w-4 h-4 text-[#8C9EAF]" /><span>Mon - Sat: 8:00 AM - 5:00 PM</span></div>
-                    </div>
                   </div>
                   <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
                     {mainNavItems.map((item) => {
