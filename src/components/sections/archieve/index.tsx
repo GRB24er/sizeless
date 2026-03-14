@@ -29,7 +29,7 @@ export const Achievement = () => {
     { icon: Package, value: 850000, suffix: "+", label: "Shipments Delivered", color: "emerald" },
     { icon: MapPin, value: 190, suffix: "+", label: "Countries Served", color: "emerald" },
     { icon: Users, value: 12000, suffix: "+", label: "Business Clients", color: "emerald" },
-    { icon: Vault, value: 48, suffix: "M+", label: "Vault Assets (USD)", color: "gold" },
+    { icon: Vault, value: 250, suffix: "M+", label: "Vault Assets (USD)", color: "gold" },
     { icon: TrendingUp, value: 99, suffix: ".8%", label: "On-Time Delivery", color: "emerald" },
     { icon: Award, value: 26, suffix: "+", label: "Years in Service", color: "gold" },
   ];
