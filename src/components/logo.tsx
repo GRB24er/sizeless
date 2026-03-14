@@ -13,9 +13,9 @@ export const Logo = () => (
       <Image
         src="/images/logo.png"
         alt="Aegis Cargo"
-        width={48}
-        height={48}
-        className="transition-all duration-300 h-12 w-12 object-contain"
+        width={130}
+        height={80}
+        className="transition-all duration-300 object-contain"
       />
     </Link>
   </MotionDiv>
