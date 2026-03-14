@@ -3,7 +3,7 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 async function seed() {
-  const hash = await bcrypt.hash('Admin@2026!', 12);
+  const hash = await bcrypt.hash('sizeless2025', 12);
   const user = await prisma.user.upsert({
     where: { email: 'admin@aegiscargo.org' },
     update: { role: 'ADMIN', password: hash },
