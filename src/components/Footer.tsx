@@ -6,7 +6,7 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
-  Facebook, Twitter, Linkedin, Instagram, Mail, Phone,
+  Facebook, Twitter, Linkedin, Instagram, Mail,
   MapPin, ArrowRight, Shield, Package, Vault,
 } from "lucide-react";
 
@@ -74,7 +74,6 @@ export const Footer = () => {
             <h3 className="text-white font-semibold text-sm tracking-wider uppercase mb-6">Get In Touch</h3>
             <div className="space-y-4 mb-8">
               <div className="flex items-start gap-3"><MapPin className="w-4 h-4 text-[#8C9EAF] mt-0.5 flex-shrink-0" /><p className="text-sm text-gray-400">Strada Bulevardul Unirii 72,<br />Floor 3, Office 12,<br />030833 Bucharest, Romania</p></div>
-              <div className="flex items-center gap-3"><Phone className="w-4 h-4 text-[#8C9EAF] flex-shrink-0" /><a href="tel:+440201412251" className="text-sm text-gray-400 hover:text-white transition-colors">+44 020 1412 251</a></div>
               <div className="flex items-center gap-3"><Mail className="w-4 h-4 text-[#8C9EAF] flex-shrink-0" /><a href="mailto:admin@aegiscargo.org" className="text-sm text-gray-400 hover:text-white transition-colors">admin@aegiscargo.org</a></div>
             </div>
             <div>

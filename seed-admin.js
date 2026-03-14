@@ -10,7 +10,7 @@ async function seed() {
     create: {
       name: 'Admin Aegis Cargo',
       email: 'admin@aegiscargo.org',
-      phone: '+440201412251',
+      phone: '',
       password: hash,
       role: 'ADMIN',
     },

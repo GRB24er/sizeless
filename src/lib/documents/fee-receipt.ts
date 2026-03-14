@@ -100,7 +100,7 @@ export async function generateFeeReceiptPDF(
   doc.setFontSize(7);
   doc.setFont("helvetica", "normal");
   doc.text("Global Logistics & Vault Services", 15, 27);
-  doc.text("admin@aegiscargo.org  |  +44 020 1412 251", 15, 31);
+  doc.text("admin@aegiscargo.org", 15, 31);
 
   // Title
   doc.setFontSize(14);
@@ -253,7 +253,7 @@ export async function generateFeeReceiptPDF(
     { maxWidth: 170 }
   );
   doc.text(
-    "This is an official document. For any queries, contact admin@aegiscargo.org or +44 020 1412 251.",
+    "This is an official document. For any queries, contact admin@aegiscargo.org.",
     20,
     y + 12,
     { maxWidth: 170 }

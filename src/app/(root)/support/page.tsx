@@ -1,6 +1,6 @@
 "use client";
 
-import { MessageCircle, Phone, Mail, HelpCircle, Send, CheckCircle, Headphones } from "lucide-react";
+import { MessageCircle, Mail, HelpCircle, Send, CheckCircle, Headphones } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -27,7 +27,6 @@ const fadeInUp = { hidden: { opacity: 0, y: 40 }, visible: { opacity: 1, y: 0, t
 const staggerContainer = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.1 } } };
 
 const contactMethods = [
-  { icon: Phone, title: "Call Us", description: "Speak directly with our support team", value: "+44 020 1412 251", action: "tel:+440201412251" },
   { icon: Mail, title: "Email Us", description: "Get a response within 24 hours", value: "admin@aegiscargo.org", action: "mailto:admin@aegiscargo.org" },
   { icon: MessageCircle, title: "Live Chat", description: "Chat with us in real-time", value: "Available 24/7", action: "#chat" },
 ];
@@ -89,7 +88,7 @@ export default function SupportPage() {
           </motion.p>
         </motion.div>
 
-        <motion.div ref={contactRef} initial="hidden" animate={contactInView ? "visible" : "hidden"} variants={staggerContainer} className="grid md:grid-cols-3 gap-6 mb-16">
+        <motion.div ref={contactRef} initial="hidden" animate={contactInView ? "visible" : "hidden"} variants={staggerContainer} className="grid md:grid-cols-2 gap-6 mb-16">
           {contactMethods.map((method) => (
             <motion.a key={method.title} href={method.action} variants={fadeInUp}>
               <Card className="group h-full bg-slate-800/30 border-slate-700/50 hover:border-emerald-500/30 transition-all duration-300 hover:bg-slate-800/50 cursor-pointer">
@@ -128,7 +127,7 @@ export default function SupportPage() {
                       <FormItem><FormLabel className="text-slate-300">Email</FormLabel><FormControl><Input placeholder="you@example.com" {...field} className="bg-slate-800/50 border-slate-700 text-white placeholder-slate-500 focus:border-emerald-500 focus:ring-emerald-500/20" /></FormControl><FormMessage className="text-red-400" /></FormItem>
                     )} />
                     <FormField control={form.control} name="phone" render={({ field }) => (
-                      <FormItem><FormLabel className="text-slate-300">Phone (Optional)</FormLabel><FormControl><Input placeholder="+44 xxx xxx xxxx" {...field} className="bg-slate-800/50 border-slate-700 text-white placeholder-slate-500 focus:border-emerald-500 focus:ring-emerald-500/20" /></FormControl><FormMessage className="text-red-400" /></FormItem>
+                      <FormItem><FormLabel className="text-slate-300">Phone (Optional)</FormLabel><FormControl><Input placeholder="+xx xxx xxx xxxx" {...field} className="bg-slate-800/50 border-slate-700 text-white placeholder-slate-500 focus:border-emerald-500 focus:ring-emerald-500/20" /></FormControl><FormMessage className="text-red-400" /></FormItem>
                     )} />
                   </div>
                   <FormField control={form.control} name="category" render={({ field }) => (

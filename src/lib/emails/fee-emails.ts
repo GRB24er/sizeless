@@ -90,7 +90,7 @@ export async function sendFeeInvoiceEmail(data: FeeEmailData): Promise<boolean> 
     <!-- Warning -->
     <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:16px;margin:24px 0;">
       <p style="color:#92400e;font-size:13px;margin:0;line-height:1.5;">
-        <strong>⚠️ Important:</strong> Your shipment will remain on hold until this payment is confirmed. Please contact us at <a href="mailto:admin@aegiscargo.org" style="color:#1E3A5F;">admin@aegiscargo.org</a> or call <strong>+44 020 1412 251</strong> to arrange payment.
+        <strong>⚠️ Important:</strong> Your shipment will remain on hold until this payment is confirmed. Please contact us at <a href="mailto:admin@aegiscargo.org" style="color:#1E3A5F;">admin@aegiscargo.org</a> to arrange payment.
       </p>
     </div>
 
@@ -103,7 +103,7 @@ export async function sendFeeInvoiceEmail(data: FeeEmailData): Promise<boolean> 
   <!-- Footer -->
   <div style="background:#f9fafb;padding:24px 32px;border-top:1px solid #e5e7eb;text-align:center;">
     <p style="color:#9ca3af;font-size:12px;margin:0;">© ${new Date().getFullYear()} Aegis Cargo Ltd | Registered in Romania</p>
-    <p style="color:#9ca3af;font-size:12px;margin:4px 0 0;">admin@aegiscargo.org | +44 020 1412 251</p>
+    <p style="color:#9ca3af;font-size:12px;margin:4px 0 0;">admin@aegiscargo.org</p>
   </div>
 </div>`,
     });
@@ -199,7 +199,7 @@ export async function sendFeeReceiptEmail(
   <!-- Footer -->
   <div style="background:#f9fafb;padding:24px 32px;border-top:1px solid #e5e7eb;text-align:center;">
     <p style="color:#9ca3af;font-size:12px;margin:0;">© ${new Date().getFullYear()} Aegis Cargo Ltd | Registered in Romania</p>
-    <p style="color:#9ca3af;font-size:12px;margin:4px 0 0;">admin@aegiscargo.org | +44 020 1412 251</p>
+    <p style="color:#9ca3af;font-size:12px;margin:4px 0 0;">admin@aegiscargo.org</p>
   </div>
 </div>`,
     });

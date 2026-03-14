@@ -55,7 +55,7 @@ function vaultEmailTemplate(
   
   <!-- Footer -->
   <div style="background:#f9fafb;padding:24px 32px;border-top:1px solid #e5e7eb;">
-    <p style="color:#9ca3af;font-size:11px;margin:0 0 4px 0;text-align:center;">Aegis Cargo Vault Services Ltd. | admin@aegiscargo.org | +44 020 1412 251</p>
+    <p style="color:#9ca3af;font-size:11px;margin:0 0 4px 0;text-align:center;">Aegis Cargo Vault Services Ltd. | admin@aegiscargo.org</p>
     <p style="color:#d1d5db;font-size:10px;margin:0;text-align:center;">&copy; ${new Date().getFullYear()} All rights reserved. This is an automated notification.</p>
   </div>
 </div>

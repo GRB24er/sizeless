@@ -204,7 +204,7 @@ function drawHeader(doc: jsPDF, title: string, docNumber: string) {
   doc.setFontSize(7);
   doc.setFont("helvetica", "normal");
   doc.text("Global Logistics & Vault Services", 15, 27);
-  doc.text("admin@aegiscargo.org  |  +44 020 1412 251", 15, 31);
+  doc.text("admin@aegiscargo.org", 15, 31);
 
   // Document title on right
   doc.setFontSize(13);
@@ -452,7 +452,7 @@ export async function generateAirwayBill(data: ShipmentData): Promise<Buffer> {
   doc.setFontSize(7); doc.setFont("helvetica", "normal");
   doc.text("Global Logistics & Vault Services", 12, 22);
   doc.setFontSize(5.5);
-  doc.text("admin@aegiscargo.org  |  +44 020 1412 251  |  aegiscargo.org", 12, 26);
+  doc.text("admin@aegiscargo.org  |  aegiscargo.org", 12, 26);
 
   // Document title right side
   doc.setFontSize(16); doc.setFont("helvetica", "bold"); doc.setTextColor(...WHITE);
@@ -1078,7 +1078,7 @@ export async function generateVaultCertificate(data: VaultData): Promise<Buffer>
   }
   doc.setTextColor(180, 190, 200); doc.setFontSize(7); doc.setFont("helvetica", "normal");
   doc.text("Vault Services Division  |  LBMA Approved", 15, 27);
-  doc.text("admin@aegiscargo.org  |  +44 020 1412 251", 15, 31);
+  doc.text("admin@aegiscargo.org", 15, 31);
 
   doc.setFontSize(13); doc.setFont("helvetica", "bold"); doc.setTextColor(...GOLD);
   doc.text("VAULT DEPOSIT CERTIFICATE", 195, 14, { align: "right" });
@@ -1185,7 +1185,7 @@ export async function generateInsuranceCertificate(data: ShipmentData): Promise<
   doc.setFontSize(6.5); doc.setFont("helvetica", "italic"); doc.setTextColor(...TEXT_MED);
   doc.text("This certificate confirms that the goods described above are insured against loss or damage during transit.", 20, y + 5, { maxWidth: 170 });
   doc.text("Coverage applies from the point of pickup to final delivery. Claims must be reported within 72 hours of delivery.", 20, y + 10, { maxWidth: 170 });
-  doc.text("For claims: claims@aegiscargo.org  |  +44 020 1412 251", 20, y + 16, { maxWidth: 170 });
+  doc.text("For claims: claims@aegiscargo.org", 20, y + 16, { maxWidth: 170 });
 
   drawSignatureBlock(doc, 218, { showSeal: true, sealX: 172, sealY: 240 });
 
@@ -1290,7 +1290,7 @@ export async function generateAssayReport(data: VaultAssayData): Promise<Buffer>
   }
   doc.setTextColor(180, 190, 200); doc.setFontSize(7); doc.setFont("helvetica", "normal");
   doc.text("Vault Assay & Verification Division  |  LBMA Approved Laboratory", 15, 27);
-  doc.text("admin@aegiscargo.org  |  +44 020 1412 251", 15, 31);
+  doc.text("admin@aegiscargo.org", 15, 31);
 
   doc.setFontSize(13); doc.setFont("helvetica", "bold"); doc.setTextColor(147, 51, 234);
   doc.text("ASSAY VERIFICATION REPORT", 195, 14, { align: "right" });
@@ -1410,7 +1410,7 @@ export async function generateStorageAgreement(data: VaultStorageData): Promise<
   }
   doc.setTextColor(180, 190, 200); doc.setFontSize(7); doc.setFont("helvetica", "normal");
   doc.text("Vault Services Division  |  Secure Custody & Storage", 15, 27);
-  doc.text("admin@aegiscargo.org  |  +44 020 1412 251", 15, 31);
+  doc.text("admin@aegiscargo.org", 15, 31);
 
   doc.setFontSize(13); doc.setFont("helvetica", "bold"); doc.setTextColor(...GOLD);
   doc.text("STORAGE AGREEMENT", 195, 14, { align: "right" });
@@ -1533,7 +1533,7 @@ export async function generateVaultInsuranceCertificate(data: VaultInsuranceData
   }
   doc.setTextColor(180, 190, 200); doc.setFontSize(7); doc.setFont("helvetica", "normal");
   doc.text("Vault Insurance Services  |  Underwritten by Lloyd's of London", 15, 27);
-  doc.text("admin@aegiscargo.org  |  +44 020 1412 251", 15, 31);
+  doc.text("admin@aegiscargo.org", 15, 31);
 
   doc.setFontSize(13); doc.setFont("helvetica", "bold"); doc.setTextColor(37, 99, 235);
   doc.text("VAULT INSURANCE CERTIFICATE", 195, 14, { align: "right" });
@@ -1602,7 +1602,7 @@ export async function generateVaultInsuranceCertificate(data: VaultInsuranceData
   doc.setFontSize(6.5); doc.setFont("helvetica", "italic"); doc.setTextColor(...TEXT_MED);
   doc.text("This certificate confirms that the assets described above are insured while in custody at the specified vault.", 20, y + 5, { maxWidth: 170 });
   doc.text("Coverage is continuous and renews automatically. Claims must be reported within 48 hours of discovery.", 20, y + 10, { maxWidth: 170 });
-  doc.text("For claims: claims@aegiscargo.org | For policy queries: vault@aegiscargo.org | +44 020 1412 251", 20, y + 16, { maxWidth: 170 });
+  doc.text("For claims: claims@aegiscargo.org | For policy queries: vault@aegiscargo.org", 20, y + 16, { maxWidth: 170 });
 
   drawSignatureBlock(doc, 218, { showSeal: true, sealX: 172, sealY: 240 });
   drawFooter(doc);

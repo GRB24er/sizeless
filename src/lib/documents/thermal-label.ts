@@ -315,7 +315,7 @@ export async function generateThermalLabel(
 
   doc.setFontSize(3.5);
   doc.setFont("helvetica", "normal");
-  doc.text("aegiscargo.org  |  +44 020 1412 251", LABEL_W / 2, LABEL_H - 2.5, {
+  doc.text("aegiscargo.org", LABEL_W / 2, LABEL_H - 2.5, {
     align: "center",
   });
 

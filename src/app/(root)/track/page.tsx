@@ -3,7 +3,7 @@
 import { useState } from "react";
 import TrackingForm from "@/components/tracking.form";
 import Link from "next/link";
-import { Package, Globe, Shield, Clock, Phone, MessageCircle, HelpCircle, ChevronDown, Truck, Plane, Ship } from "lucide-react";
+import { Package, Globe, Shield, Clock, MessageCircle, HelpCircle, ChevronDown, Truck, Plane, Ship } from "lucide-react";
 
 const features = [
   {
@@ -194,9 +194,6 @@ export default function TrackingPage() {
                   <Link href="/support" className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-semibold text-sm hover:from-emerald-500 hover:to-emerald-600 transition-all shadow-lg shadow-emerald-600/25">
                     <MessageCircle className="w-5 h-5" /> Live Chat Support
                   </Link>
-                  <a href="tel:+440201412251" className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl border border-slate-600 text-white font-semibold text-sm hover:bg-white/5 transition-colors">
-                    <Phone className="w-5 h-5" /> +44 020 1412 251
-                  </a>
                 </div>
               </div>
             </div>

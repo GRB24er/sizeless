@@ -56,7 +56,7 @@ async function sendStatusEmail(email: string, name: string, trackingNumber: stri
           <div style="text-align:center;margin:32px 0;"><a href="https://www.aegiscargo.org/track" style="display:inline-block;background:#1E3A5F;color:#fff;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:600;font-size:14px;">Track Shipment</a></div>
           ${isDelivered ? `<div style="background:#EEF2F7;border:1px solid #B3C7DB;border-radius:12px;padding:20px;text-align:center;margin:24px 0;"><p style="color:#162D4A;font-size:16px;font-weight:600;margin:0 0 4px 0;">✅ Delivered Successfully</p><p style="color:#1E3A5F;font-size:13px;margin:0;">Thank you for choosing Aegis Cargo!</p></div>` : ""}
         </div>
-        <div style="background:#f9fafb;padding:24px 32px;border-top:1px solid #e5e7eb;text-align:center;"><p style="color:#9ca3af;font-size:12px;margin:0;">&copy; ${new Date().getFullYear()} Aegis Cargo | admin@aegiscargo.org | +44 020 1412 251</p></div>
+        <div style="background:#f9fafb;padding:24px 32px;border-top:1px solid #e5e7eb;text-align:center;"><p style="color:#9ca3af;font-size:12px;margin:0;">&copy; ${new Date().getFullYear()} Aegis Cargo | admin@aegiscargo.org</p></div>
       </div>`,
     });
   } catch (error) { console.error("Failed to send status update email:", error); }

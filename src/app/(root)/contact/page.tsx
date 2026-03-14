@@ -3,7 +3,6 @@
 import { useState } from "react";
 import {
   Mail,
-  Phone,
   MapPin,
   Send,
   CheckCircle,
@@ -73,12 +72,6 @@ const contactInfo = [
     title: "Email Us",
     lines: ["admin@aegiscargo.org"],
     action: "mailto:admin@aegiscargo.org",
-  },
-  {
-    icon: Phone,
-    title: "Call Us",
-    lines: ["+44 020 1412 251"],
-    action: "tel:+440201412251",
   },
   {
     icon: Clock,

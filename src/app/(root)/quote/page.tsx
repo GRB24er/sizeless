@@ -231,7 +231,7 @@ export default function QuotePage() {
                           <FormLabel className="text-slate-300">Phone</FormLabel>
                           <FormControl>
                             <Input
-                              placeholder="+44 xxx xxx xxxx"
+                              placeholder="+xx xxx xxx xxxx"
                               {...field}
                               className="bg-slate-800/50 border-slate-700 text-white placeholder-slate-500 focus:border-[#1E3A5F] focus:ring-[#1E3A5F]/20"
                             />

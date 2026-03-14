@@ -51,7 +51,7 @@ async function notifySender(email: string, name: string, trackingNumber: string,
           </div>
           <div style="text-align:center;margin:32px 0;"><a href="https://www.aegiscargo.org/track" style="display:inline-block;background:#059669;color:#fff;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:600;font-size:14px;">Track Your Shipment</a></div>
         </div>
-        <div style="background:#f9fafb;padding:24px 32px;border-top:1px solid #e5e7eb;text-align:center;"><p style="color:#9ca3af;font-size:12px;margin:0;">&copy; ${new Date().getFullYear()} Aegis Cargo | admin@aegiscargo.org | +44 020 1412 251</p></div>
+        <div style="background:#f9fafb;padding:24px 32px;border-top:1px solid #e5e7eb;text-align:center;"><p style="color:#9ca3af;font-size:12px;margin:0;">&copy; ${new Date().getFullYear()} Aegis Cargo | admin@aegiscargo.org</p></div>
       </div>`,
     });
   } catch (error) { console.error("Failed to send sender notification:", error); }
@@ -77,7 +77,7 @@ async function notifyRecipient(email: string, recipientName: string, senderName:
           <div style="text-align:center;margin:32px 0;"><a href="https://www.aegiscargo.org/track" style="display:inline-block;background:#059669;color:#fff;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:600;font-size:14px;">Track Package</a></div>
           <p style="color:#6b7280;font-size:13px;line-height:1.6;">Questions? Contact us at <a href="mailto:admin@aegiscargo.org" style="color:#059669;">admin@aegiscargo.org</a>.</p>
         </div>
-        <div style="background:#f9fafb;padding:24px 32px;border-top:1px solid #e5e7eb;text-align:center;"><p style="color:#9ca3af;font-size:12px;margin:0;">&copy; ${new Date().getFullYear()} Aegis Cargo | admin@aegiscargo.org | +44 020 1412 251</p></div>
+        <div style="background:#f9fafb;padding:24px 32px;border-top:1px solid #e5e7eb;text-align:center;"><p style="color:#9ca3af;font-size:12px;margin:0;">&copy; ${new Date().getFullYear()} Aegis Cargo | admin@aegiscargo.org</p></div>
       </div>`,
     });
   } catch (error) { console.error("Failed to send recipient notification:", error); }

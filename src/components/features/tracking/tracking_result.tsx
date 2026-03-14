@@ -619,9 +619,6 @@ export default function AdvancedTrackingResult({ data }: TrackingResultProps) {
                 <h3 className="font-semibold text-sm mb-2">Need Help?</h3>
                 <p className="text-xs text-gray-400 mb-4">Our logistics team is available 24/7</p>
                 <div className="space-y-2">
-                  <a href="tel:+440201412251" className="flex items-center gap-2 text-xs text-[#B3C7DB] hover:text-[#C8D3DD]">
-                    <Phone className="w-3.5 h-3.5" /> +44 020 1412 251
-                  </a>
                   <a href="mailto:admin@aegiscargo.org" className="flex items-center gap-2 text-xs text-[#B3C7DB] hover:text-[#C8D3DD]">
                     <Mail className="w-3.5 h-3.5" /> admin@aegiscargo.org
                   </a>

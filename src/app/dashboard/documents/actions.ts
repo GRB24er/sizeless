@@ -175,8 +175,7 @@ function buildEmailHTML(params: {
             
             <p style="color:#9CA3AF;font-size:12px;line-height:1.5;margin:0;">
               The attached PDF contains a QR code for instant verification. If you have questions about this shipment, 
-              contact our support team at <a href="mailto:admin@aegiscargo.org" style="color:#1E3A5F;">admin@aegiscargo.org</a> 
-              or call <strong>+44 020 1412 251</strong>.
+              contact our support team at <a href="mailto:admin@aegiscargo.org" style="color:#1E3A5F;">admin@aegiscargo.org</a>.
             </p>
           </td></tr>
           

@@ -2,7 +2,7 @@
 
 import { motion } from "motion/react";
 import { useInView } from "react-intersection-observer";
-import { Vault, Shield, Lock, Eye, Clock, FileCheck, ArrowRight, Phone, Mail, CheckCircle } from "lucide-react";
+import { Vault, Shield, Lock, Eye, Clock, FileCheck, ArrowRight, Mail, CheckCircle } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -56,8 +56,8 @@ export default function VaultPage() {
                 <Link href="/login" className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-r from-[#D4A853] to-[#C09740] text-[#0A1628] font-semibold text-sm hover:from-[#F5DEB3] hover:to-[#D4A853] transition-all shadow-lg shadow-[#D4A853]/25">
                   Open Vault Account <ArrowRight className="w-4 h-4" />
                 </Link>
-                <a href="tel:+440201412251" className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl border border-slate-700/50 text-slate-300 font-semibold text-sm hover:bg-slate-800/50 transition-all">
-                  <Phone className="w-4 h-4" /> Speak to an Advisor
+                <a href="mailto:admin@aegiscargo.org" className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl border border-slate-700/50 text-slate-300 font-semibold text-sm hover:bg-slate-800/50 transition-all">
+                  <Mail className="w-4 h-4" /> Speak to an Advisor
                 </a>
               </div>
             </motion.div>

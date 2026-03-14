@@ -65,7 +65,7 @@ const sections = [
   {
     title: "12. Contact Us",
     content:
-      "If you have any questions, concerns, or requests regarding this Privacy Policy or how we handle your personal data, please contact our Data Protection team at admin@aegiscargo.org or write to us at Strada Bulevardul Unirii 72, Floor 3, Office 12, 030833 Bucharest, Romania. Phone: +44 020 1412 251.",
+      "If you have any questions, concerns, or requests regarding this Privacy Policy or how we handle your personal data, please contact our Data Protection team at admin@aegiscargo.org or write to us at Strada Bulevardul Unirii 72, Floor 3, Office 12, 030833 Bucharest, Romania.",
   },
 ];
 

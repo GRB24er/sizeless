@@ -2,7 +2,7 @@
 
 import { motion } from "motion/react";
 import { useInView } from "react-intersection-observer";
-import { ArrowRight, Phone, Mail, Shield, Vault } from "lucide-react";
+import { ArrowRight, Mail, Shield, Vault } from "lucide-react";
 import Link from "next/link";
 
 export const Quota = () => {
@@ -39,7 +39,6 @@ export const Quota = () => {
               </div>
 
               <div className="flex items-center gap-6 text-sm">
-                <a href="tel:+440201412251" className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors"><Phone className="w-4 h-4 text-emerald-400" />+44 020 1412 251</a>
                 <a href="mailto:admin@aegiscargo.org" className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors"><Mail className="w-4 h-4 text-emerald-400" />admin@aegiscargo.org</a>
               </div>
             </div>
