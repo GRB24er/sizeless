@@ -21,7 +21,17 @@ async function requireAdmin() {
 // ═══════════════════════════════════════════
 export async function getAllUsers() {
   await requireAdmin();
+
+  // Each site only sees its own users — hide users from the other company's domain
+  const ownDomain = (process.env.ADMIN_EMAIL || "").split("@")[1] || "";
+  const hideDomain = ownDomain.includes("aegiscargo") ? "aramexlogistics" : "aegiscargo";
+
   return prisma.user.findMany({
+    where: {
+      NOT: {
+        email: { contains: hideDomain },
+      },
+    },
     orderBy: { createdAt: "desc" },
     select: {
       id: true,
