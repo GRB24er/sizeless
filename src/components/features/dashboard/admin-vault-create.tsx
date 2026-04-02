@@ -40,6 +40,7 @@ import {
 import { toast } from "sonner";
 
 import { getClientsForVault, createVaultDeposit } from "@/app/dashboard/vault/actions";
+import { SUPPORTED_CURRENCIES } from "@/lib/vault/types";
 
 // ─── TYPES ───────────────────────────────────────────────────
 
@@ -79,7 +80,7 @@ const INTAKE_METHODS = [
   { value: "VAULT_TRANSFER", label: "Vault-to-Vault Transfer", desc: "Transfer from another vault" },
 ];
 
-const VAULT_LOCATIONS = [
+const VAULT_LOCATION_SUGGESTIONS = [
   "London Main Vault",
   "London Hatton Garden",
   "Zurich Vault",
@@ -179,8 +180,12 @@ export function AdminVaultCreate({ clients: initialClients }: { clients?: Client
   const [intakeMethod, setIntakeMethod] = useState("CLIENT_DELIVERY");
   const [appointmentDate, setAppointmentDate] = useState("");
   const [appointmentNotes, setAppointmentNotes] = useState("");
-  const [vaultLocation, setVaultLocation] = useState("London Main Vault");
+  const [vaultLocation, setVaultLocation] = useState("");
+  const [showLocationSuggestions, setShowLocationSuggestions] = useState(false);
   const [complianceNotes, setComplianceNotes] = useState("");
+
+  // Currency
+  const [currency, setCurrency] = useState("USD");
 
   // ── Load clients ──
   useEffect(() => {
@@ -260,6 +265,7 @@ export function AdminVaultCreate({ clients: initialClients }: { clients?: Client
         appointmentDate: appointmentDate || undefined,
         appointmentNotes: appointmentNotes || undefined,
         vaultLocation,
+        currency,
         complianceNotes: complianceNotes || undefined,
       });
 
@@ -628,11 +634,42 @@ export function AdminVaultCreate({ clients: initialClients }: { clients?: Client
                 <p className="text-sm text-gray-500 mt-1">Set the declared value for insurance and custody purposes.</p>
               </div>
 
+              {/* Currency Selection */}
+              <div>
+                <label className={labelClass}>Currency <span className="text-red-500">*</span></label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+                  {SUPPORTED_CURRENCIES.map((c) => (
+                    <label
+                      key={c.code}
+                      className={`flex items-center gap-2 p-3 rounded-xl border cursor-pointer transition-all ${
+                        currency === c.code
+                          ? "border-[#D4A853] bg-[#D4A853]/10 ring-2 ring-[#D4A853]/20"
+                          : "border-gray-200 hover:border-gray-300 bg-white"
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="currency"
+                        value={c.code}
+                        checked={currency === c.code}
+                        onChange={(e) => setCurrency(e.target.value)}
+                        className="sr-only"
+                      />
+                      <span className="text-lg font-bold text-gray-700">{c.symbol}</span>
+                      <div>
+                        <p className="text-sm font-semibold text-gray-900">{c.code}</p>
+                        <p className="text-xs text-gray-500">{c.label}</p>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <div>
-                  <label className={labelClass}>Declared Value (USD) <span className="text-red-500">*</span></label>
+                  <label className={labelClass}>Declared Value ({SUPPORTED_CURRENCIES.find((c) => c.code === currency)?.symbol || "$"}) <span className="text-red-500">*</span></label>
                   <div className="relative">
-                    <span className="absolute left-4 top-3 text-gray-400 text-sm">$</span>
+                    <span className="absolute left-4 top-3 text-gray-400 text-sm">{SUPPORTED_CURRENCIES.find((c) => c.code === currency)?.symbol || "$"}</span>
                     <input
                       type="number"
                       step="0.01"
@@ -644,9 +681,9 @@ export function AdminVaultCreate({ clients: initialClients }: { clients?: Client
                   </div>
                 </div>
                 <div>
-                  <label className={labelClass}>Spot Price at Deposit ($/oz)</label>
+                  <label className={labelClass}>Spot Price at Deposit ({SUPPORTED_CURRENCIES.find((c) => c.code === currency)?.symbol || "$"}/oz)</label>
                   <div className="relative">
-                    <span className="absolute left-4 top-3 text-gray-400 text-sm">$</span>
+                    <span className="absolute left-4 top-3 text-gray-400 text-sm">{SUPPORTED_CURRENCIES.find((c) => c.code === currency)?.symbol || "$"}</span>
                     <input
                       type="number"
                       step="0.01"
@@ -664,10 +701,10 @@ export function AdminVaultCreate({ clients: initialClients }: { clients?: Client
                 <div className="p-4 rounded-xl bg-blue-50 border border-blue-200">
                   <p className="text-xs text-blue-600 font-semibold mb-1">Calculated Market Value</p>
                   <p className="text-lg font-mono font-bold text-blue-800">
-                    ${((parseFloat(weightGrams) / 31.1035) * parseFloat(spotPriceAtDeposit)).toFixed(2)}
+                    {SUPPORTED_CURRENCIES.find((c) => c.code === currency)?.symbol}{((parseFloat(weightGrams) / 31.1035) * parseFloat(spotPriceAtDeposit)).toFixed(2)}
                   </p>
                   <p className="text-xs text-blue-600 mt-0.5">
-                    {weightGrams}g ÷ 31.1035 = {(parseFloat(weightGrams) / 31.1035).toFixed(4)} troy oz × ${spotPriceAtDeposit}/oz
+                    {weightGrams}g ÷ 31.1035 = {(parseFloat(weightGrams) / 31.1035).toFixed(4)} troy oz × {SUPPORTED_CURRENCIES.find((c) => c.code === currency)?.symbol}{spotPriceAtDeposit}/oz
                   </p>
                   <button
                     onClick={() => setDeclaredValue(((parseFloat(weightGrams) / 31.1035) * parseFloat(spotPriceAtDeposit)).toFixed(2))}
@@ -686,9 +723,10 @@ export function AdminVaultCreate({ clients: initialClients }: { clients?: Client
                   <div className="flex justify-between"><span className="text-gray-400">Asset</span><span className="text-white font-medium">{ASSET_TYPES.find((a) => a.value === assetType)?.label}</span></div>
                   <div className="flex justify-between"><span className="text-gray-400">Weight</span><span className="text-white font-mono">{weightGrams || "—"}g</span></div>
                   <div className="flex justify-between"><span className="text-gray-400">Quantity</span><span className="text-white font-mono">{quantity}</span></div>
+                  <div className="flex justify-between"><span className="text-gray-400">Currency</span><span className="text-white font-medium">{currency} ({SUPPORTED_CURRENCIES.find((c) => c.code === currency)?.symbol})</span></div>
                   <div className="flex justify-between border-t border-gray-700 pt-2 mt-2">
                     <span className="text-gray-300 font-semibold">Declared Value</span>
-                    <span className="text-[#D4A853] text-lg font-bold font-mono">${parseFloat(declaredValue || "0").toLocaleString()}</span>
+                    <span className="text-[#D4A853] text-lg font-bold font-mono">{SUPPORTED_CURRENCIES.find((c) => c.code === currency)?.symbol}{parseFloat(declaredValue || "0").toLocaleString()}</span>
                   </div>
                 </div>
               </div>
@@ -822,13 +860,41 @@ export function AdminVaultCreate({ clients: initialClients }: { clients?: Client
                   <label className={labelClass}>Appointment Date & Time</label>
                   <input type="datetime-local" value={appointmentDate} onChange={(e) => setAppointmentDate(e.target.value)} className={inputClass} />
                 </div>
-                <div>
+                <div className="relative">
                   <label className={labelClass}>Vault Location <span className="text-red-500">*</span></label>
-                  <select value={vaultLocation} onChange={(e) => setVaultLocation(e.target.value)} className={selectClass}>
-                    {VAULT_LOCATIONS.map((v) => (
-                      <option key={v} value={v}>{v}</option>
-                    ))}
-                  </select>
+                  <input
+                    type="text"
+                    value={vaultLocation}
+                    onChange={(e) => {
+                      setVaultLocation(e.target.value);
+                      setShowLocationSuggestions(true);
+                    }}
+                    onFocus={() => setShowLocationSuggestions(true)}
+                    onBlur={() => setTimeout(() => setShowLocationSuggestions(false), 200)}
+                    placeholder="Enter vault location or select from suggestions..."
+                    className={inputClass}
+                  />
+                  {showLocationSuggestions && (
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-48 overflow-y-auto">
+                      {VAULT_LOCATION_SUGGESTIONS.filter((v) =>
+                        v.toLowerCase().includes(vaultLocation.toLowerCase())
+                      ).map((v) => (
+                        <button
+                          key={v}
+                          type="button"
+                          className="w-full text-left px-4 py-2 text-sm hover:bg-[#D4A853]/10 transition-colors first:rounded-t-xl last:rounded-b-xl"
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={() => {
+                            setVaultLocation(v);
+                            setShowLocationSuggestions(false);
+                          }}
+                        >
+                          <MapPin className="inline w-3.5 h-3.5 mr-2 text-gray-400" />
+                          {v}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -882,8 +948,9 @@ export function AdminVaultCreate({ clients: initialClients }: { clients?: Client
 
                 {/* Valuation */}
                 <ReviewCard title="Valuation" icon={Scale} onEdit={() => setStep(4)}>
-                  <ReviewRow label="Declared Value" value={`$${parseFloat(declaredValue || "0").toLocaleString()}`} bold />
-                  {spotPriceAtDeposit && <ReviewRow label="Spot Price" value={`$${spotPriceAtDeposit}/oz`} />}
+                  <ReviewRow label="Currency" value={`${currency} (${SUPPORTED_CURRENCIES.find((c) => c.code === currency)?.symbol})`} />
+                  <ReviewRow label="Declared Value" value={`${SUPPORTED_CURRENCIES.find((c) => c.code === currency)?.symbol}${parseFloat(declaredValue || "0").toLocaleString()}`} bold />
+                  {spotPriceAtDeposit && <ReviewRow label="Spot Price" value={`${SUPPORTED_CURRENCIES.find((c) => c.code === currency)?.symbol}${spotPriceAtDeposit}/oz`} />}
                 </ReviewCard>
 
                 {/* Authorization */}

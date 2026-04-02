@@ -291,11 +291,17 @@ model VaultDeposit {
   insuranceExpiryDate DateTime?
   insuranceCertUrl    String?
 
+  currency          String     @default("USD")
   monthlyStorageFee Float?
   insuranceFeeRate  Float?
   assayFee          Float?
   handlingFee       Float?
   totalFeesCharged  Float      @default(0)
+
+  // Demurrage
+  demurrageStartDate  DateTime?
+  demurrageRate       Float?
+  totalDemurrage      Float      @default(0)
 
   depositReceiptUrl   String?
   storageAgreementUrl String?
@@ -518,6 +524,7 @@ enum VAULT_ACTION {
   INSURANCE_EXPIRED
   FEE_CHARGED
   FEE_PAID
+  DEMURRAGE_CHARGED
   WITHDRAWAL_REQUESTED
   WITHDRAWAL_APPROVED
   WITHDRAWAL_REJECTED
@@ -612,6 +619,8 @@ enum INVOICE_ITEM_TYPE {
   KYC_FEE
   DOCUMENTATION_FEE
   LATE_FEE
+  DEMURRAGE_FEE
+  LATE_PAYMENT_PENALTY
   OTHER
 }
 
@@ -625,6 +634,7 @@ model VaultInvoice {
   paidAt          DateTime?
   periodStart     DateTime?
   periodEnd       DateTime?
+  currency        String          @default("USD")
   subtotal        Float           @default(0)
   taxRate         Float           @default(0)
   taxAmount       Float           @default(0)
