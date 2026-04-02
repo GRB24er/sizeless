@@ -377,6 +377,102 @@ export function generateCustodyReference(): string {
   return ref;
 }
 
+// ─── SUPPORTED CURRENCIES ───────────────────────────────────
+
+export const SUPPORTED_CURRENCIES = [
+  { code: "USD", symbol: "$", label: "US Dollar", locale: "en-US" },
+  { code: "EUR", symbol: "€", label: "Euro", locale: "de-DE" },
+  { code: "GBP", symbol: "£", label: "British Pound", locale: "en-GB" },
+  { code: "CHF", symbol: "CHF", label: "Swiss Franc", locale: "de-CH" },
+  { code: "AED", symbol: "د.إ", label: "UAE Dirham", locale: "ar-AE" },
+  { code: "SGD", symbol: "S$", label: "Singapore Dollar", locale: "en-SG" },
+  { code: "HKD", symbol: "HK$", label: "Hong Kong Dollar", locale: "en-HK" },
+  { code: "ZAR", symbol: "R", label: "South African Rand", locale: "en-ZA" },
+  { code: "AUD", symbol: "A$", label: "Australian Dollar", locale: "en-AU" },
+  { code: "CAD", symbol: "C$", label: "Canadian Dollar", locale: "en-CA" },
+  { code: "JPY", symbol: "¥", label: "Japanese Yen", locale: "ja-JP" },
+  { code: "CNY", symbol: "¥", label: "Chinese Yuan", locale: "zh-CN" },
+];
+
+export function getCurrencyConfig(currencyCode: string) {
+  return (
+    SUPPORTED_CURRENCIES.find((c) => c.code === currencyCode) ??
+    SUPPORTED_CURRENCIES[0] // Default to USD
+  );
+}
+
+export function formatCurrencyAmount(amount: number, currencyCode: string = "USD"): string {
+  const config = getCurrencyConfig(currencyCode);
+  return new Intl.NumberFormat(config.locale, {
+    style: "currency",
+    currency: config.code,
+    minimumFractionDigits: 2,
+  }).format(amount);
+}
+
+// ─── DEMURRAGE / STORAGE CHARGE SCHEDULE ────────────────────
+
+export const DEMURRAGE_CONFIG = {
+  // Grace period (days) before demurrage charges begin after storage end date or overdue notice
+  gracePeriodDays: 14,
+
+  // Daily demurrage rate as percentage of declared value
+  dailyRates: {
+    STANDARD: 0.015,    // 0.015% per day (~5.475% p.a.)
+    EXTENDED: 0.025,    // 0.025% per day (~9.125% p.a.) — after 90 days overdue
+    CRITICAL: 0.040,    // 0.040% per day (~14.6% p.a.) — after 180 days overdue
+  },
+
+  // Minimum daily demurrage charge (in base currency)
+  minimumDailyCharge: 10.00,
+
+  // Flat late payment penalty applied once when invoice becomes overdue
+  latePaymentPenaltyPercent: 2.0, // 2% of outstanding balance
+
+  // Thresholds for rate escalation (days overdue)
+  extendedThresholdDays: 90,
+  criticalThresholdDays: 180,
+};
+
+export function calculateDemurrageCharge(
+  declaredValue: number,
+  daysOverdue: number,
+): number {
+  if (daysOverdue <= DEMURRAGE_CONFIG.gracePeriodDays) return 0;
+
+  const chargeableDays = daysOverdue - DEMURRAGE_CONFIG.gracePeriodDays;
+
+  let rate: number;
+  if (daysOverdue >= DEMURRAGE_CONFIG.criticalThresholdDays) {
+    rate = DEMURRAGE_CONFIG.dailyRates.CRITICAL;
+  } else if (daysOverdue >= DEMURRAGE_CONFIG.extendedThresholdDays) {
+    rate = DEMURRAGE_CONFIG.dailyRates.EXTENDED;
+  } else {
+    rate = DEMURRAGE_CONFIG.dailyRates.STANDARD;
+  }
+
+  const dailyCharge = Math.max(
+    declaredValue * (rate / 100),
+    DEMURRAGE_CONFIG.minimumDailyCharge
+  );
+
+  return Math.round(dailyCharge * chargeableDays * 100) / 100;
+}
+
+export function calculateLatePaymentPenalty(outstandingBalance: number): number {
+  return Math.round(outstandingBalance * (DEMURRAGE_CONFIG.latePaymentPenaltyPercent / 100) * 100) / 100;
+}
+
+export function getDemurrageRate(daysOverdue: number): { rate: number; tier: string } {
+  if (daysOverdue >= DEMURRAGE_CONFIG.criticalThresholdDays) {
+    return { rate: DEMURRAGE_CONFIG.dailyRates.CRITICAL, tier: "Critical" };
+  }
+  if (daysOverdue >= DEMURRAGE_CONFIG.extendedThresholdDays) {
+    return { rate: DEMURRAGE_CONFIG.dailyRates.EXTENDED, tier: "Extended" };
+  }
+  return { rate: DEMURRAGE_CONFIG.dailyRates.STANDARD, tier: "Standard" };
+}
+
 // ─── HELPER: Calculate monthly storage fee ───────────────────
 
 export function calculateMonthlyStorageFee(
@@ -386,7 +482,7 @@ export function calculateMonthlyStorageFee(
   const weightKg = weightGrams / 1000;
   const config = STORAGE_TYPE_CONFIG[storageType];
   if (!config) return 0;
-  return Math.max(weightKg * config.monthlyRatePerKg, 25); // Minimum $25/month
+  return Math.max(weightKg * config.monthlyRatePerKg, 25); // Minimum 25/month
 }
 
 // ─── HELPER: Calculate annual insurance premium ──────────────
@@ -398,5 +494,5 @@ export function calculateAnnualInsurance(
   const rates = VAULT_FEE_SCHEDULE.insuranceRates;
   const rate =
     rates[coverageType as keyof typeof rates] ?? rates.ALL_RISK;
-  return Math.max(insuredValue * (rate / 100), 500); // Minimum $500/year
+  return Math.max(insuredValue * (rate / 100), 500); // Minimum 500/year
 }

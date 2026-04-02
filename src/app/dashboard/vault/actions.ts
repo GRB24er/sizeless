@@ -88,6 +88,9 @@ export async function createVaultDeposit(data: {
   appointmentNotes?: string;
   vaultLocation: string;
 
+  // Currency
+  currency?: string;
+
   // Compliance
   complianceNotes?: string;
 }) {
@@ -157,6 +160,7 @@ export async function createVaultDeposit(data: {
         appointmentDate: data.appointmentDate ? new Date(data.appointmentDate) : null,
         appointmentNotes: data.appointmentNotes,
         vaultLocation: data.vaultLocation,
+        currency: data.currency || "USD",
 
         // Compliance — auto-screen
         sanctionsChecked: true,

@@ -1,6 +1,7 @@
 import jsPDF from "jspdf";
 import { generateTrackingQR, generateVaultQR } from "./qr-generator";
 import { getLogoBase64, getLogoFormat } from "./logo-loader";
+import { formatCurrencyAmount } from "@/lib/vault/types";
 
 // ═══════════════════════════════════════════
 // BRAND COLORS
@@ -33,6 +34,7 @@ type VaultData = {
   purity: string | null; quantity: number; declaredValue: number; serialNumbers: string | null;
   vaultLocation: string; storageUnit: string | null; insuredValue: number | null;
   depositDate: string | Date; verifiedAt: string | Date | null;
+  currency?: string;
   client: { name: string; email: string; phone: string };
 };
 
@@ -47,7 +49,9 @@ function fmtDateTime(d: string | Date | null | undefined): string {
   if (!d) return "—";
   try { return new Date(d).toLocaleString("en-GB", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }); } catch { return "—"; }
 }
-function fmtCurrency(n: number): string { return `$${n.toLocaleString("en-US", { minimumFractionDigits: 2 })}`; }
+function fmtCurrency(n: number, currencyCode: string = "USD"): string {
+  return formatCurrencyAmount(n, currencyCode);
+}
 function genDocId(): string { return "DOC-" + Math.random().toString(36).substring(2, 10).toUpperCase(); }
 
 // ═══════════════════════════════════════════
@@ -1110,8 +1114,8 @@ export async function generateVaultCertificate(data: VaultData): Promise<Buffer>
   drawKeyValue(doc, "Purity", data.purity || "N/A", 130, y);
   y += 14;
   drawKeyValue(doc, "Weight", `${data.weightGrams}g`, 22, y);
-  drawKeyValue(doc, "Declared Value", fmtCurrency(data.declaredValue), 80, y);
-  drawKeyValue(doc, "Insured Value", data.insuredValue ? fmtCurrency(data.insuredValue) : "Pending", 130, y);
+  drawKeyValue(doc, "Declared Value", fmtCurrency(data.declaredValue, data.currency), 80, y);
+  drawKeyValue(doc, "Insured Value", data.insuredValue ? fmtCurrency(data.insuredValue, data.currency) : "Pending", 130, y);
   y += 14;
   if (data.serialNumbers) { drawKeyValue(doc, "Serial Numbers", data.serialNumbers, 22, y); y += 14; }
   drawKeyValue(doc, "Description", data.description, 22, y);
@@ -1220,6 +1224,7 @@ type VaultAssayData = {
   declaredValue: number;
   verifiedValue: number | null;
   vaultLocation: string;
+  currency?: string;
   client: { name: string; email: string; phone: string };
 };
 
@@ -1242,6 +1247,7 @@ type VaultStorageData = {
   insuredValue: number | null;
   insuranceProvider: string | null;
   insurancePolicyNo: string | null;
+  currency?: string;
   client: { name: string; email: string; phone: string };
 };
 
@@ -1262,6 +1268,7 @@ type VaultInsuranceData = {
   vaultLocation: string;
   storageUnit: string | null;
   depositDate: string | Date;
+  currency?: string;
   client: { name: string; email: string; phone: string };
 };
 
@@ -1358,8 +1365,8 @@ export async function generateAssayReport(data: VaultAssayData): Promise<Buffer>
     const discPct = ((disc / data.weightGrams) * 100).toFixed(3);
     drawKeyValue(doc, "Discrepancy", `${disc > 0 ? "+" : ""}${disc.toFixed(2)}g (${disc > 0 ? "+" : ""}${discPct}%)`, 140, y + 4);
   }
-  drawKeyValue(doc, "Declared Value", fmtCurrency(data.declaredValue), 22, y + 18);
-  if (data.verifiedValue) drawKeyValue(doc, "Verified Value", fmtCurrency(data.verifiedValue), 100, y + 18);
+  drawKeyValue(doc, "Declared Value", fmtCurrency(data.declaredValue, data.currency), 22, y + 18);
+  if (data.verifiedValue) drawKeyValue(doc, "Verified Value", fmtCurrency(data.verifiedValue, data.currency), 100, y + 18);
 
   y += 36;
   // Assay notes
@@ -1452,7 +1459,7 @@ export async function generateStorageAgreement(data: VaultStorageData): Promise<
   drawKeyValue(doc, "Weight", `${data.weightGrams}g`, 150, y);
   y += 14;
   drawKeyValue(doc, "Description", data.description, 22, y);
-  drawKeyValue(doc, "Declared Value", fmtCurrency(data.declaredValue), 130, y);
+  drawKeyValue(doc, "Declared Value", fmtCurrency(data.declaredValue, data.currency), 130, y);
   y += 14;
   if (data.serialNumbers) { drawKeyValue(doc, "Serial Numbers", data.serialNumbers, 22, y); y += 14; }
 
@@ -1472,14 +1479,14 @@ export async function generateStorageAgreement(data: VaultStorageData): Promise<
   drawKeyValue(doc, "Position", data.shelfPosition || "—", 140, y);
   y += 14;
   drawKeyValue(doc, "Commencement", fmtDate(data.depositDate), 22, y);
-  drawKeyValue(doc, "Monthly Fee", data.monthlyStorageFee ? fmtCurrency(data.monthlyStorageFee) : "TBD", 80, y);
+  drawKeyValue(doc, "Monthly Fee", data.monthlyStorageFee ? fmtCurrency(data.monthlyStorageFee, data.currency) : "TBD", 80, y);
   drawKeyValue(doc, "Billing Cycle", "1st of each month", 140, y);
 
   y += 16;
   // Insurance summary
   if (data.insuredValue) {
     y = drawGoldSectionTitle(doc, "Insurance", y);
-    drawKeyValue(doc, "Insured Value", fmtCurrency(data.insuredValue), 22, y);
+    drawKeyValue(doc, "Insured Value", fmtCurrency(data.insuredValue, data.currency), 22, y);
     drawKeyValue(doc, "Provider", data.insuranceProvider || "—", 80, y);
     drawKeyValue(doc, "Policy No.", data.insurancePolicyNo || "—", 140, y);
     y += 16;
@@ -1584,8 +1591,8 @@ export async function generateVaultInsuranceCertificate(data: VaultInsuranceData
   };
 
   drawKeyValue(doc, "Coverage Type", coverageLabels[data.insuranceCoverage || ""] || data.insuranceCoverage || "—", 22, y + 14);
-  drawKeyValue(doc, "Declared Value", fmtCurrency(data.declaredValue), 22, y + 24);
-  drawKeyValue(doc, "Insured Value", data.insuredValue ? fmtCurrency(data.insuredValue) : "Pending", 80, y + 24);
+  drawKeyValue(doc, "Declared Value", fmtCurrency(data.declaredValue, data.currency), 22, y + 24);
+  drawKeyValue(doc, "Insured Value", data.insuredValue ? fmtCurrency(data.insuredValue, data.currency) : "Pending", 80, y + 24);
   drawKeyValue(doc, "Provider", data.insuranceProvider || "—", 140, y + 14);
   drawKeyValue(doc, "Expiry", fmtDate(data.insuranceExpiryDate as any), 140, y + 24);
 
