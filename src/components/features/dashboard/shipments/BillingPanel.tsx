@@ -44,6 +44,7 @@ import {
   recordInvoicePayment,
   cancelInvoice,
 } from "@/app/(root)/shipments/vault-billing-actions";
+import { formatCurrencyAmount } from "@/lib/vault/types";
 
 // ─── TYPES ───────────────────────────────────────────────────
 
@@ -59,6 +60,7 @@ type Invoice = {
   total: number;
   amountPaid: number;
   balanceDue: number;
+  currency: string;
   status: string;
   paymentMethod: string | null;
   paymentRef: string | null;
@@ -156,7 +158,7 @@ function PaymentDialog({
             </div>
             <div className="flex justify-between">
               <span className="text-gray-500">Total Due</span>
-              <span className="font-bold text-lg">${invoice.balanceDue.toFixed(2)}</span>
+              <span className="font-bold text-lg">{formatCurrencyAmount(invoice.balanceDue, invoice.currency || "USD")}</span>
             </div>
           </div>
 
@@ -238,9 +240,10 @@ function InvoiceDetail({
   const [paymentDialog, setPaymentDialog] = useState(false);
 
   const cfg = statusConfig[invoice.status] || statusConfig.DRAFT;
+  const cur = invoice.currency || "USD";
   const fmtDate = (d: string | null) =>
     d ? new Date(d).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "—";
-  const fmtCurrency = (n: number) => `$${n.toFixed(2)}`;
+  const fmtCurrency = (n: number) => formatCurrencyAmount(n, cur);
 
   const handleCancel = () => {
     startTransition(async () => {
@@ -436,8 +439,7 @@ export default function BillingPanel({ adminId }: { adminId: string }) {
     });
   };
 
-  const fmtCurrency = (n: number) =>
-    `$${n.toLocaleString("en-US", { minimumFractionDigits: 2 })}`;
+  const fmtCurrency = (n: number) => formatCurrencyAmount(n, "USD");
 
   const fmtDate = (d: string) =>
     new Date(d).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });

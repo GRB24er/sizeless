@@ -53,6 +53,7 @@ function fmtCurrency(n: number, currencyCode: string = "USD"): string {
   return formatCurrencyAmount(n, currencyCode);
 }
 function genDocId(): string { return "DOC-" + Math.random().toString(36).substring(2, 10).toUpperCase(); }
+function fmtPurity(p: string | null): string { if (!p) return "N/A"; return p === "dore" ? "Doré" : `${p}%`; }
 
 // ═══════════════════════════════════════════
 // WATERMARK — Diagonal "AEGIS CARGO" across page
@@ -155,7 +156,7 @@ function drawEmbossedSeal(doc: jsPDF, x: number, y: number, size: number = 22) {
 
   doc.setFontSize(4.5);
   doc.setTextColor(...GOLD);
-  doc.text("EST. 2024", x, y + 7, { align: "center" });
+  doc.text("EST. 2008", x, y + 7, { align: "center" });
 
   // ISO badge
   doc.setFontSize(3.5);
@@ -1111,7 +1112,7 @@ export async function generateVaultCertificate(data: VaultData): Promise<Buffer>
   y = drawSectionTitle(doc, "Asset Details", y);
   drawKeyValue(doc, "Asset Type", data.assetType, 22, y);
   drawKeyValue(doc, "Quantity", `${data.quantity}`, 80, y);
-  drawKeyValue(doc, "Purity", data.purity || "N/A", 130, y);
+  drawKeyValue(doc, "Purity", fmtPurity(data.purity), 130, y);
   y += 14;
   drawKeyValue(doc, "Weight", `${data.weightGrams}g`, 22, y);
   drawKeyValue(doc, "Declared Value", fmtCurrency(data.declaredValue, data.currency), 80, y);
@@ -1341,7 +1342,7 @@ export async function generateAssayReport(data: VaultAssayData): Promise<Buffer>
   y = drawGoldSectionTitle(doc, "Asset Under Test", y);
   drawKeyValue(doc, "Asset Type", data.assetType, 22, y);
   drawKeyValue(doc, "Quantity", `${data.quantity}`, 80, y);
-  drawKeyValue(doc, "Purity (Declared)", data.purity || "N/A", 130, y);
+  drawKeyValue(doc, "Purity (Declared)", fmtPurity(data.purity), 130, y);
   y += 14;
   drawKeyValue(doc, "Description", data.description, 22, y);
   y += 14;
@@ -1455,7 +1456,7 @@ export async function generateStorageAgreement(data: VaultStorageData): Promise<
   y = drawGoldSectionTitle(doc, "Assets in Custody", y);
   drawKeyValue(doc, "Asset Type", data.assetType, 22, y);
   drawKeyValue(doc, "Qty", `${data.quantity}`, 80, y);
-  drawKeyValue(doc, "Purity", data.purity || "N/A", 110, y);
+  drawKeyValue(doc, "Purity", fmtPurity(data.purity), 110, y);
   drawKeyValue(doc, "Weight", `${data.weightGrams}g`, 150, y);
   y += 14;
   drawKeyValue(doc, "Description", data.description, 22, y);
@@ -1573,7 +1574,7 @@ export async function generateVaultInsuranceCertificate(data: VaultInsuranceData
   y += 14;
   drawKeyValue(doc, "Asset Type", data.assetType, 22, y);
   drawKeyValue(doc, "Weight", `${data.weightGrams}g`, 80, y);
-  drawKeyValue(doc, "Purity", data.purity || "N/A", 130, y);
+  drawKeyValue(doc, "Purity", fmtPurity(data.purity), 130, y);
   y += 14;
   drawKeyValue(doc, "Description", data.description, 22, y);
 
