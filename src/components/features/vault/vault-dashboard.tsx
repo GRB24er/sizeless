@@ -104,7 +104,7 @@ export function VaultDashboard({ deposits }: { deposits: VaultDeposit[] }) {
                   <Select name="purity">
                     <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white"><SelectValue placeholder="Select" /></SelectTrigger>
                     <SelectContent className="bg-[#0D1F35] border-slate-700">
-                      {["999.9 (24K)","995 (23.88K)","916.7 (22K)","750 (18K)","999 (Fine Silver)"].map(p => (
+                      {["99.99% (24K)","99.5% (23.88K)","91.67% (22K)","75.0% (18K)","99.9% (Fine Silver)"].map(p => (
                         <SelectItem key={p} value={p} className="text-white">{p}</SelectItem>
                       ))}
                     </SelectContent>
@@ -158,7 +158,7 @@ export function VaultDashboard({ deposits }: { deposits: VaultDeposit[] }) {
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm mb-4">
                   <div><p className="text-slate-500">Asset</p><p className="text-white font-medium">{dep.quantity}x {dep.assetType}</p></div>
                   <div><p className="text-slate-500">Weight</p><p className="text-white font-medium">{dep.weightGrams}g</p></div>
-                  <div><p className="text-slate-500">Purity</p><p className="text-white font-medium">{dep.purity || "—"}</p></div>
+                  <div><p className="text-slate-500">Purity</p><p className="text-white font-medium">{dep.purity ? (dep.purity === "dore" ? "Doré" : `${dep.purity}%`) : "—"}</p></div>
                   <div><p className="text-slate-500">Value</p><p className="text-[#D4A853] font-semibold">${dep.declaredValue.toLocaleString()}</p></div>
                 </div>
                 <div className="flex items-center gap-3">

@@ -142,14 +142,14 @@ export const ASSET_TYPE_LABELS: Record<string, string> = {
 // ─── PURITY OPTIONS ──────────────────────────────────────────
 
 export const PURITY_OPTIONS = [
-  { value: "999.9", label: "999.9 — Four Nines Fine (LBMA)" },
-  { value: "999",   label: "999 — Three Nines Fine" },
-  { value: "995",   label: "995 — London Good Delivery Minimum" },
-  { value: "990",   label: "990" },
-  { value: "916",   label: "916 — 22 Karat" },
-  { value: "750",   label: "750 — 18 Karat" },
-  { value: "585",   label: "585 — 14 Karat" },
-  { value: "375",   label: "375 — 9 Karat" },
+  { value: "99.99", label: "99.99% — Four Nines Fine (LBMA)" },
+  { value: "99.9",  label: "99.9% — Three Nines Fine" },
+  { value: "99.5",  label: "99.5% — London Good Delivery Minimum" },
+  { value: "99.0",  label: "99.0%" },
+  { value: "91.6",  label: "91.6% — 22 Karat" },
+  { value: "75.0",  label: "75.0% — 18 Karat" },
+  { value: "58.5",  label: "58.5% — 14 Karat" },
+  { value: "37.5",  label: "37.5% — 9 Karat" },
   { value: "dore",  label: "Doré / Unrefined (variable)" },
 ];
 

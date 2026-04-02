@@ -141,7 +141,7 @@ export function AdminVaultCreate({ clients: initialClients }: { clients?: Client
   const [assetType, setAssetType] = useState("GOLD_BAR");
   const [description, setDescription] = useState("");
   const [weightGrams, setWeightGrams] = useState("");
-  const [purity, setPurity] = useState("999.9");
+  const [purity, setPurity] = useState("99.99");
   const [fineness, setFineness] = useState("");
   const [quantity, setQuantity] = useState("1");
   const [serialNumbers, setSerialNumbers] = useState("");
@@ -939,7 +939,7 @@ export function AdminVaultCreate({ clients: initialClients }: { clients?: Client
                   <ReviewRow label="Type" value={`${ASSET_TYPES.find((a) => a.value === assetType)?.icon} ${ASSET_TYPES.find((a) => a.value === assetType)?.label}`} />
                   <ReviewRow label="Description" value={description} />
                   <ReviewRow label="Weight" value={`${weightGrams}g`} />
-                  <ReviewRow label="Purity" value={purity || "—"} />
+                  <ReviewRow label="Purity" value={purity === "dore" ? "Doré (variable)" : purity ? `${purity}%` : "—"} />
                   <ReviewRow label="Quantity" value={quantity} />
                   {serialNumbers && <ReviewRow label="Serial #" value={serialNumbers} />}
                   {refinerName && <ReviewRow label="Refiner" value={refinerName} />}

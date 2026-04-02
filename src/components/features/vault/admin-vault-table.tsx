@@ -128,7 +128,7 @@ export function AdminVaultTable({ deposits }: { deposits: Deposit[] }) {
                 <TableRow key={dep.id} className="hover:bg-gray-50">
                   <TableCell className="font-mono text-sm font-medium text-amber-700">{dep.depositNumber}</TableCell>
                   <TableCell><p className="font-medium text-sm">{dep.client.name}</p><p className="text-xs text-gray-500">{dep.client.email}</p></TableCell>
-                  <TableCell><p className="text-sm">{dep.quantity}x {dep.assetType}</p>{dep.purity && <p className="text-xs text-gray-500">{dep.purity}</p>}</TableCell>
+                  <TableCell><p className="text-sm">{dep.quantity}x {dep.assetType}</p>{dep.purity && <p className="text-xs text-gray-500">{dep.purity === "dore" ? "Doré" : `${dep.purity}%`}</p>}</TableCell>
                   <TableCell className="text-sm">{dep.weightGrams}g</TableCell>
                   <TableCell className="font-semibold text-sm text-amber-700">${dep.declaredValue.toLocaleString()}</TableCell>
                   <TableCell><Badge className={`${cfg.color} border text-xs`}>{cfg.label}</Badge></TableCell>
@@ -153,7 +153,7 @@ export function AdminVaultTable({ deposits }: { deposits: Deposit[] }) {
                 <div><p className="text-gray-500">Client</p><p className="font-medium">{selected.client.name}</p></div>
                 <div><p className="text-gray-500">Email</p><p className="font-medium">{selected.client.email}</p></div>
                 <div><p className="text-gray-500">Asset</p><p className="font-medium">{selected.quantity}x {selected.assetType}</p></div>
-                <div><p className="text-gray-500">Weight</p><p className="font-medium">{selected.weightGrams}g ({selected.purity || "N/A"})</p></div>
+                <div><p className="text-gray-500">Weight</p><p className="font-medium">{selected.weightGrams}g ({selected.purity ? (selected.purity === "dore" ? "Doré" : `${selected.purity}%`) : "N/A"})</p></div>
                 <div><p className="text-gray-500">Value</p><p className="font-semibold text-amber-700">${selected.declaredValue.toLocaleString()}</p></div>
                 <div><p className="text-gray-500">Storage Unit</p><p className="font-medium">{selected.storageUnit || "Unassigned"}</p></div>
                 {selected.serialNumbers && <div className="col-span-2"><p className="text-gray-500">Serial #</p><p className="font-mono text-xs">{selected.serialNumbers}</p></div>}
