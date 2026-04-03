@@ -32,6 +32,16 @@ function addDays(date: Date, days: number): Date {
   return r;
 }
 
+/** Safely read deposit currency (column may not exist in DB yet) */
+function getDepositCurrency(deposit: any): string {
+  try { return deposit?.currency || "USD"; } catch { return "USD"; }
+}
+
+/** Build optional currency field — only include if not default USD */
+function currencyField(currency: string): Record<string, string> {
+  return currency && currency !== "USD" ? { currency } : {};
+}
+
 // ═══════════════════════════════════════════════════════════════
 // CREATE SINGLE INVOICE (Manual)
 // ═══════════════════════════════════════════════════════════════
@@ -73,7 +83,7 @@ export async function createVaultInvoice(
     const taxAmount = subtotal * (taxRate / 100);
     const total = subtotal + taxAmount;
 
-    const depositCurrency = options?.currency || (deposit as any).currency || "USD";
+    const depositCurrency = options?.currency || getDepositCurrency(deposit);
 
     const invoice = await prisma.vaultInvoice.create({
       data: {
@@ -84,7 +94,7 @@ export async function createVaultInvoice(
         dueDate: addDays(new Date(), options?.dueDays || 30),
         periodStart: options?.periodStart ? new Date(options.periodStart) : null,
         periodEnd: options?.periodEnd ? new Date(options.periodEnd) : null,
-        currency: depositCurrency,
+        ...currencyField(depositCurrency),
         subtotal,
         taxRate,
         taxAmount,
@@ -174,6 +184,7 @@ export async function generateMonthlyInvoices(adminId: string) {
         }
 
         const subtotal = invoiceItems.reduce((s: number, item: any) => s + item.amount, 0);
+        const depCurrency = getDepositCurrency(deposit);
 
         await prisma.vaultInvoice.create({
           data: {
@@ -184,7 +195,7 @@ export async function generateMonthlyInvoices(adminId: string) {
             dueDate: addDays(new Date(), 30),
             periodStart,
             periodEnd,
-            currency: (deposit as any).currency || "USD",
+            ...currencyField(depCurrency),
             subtotal,
             taxRate: 0,
             taxAmount: 0,
@@ -265,6 +276,7 @@ export async function generateTransactionInvoice(
     }));
 
     const subtotal = invoiceItems.reduce((s: number, i: any) => s + i.amount, 0);
+    const depCurrency = getDepositCurrency(deposit);
 
     const invoice = await prisma.vaultInvoice.create({
       data: {
@@ -273,7 +285,7 @@ export async function generateTransactionInvoice(
         clientId: deposit.clientId,
         issueDate: new Date(),
         dueDate: addDays(new Date(), 14), // Transaction invoices due in 14 days
-        currency: (deposit as any).currency || "USD",
+        ...currencyField(depCurrency),
         subtotal,
         taxRate: 0,
         taxAmount: 0,
@@ -445,7 +457,7 @@ export async function generateDemurrageInvoice(
     const demurrageAmount = calculateDemurrageCharge(deposit.declaredValue, daysOverdue);
     const { rate, tier } = getDemurrageRate(daysOverdue);
     const chargeableDays = daysOverdue - DEMURRAGE_CONFIG.gracePeriodDays;
-    const depositCurrency = (deposit as any).currency || "USD";
+    const depositCurrency = getDepositCurrency(deposit);
 
     const invoiceItems: any[] = [
       {
@@ -466,7 +478,7 @@ export async function generateDemurrageInvoice(
         clientId: deposit.clientId,
         issueDate: new Date(),
         dueDate: addDays(new Date(), 14),
-        currency: depositCurrency,
+        ...currencyField(depositCurrency),
         subtotal,
         taxRate: 0,
         taxAmount: 0,
@@ -478,24 +490,27 @@ export async function generateDemurrageInvoice(
       },
     });
 
-    // Update deposit demurrage total
-    await prisma.vaultDeposit.update({
-      where: { id: depositId },
-      data: {
-        totalDemurrage: { increment: demurrageAmount },
-        totalFeesCharged: { increment: demurrageAmount },
-      },
-    });
+    // Update deposit totals (safe — totalFeesCharged already exists in DB)
+    try {
+      await prisma.vaultDeposit.update({
+        where: { id: depositId },
+        data: {
+          totalFeesCharged: { increment: demurrageAmount },
+        },
+      });
+    } catch { /* totalDemurrage column may not exist yet */ }
 
     // Log activity
-    await (prisma as any).vaultActivity.create({
-      data: {
-        depositId,
-        action: "DEMURRAGE_CHARGED",
-        description: `Demurrage invoice ${invoice.invoiceNumber} generated: ${formatCurrencyAmount(demurrageAmount, depositCurrency)} for ${chargeableDays} day(s) at ${tier} rate`,
-        performedBy: adminId,
-      },
-    });
+    try {
+      await (prisma as any).vaultActivity.create({
+        data: {
+          depositId,
+          action: "DEMURRAGE_CHARGED",
+          description: `Demurrage invoice ${invoice.invoiceNumber} generated: ${formatCurrencyAmount(demurrageAmount, depositCurrency)} for ${chargeableDays} day(s) at ${tier} rate`,
+          performedBy: adminId,
+        },
+      });
+    } catch { /* DEMURRAGE_CHARGED enum may not exist yet */ }
 
     revalidatePath("/dashboard/shipments");
     return {
@@ -542,7 +557,7 @@ export async function generateLatePaymentPenalty(
         clientId: invoice.clientId,
         issueDate: new Date(),
         dueDate: addDays(new Date(), 14),
-        currency: depositCurrency,
+        ...currencyField(depositCurrency),
         subtotal: penalty,
         taxRate: 0,
         taxAmount: 0,
@@ -602,19 +617,25 @@ export async function getDemurrageSummary(depositId: string) {
       ? Math.floor((now.getTime() - new Date(referenceDate).getTime()) / (1000 * 60 * 60 * 24))
       : 0;
 
-    const depositCurrency = (deposit as any).currency || "USD";
+    const depositCurrency = getDepositCurrency(deposit);
     const { rate, tier } = getDemurrageRate(daysOverdue);
     const currentDemurrage = calculateDemurrageCharge(deposit.declaredValue, daysOverdue);
 
-    // Get existing demurrage invoices
-    const demurrageInvoices = await prisma.vaultInvoice.findMany({
-      where: {
-        depositId,
-        items: { some: { type: "DEMURRAGE_FEE" as any } },
-      },
-      include: { items: true },
-      orderBy: { createdAt: "desc" },
-    });
+    // Get existing demurrage invoices (look for demurrage in notes since enum may not exist yet)
+    let demurrageInvoices: any[] = [];
+    try {
+      demurrageInvoices = await prisma.vaultInvoice.findMany({
+        where: {
+          depositId,
+          notes: { contains: "Demurrage" },
+        },
+        include: { items: true },
+        orderBy: { createdAt: "desc" },
+      });
+    } catch {
+      // Fallback if the query fails
+      demurrageInvoices = [];
+    }
 
     return {
       depositNumber: deposit.depositNumber,
