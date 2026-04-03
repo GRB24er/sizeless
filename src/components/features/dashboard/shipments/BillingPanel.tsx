@@ -60,7 +60,6 @@ type Invoice = {
   total: number;
   amountPaid: number;
   balanceDue: number;
-  currency: string;
   status: string;
   paymentMethod: string | null;
   paymentRef: string | null;
@@ -158,7 +157,7 @@ function PaymentDialog({
             </div>
             <div className="flex justify-between">
               <span className="text-gray-500">Total Due</span>
-              <span className="font-bold text-lg">{formatCurrencyAmount(invoice.balanceDue, invoice.currency || "USD")}</span>
+              <span className="font-bold text-lg">{formatCurrencyAmount(invoice.balanceDue, "USD")}</span>
             </div>
           </div>
 
@@ -240,10 +239,9 @@ function InvoiceDetail({
   const [paymentDialog, setPaymentDialog] = useState(false);
 
   const cfg = statusConfig[invoice.status] || statusConfig.DRAFT;
-  const cur = invoice.currency || "USD";
   const fmtDate = (d: string | null) =>
     d ? new Date(d).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }) : "—";
-  const fmtCurrency = (n: number) => formatCurrencyAmount(n, cur);
+  const fmtCurrency = (n: number) => formatCurrencyAmount(n, "USD");
 
   const handleCancel = () => {
     startTransition(async () => {

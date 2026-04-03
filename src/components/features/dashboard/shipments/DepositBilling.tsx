@@ -342,7 +342,7 @@ export default function DepositBilling({
           {invoices.map((inv) => {
             const isOverdue = inv.status === "SENT" && new Date(inv.dueDate) < new Date();
             const isDemurrage = inv.items.some((i) => i.type === "DEMURRAGE_FEE");
-            const currency = (inv as any).currency || "USD";
+            const currency = "USD";
             return (
               <div
                 key={inv.id}

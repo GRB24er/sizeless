@@ -160,7 +160,6 @@ export async function createVaultDeposit(data: {
         appointmentDate: data.appointmentDate ? new Date(data.appointmentDate) : null,
         appointmentNotes: data.appointmentNotes,
         vaultLocation: data.vaultLocation,
-        ...(data.currency && data.currency !== "USD" ? { currency: data.currency } : {}),
 
         // Compliance — auto-screen
         sanctionsChecked: true,
