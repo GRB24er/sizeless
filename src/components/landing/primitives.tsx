@@ -153,6 +153,15 @@ export const usd = (n: number) =>
 export const usdCents = (n: number) =>
   new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 2 }).format(n);
 
+/** Money in a given currency (defaults to USD). Falls back to USD if the code is unknown. */
+export const money = (n: number, currency = "USD") => {
+  try {
+    return new Intl.NumberFormat("en-US", { style: "currency", currency, minimumFractionDigits: 2 }).format(n);
+  } catch {
+    return usdCents(n);
+  }
+};
+
 /** "3–5 business days" → "3-5 business days" (the rate card uses en dashes). */
 export const plainRange = (s: string) => s.replace(/\s*[–—]\s*/g, "-");
 

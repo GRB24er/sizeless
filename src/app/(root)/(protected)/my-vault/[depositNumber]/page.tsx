@@ -2,12 +2,21 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { format } from "date-fns";
-import { ArrowLeft, FileText } from "lucide-react";
+import { ArrowLeft, Clock, FileText } from "lucide-react";
 import { auth } from "~/auth";
 import { COMPANY } from "@/lib/company";
 import { getClientDeposit } from "@/lib/client-account";
-import { STORAGE_TYPE_CONFIG, calculateMonthlyStorageFee } from "@/lib/vault/types";
+import {
+  STORAGE_TYPE_CONFIG,
+  VAULT_FEE_SCHEDULE,
+  calculateDemurrage,
+  calculateMonthlyStorageFee,
+  demurrageChargeableDays,
+  demurrageFreeUntil,
+  demurragePerDay,
+} from "@/lib/vault/types";
 import { VAULT_DOCUMENTS } from "@/lib/vault/client-documents";
+import { demoDeposit } from "@/lib/vault/demo-deposits";
 import { cn } from "@/lib/utils";
 import { AccountShell, Field, Panel, PaymentNotice } from "@/components/account/account-shell";
 import { PhaseBar } from "@/components/account/vault-bits";
@@ -27,7 +36,7 @@ import {
   storageLabel,
   weightText,
 } from "@/components/account/vault-format";
-import { ButtonLink, usdCents } from "@/components/landing/primitives";
+import { ButtonLink, money } from "@/components/landing/primitives";
 
 export const metadata: Metadata = { title: "Vault deposit | Aegis Cargo" };
 
@@ -49,12 +58,24 @@ export default async function DepositPage({ params }: { params: Promise<{ deposi
   const d = await getClientDeposit(session.user.id, decodeURIComponent(depositNumber));
   if (!d) notFound();
 
+  // Extra presentation fields (depositor, codes, currency, ...) for demo records.
+  const demo = demoDeposit(d.depositNumber);
+  const currency = demo?.currencyCode ?? "USD";
+  const cash = (n: number) => money(n, currency);
+
   const status = CLIENT_STATUS[d.status];
   const tone = statusTone(d.status);
   const documents = VAULT_DOCUMENTS.filter((doc) => doc.available(d));
   const rate = STORAGE_TYPE_CONFIG[d.storageType]?.monthlyRatePerKg;
   const monthlyStorage = calculateMonthlyStorageFee(d.weightGrams, d.storageType);
   const insured = Boolean(d.insuranceProvider && d.insurancePolicyNo);
+
+  // Demurrage only applies once a withdrawal is approved and the free collection
+  // window has passed. Show the countdown while in the window, the accrual after.
+  const awaitingCollection = d.status === "RELEASE_APPROVED" && Boolean(d.releaseApprovedAt);
+  const demurrageDays = awaitingCollection ? demurrageChargeableDays(d.releaseApprovedAt) : 0;
+  const demurrageAccrued = calculateDemurrage(d.weightGrams, demurrageDays);
+  const freeUntil = d.releaseApprovedAt ? demurrageFreeUntil(d.releaseApprovedAt) : null;
 
   const milestones = [
     { label: "Deposit opened", date: d.depositDate },
@@ -131,6 +152,40 @@ export default async function DepositPage({ params }: { params: Promise<{ deposi
         </div>
       </section>
 
+      {awaitingCollection && (
+        <section
+          className={cn(
+            "mt-6 flex gap-4 rounded-xl border p-5 sm:p-6",
+            demurrageDays > 0 ? "border-signal/25 bg-signal-soft" : "border-line bg-surface"
+          )}
+        >
+          <Clock aria-hidden strokeWidth={1.5} className={cn("mt-0.5 size-6 shrink-0", demurrageDays > 0 ? "text-signal-ink" : "text-ink-3")} />
+          <div>
+            {demurrageDays > 0 ? (
+              <>
+                <h2 className="font-semibold text-ink">
+                  Demurrage is building up: <span className="figures">{usdCents(demurrageAccrued)}</span> so far
+                </h2>
+                <p className="mt-1 max-w-[70ch] text-[15px] leading-relaxed text-ink-2">
+                  Your withdrawal was approved and the {VAULT_FEE_SCHEDULE.demurrageFreeDays}-day free collection window has passed, so
+                  demurrage of <span className="figures">{usdCents(demurragePerDay(d.weightGrams))}</span> a day has applied for{" "}
+                  {demurrageDays} {demurrageDays === 1 ? "day" : "days"}. It stops as soon as you collect. Contact us to arrange
+                  collection.
+                </p>
+              </>
+            ) : (
+              <>
+                <h2 className="font-semibold text-ink">Ready to collect, free until {freeUntil ? format(freeUntil, "d MMMM yyyy") : "soon"}</h2>
+                <p className="mt-1 max-w-[70ch] text-[15px] leading-relaxed text-ink-2">
+                  Your withdrawal is approved. Collection is free for {VAULT_FEE_SCHEDULE.demurrageFreeDays} days. After that, demurrage of{" "}
+                  <span className="figures">{usdCents(demurragePerDay(d.weightGrams))}</span> a day applies until you collect.
+                </p>
+              </>
+            )}
+          </div>
+        </section>
+      )}
+
       <div className="mt-6 grid gap-6 lg:grid-cols-12">
         <div className="space-y-6 lg:col-span-8">
           <Panel title="What you deposited">
@@ -201,6 +256,17 @@ export default async function DepositPage({ params }: { params: Promise<{ deposi
               </Field>
               <Field label="In storage since">{day(d.storedAt ?? d.storageStartDate) ?? "Not yet"}</Field>
             </dl>
+            <p className="mt-4 border-t border-line pt-4 text-sm leading-relaxed text-ink-3">
+              Storage is billed monthly. If you request a withdrawal, collection is free for {VAULT_FEE_SCHEDULE.demurrageFreeDays} days
+              after we approve it. Metal held past that is charged demurrage of{" "}
+              <span className="figures text-ink-2">{usdCents(VAULT_FEE_SCHEDULE.demurrageRatePerKgPerDay)}</span> per kg a day (minimum{" "}
+              <span className="figures text-ink-2">{usdCents(VAULT_FEE_SCHEDULE.demurrageMinPerDay)}</span> a day) until you collect. It
+              is on the{" "}
+              <Link href="/vault#fees" className="font-medium text-ink underline decoration-line-2 underline-offset-4">
+                published fee schedule
+              </Link>
+              .
+            </p>
           </Panel>
 
           <Panel title="Insurance">

@@ -609,3 +609,182 @@ Please make sure your database server is running at `127.0.0.1:5432`.
 [ 8247201ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
 [ 8247238ms] [LOG] [Fast Refresh] done in 146ms @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
 [ 8266503ms] [ERROR] Failed to load resource: the server responded with a status of 500 () @ https://va.tawk.to/v1/session/start:0
+[10513991ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10514375ms] [WARNING] [Fast Refresh] performing full reload
+
+Fast Refresh will perform a full reload when you edit a file that's imported by modules outside of the React rendering tree.
+You might have a file which exports a React component but also exports a value that is imported by a non-React component file.
+Consider migrating the non-React component export to a separate file and importing it into both files.
+
+It is also possible the parent component of the component you edited is a class component, which disables Fast Refresh.
+Fast Refresh requires at least one parent function component in your React tree. @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10514381ms] [LOG] [Fast Refresh] done in 483ms @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10514622ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10514712ms] [LOG] [Fast Refresh] done in 190ms @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10514813ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10515307ms] [LOG] [Fast Refresh] done in 594ms @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10515582ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10515720ms] [LOG] [HMR] connected @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10527446ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10527468ms] [WARNING] [Fast Refresh] performing full reload
+
+Fast Refresh will perform a full reload when you edit a file that's imported by modules outside of the React rendering tree.
+You might have a file which exports a React component but also exports a value that is imported by a non-React component file.
+Consider migrating the non-React component export to a separate file and importing it into both files.
+
+It is also possible the parent component of the component you edited is a class component, which disables Fast Refresh.
+Fast Refresh requires at least one parent function component in your React tree. @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10527651ms] [LOG] [Fast Refresh] done in 115ms @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10527848ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10528355ms] [LOG] [Fast Refresh] done in 608ms @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10528586ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10528688ms] [LOG] [HMR] connected @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10536277ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10536301ms] [WARNING] [Fast Refresh] performing full reload
+
+Fast Refresh will perform a full reload when you edit a file that's imported by modules outside of the React rendering tree.
+You might have a file which exports a React component but also exports a value that is imported by a non-React component file.
+Consider migrating the non-React component export to a separate file and importing it into both files.
+
+It is also possible the parent component of the component you edited is a class component, which disables Fast Refresh.
+Fast Refresh requires at least one parent function component in your React tree. @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10536494ms] [LOG] [Fast Refresh] done in 100ms @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10536672ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10537272ms] [LOG] [Fast Refresh] done in 700ms @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10537537ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10537648ms] [LOG] [HMR] connected @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10564100ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10564296ms] [LOG] [Fast Refresh] done in 92ms @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10578917ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10578998ms] [LOG] [Fast Refresh] done in 57ms @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10587941ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10588016ms] [LOG] [Fast Refresh] done in 83ms @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10607104ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10607186ms] [LOG] [Fast Refresh] done in 95ms @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10627094ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10627174ms] [LOG] [Fast Refresh] done in 75ms @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10656743ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10656761ms] [LOG] [Fast Refresh] done in 118ms @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10667609ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10667697ms] [LOG] [Fast Refresh] done in 85ms @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10673826ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10673913ms] [LOG] [Fast Refresh] done in 78ms @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10682393ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10682394ms] [LOG] [Fast Refresh] done in 102ms @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10708597ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10708605ms] [LOG] [Fast Refresh] done in 108ms @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10716821ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10716831ms] [LOG] [Fast Refresh] done in 110ms @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10725191ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10725314ms] [LOG] [Fast Refresh] done in 174ms @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10821628ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10821707ms] [LOG] [Fast Refresh] done in 179ms @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10821808ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10822190ms] [LOG] [Fast Refresh] done in 482ms @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10831955ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10832050ms] [LOG] [HMR] connected @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10832205ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10832342ms] [LOG] [Fast Refresh] done in 246ms @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10832499ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10832500ms] [LOG] [Fast Refresh] done in 100ms @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10852971ms] [ERROR] Failed to load resource: the server responded with a status of 500 () @ https://va.tawk.to/v1/session/start:0
+[10853072ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10853113ms] [LOG] [Fast Refresh] done in 142ms @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10863653ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:3100/login:0
+[10863715ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10863779ms] [LOG] [HMR] connected @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10864173ms] [ERROR] Failed to load resource: the server responded with a status of 500 () @ https://va.tawk.to/v1/session/start:0
+[10864295ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10864301ms] [LOG] [Fast Refresh] done in 106ms @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10865655ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10865692ms] [LOG] [Fast Refresh] done in 137ms @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10865893ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10865894ms] [LOG] [Fast Refresh] done in 100ms @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10866190ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10866317ms] [LOG] [Fast Refresh] done in 228ms @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10866458ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10866477ms] [LOG] [Fast Refresh] done in 120ms @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10866600ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10866631ms] [LOG] [Fast Refresh] done in 152ms @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10866895ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10867206ms] [LOG] [Fast Refresh] done in 411ms @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10868287ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10868367ms] [LOG] [HMR] connected @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10868733ms] [ERROR] Failed to load resource: the server responded with a status of 500 () @ https://va.tawk.to/v1/session/start:0
+[10871155ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10871163ms] [LOG] [Fast Refresh] done in 109ms @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10928582ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:3100/login:0
+[10928666ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10928738ms] [LOG] [HMR] connected @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10950486ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10950601ms] [ERROR] Failed to load resource: the server responded with a status of 500 () @ https://va.tawk.to/v1/session/start:0
+[10951629ms] [LOG] [Fast Refresh] done in 1243ms @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10951884ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:3100/login:0
+[10951946ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[10952022ms] [LOG] [HMR] connected @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[11023365ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:3100/login:0
+[11023435ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[11023497ms] [LOG] [HMR] connected @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[11026887ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[11026890ms] [LOG] [Fast Refresh] done in 104ms @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[11050120ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:3100/login:0
+[11050205ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[11050262ms] [LOG] [HMR] connected @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[11057079ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:3100/login:0
+[11057157ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[11057213ms] [LOG] [HMR] connected @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[11058426ms] [ERROR] Failed to load resource: the server responded with a status of 500 () @ https://va.tawk.to/v1/session/start:0
+[11058542ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[11058559ms] [LOG] [Fast Refresh] done in 117ms @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[11116978ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:3100/login:0
+[11117042ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[11117104ms] [LOG] [HMR] connected @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[11123934ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:3100/login:0
+[11124020ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[11124085ms] [LOG] [HMR] connected @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[11124255ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[11124331ms] [LOG] [Fast Refresh] done in 177ms @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[11125088ms] [ERROR] Failed to load resource: the server responded with a status of 500 () @ https://va.tawk.to/v1/session/start:0
+[11151904ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:3100/login:0
+[11151978ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[11152037ms] [LOG] [HMR] connected @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[11184964ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:3100/login:0
+[11185026ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[11185080ms] [LOG] [HMR] connected @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[11191141ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:3100/login:0
+[11191218ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[11191280ms] [LOG] [HMR] connected @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[11191481ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[11191494ms] [LOG] [Fast Refresh] done in 114ms @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[11197364ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:3100/login:0
+[11197424ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[11197466ms] [LOG] [HMR] connected @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[11197656ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[11197670ms] [LOG] [Fast Refresh] done in 115ms @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[11197774ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[11197776ms] [LOG] [Fast Refresh] done in 102ms @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[11197893ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[11197899ms] [LOG] [Fast Refresh] done in 105ms @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[11198015ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[11198016ms] [LOG] [Fast Refresh] done in 101ms @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[11281764ms] [ERROR] WebSocket connection to 'ws://localhost:3100/_next/webpack-hmr?id=gmW0IZ_XqBE92D9aJj_95' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_client_17643121._.js:10878
+[11282765ms] [ERROR] WebSocket connection to 'ws://localhost:3100/_next/webpack-hmr?id=gmW0IZ_XqBE92D9aJj_95' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_client_17643121._.js:10878
+[11283767ms] [ERROR] WebSocket connection to 'ws://localhost:3100/_next/webpack-hmr?id=gmW0IZ_XqBE92D9aJj_95' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_client_17643121._.js:10878
+[11284769ms] [ERROR] WebSocket connection to 'ws://localhost:3100/_next/webpack-hmr?id=gmW0IZ_XqBE92D9aJj_95' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_client_17643121._.js:10878
+[11285770ms] [ERROR] WebSocket connection to 'ws://localhost:3100/_next/webpack-hmr?id=gmW0IZ_XqBE92D9aJj_95' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_client_17643121._.js:10878
+[11290772ms] [ERROR] WebSocket connection to 'ws://localhost:3100/_next/webpack-hmr?id=gmW0IZ_XqBE92D9aJj_95' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_client_17643121._.js:10878
+[11295773ms] [ERROR] WebSocket connection to 'ws://localhost:3100/_next/webpack-hmr?id=gmW0IZ_XqBE92D9aJj_95' failed: Error in connection establishment: net::ERR_CONNECTION_REFUSED @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_client_17643121._.js:10878
+[11300780ms] [LOG] [HMR] connected @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[11302466ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:3100/login:0
+[11302529ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[11302602ms] [LOG] [HMR] connected @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[11306088ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[11306129ms] [LOG] [Fast Refresh] done in 140ms @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[11306230ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[11306694ms] [LOG] [Fast Refresh] done in 565ms @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[11306809ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[11306818ms] [LOG] [Fast Refresh] done in 109ms @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[11316989ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ http://localhost:3100/login:0
+[11317066ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[11317135ms] [LOG] [HMR] connected @ http://localhost:3100/_next/static/chunks/node_modules_next_dist_f3530cac._.js:2297
+[11336833ms] [ERROR] Failed to load resource: the server responded with a status of 500 () @ https://va.tawk.to/v1/session/start:0

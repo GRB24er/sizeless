@@ -246,6 +246,14 @@ export const VAULT_FEE_SCHEDULE = {
   wireTransferFee: 35.00,
   complianceReReviewFee: 125.00,     // For large withdrawals > $500k
 
+  // Demurrage (late collection). After a withdrawal is approved, collection is
+  // free for demurrageFreeDays. Metal still in the vault after that window is
+  // charged per kg per day until collected. Distinct from monthly storage; it
+  // only applies once a release is approved and the free window has passed.
+  demurrageFreeDays: 10,
+  demurrageRatePerKgPerDay: 0.75,
+  demurrageMinPerDay: 5.00,
+
   // Audit & Inspection
   clientAuditFee: 0,                 // First annual audit free
   additionalAuditFee: 200.00,
@@ -422,6 +430,43 @@ export function calculateMonthlyStorageFee(
   return Math.max(weightKg * config.monthlyRatePerKg, MIN_MONTHLY_STORAGE_FEE);
 }
 
+// ─── HELPER: Demurrage (late collection) ─────────────────────
+// After a withdrawal is approved, collection is free for DEMURRAGE_FREE_DAYS.
+// Metal held past that is charged per kg per day (with a per-day minimum).
+
+export const DEMURRAGE_FREE_DAYS = VAULT_FEE_SCHEDULE.demurrageFreeDays;
+
+const MS_PER_DAY = 24 * 60 * 60 * 1000;
+
+/** Whole days a release has waited past the free collection window. 0 within it. */
+export function demurrageChargeableDays(
+  releaseApprovedAt: Date | string | null | undefined,
+  now: Date = new Date()
+): number {
+  if (!releaseApprovedAt) return 0;
+  const elapsed = Math.floor((now.getTime() - new Date(releaseApprovedAt).getTime()) / MS_PER_DAY);
+  return Math.max(0, elapsed - VAULT_FEE_SCHEDULE.demurrageFreeDays);
+}
+
+/** Demurrage per day for a weight: per-kg rate, with a per-day minimum. */
+export function demurragePerDay(weightGrams: number): number {
+  const perDay = (weightGrams / 1000) * VAULT_FEE_SCHEDULE.demurrageRatePerKgPerDay;
+  return Math.max(Math.round(perDay * 100) / 100, VAULT_FEE_SCHEDULE.demurrageMinPerDay);
+}
+
+/** Total demurrage accrued for a weight over a number of chargeable days. */
+export function calculateDemurrage(weightGrams: number, chargeableDays: number): number {
+  if (chargeableDays <= 0) return 0;
+  return Math.round(demurragePerDay(weightGrams) * chargeableDays * 100) / 100;
+}
+
+/** The date free collection ends, DEMURRAGE_FREE_DAYS after the release was approved. */
+export function demurrageFreeUntil(releaseApprovedAt: Date | string): Date {
+  const d = new Date(releaseApprovedAt);
+  d.setDate(d.getDate() + VAULT_FEE_SCHEDULE.demurrageFreeDays);
+  return d;
+}
+
 // ─── HELPER: Calculate annual insurance premium ──────────────
 
 export function calculateAnnualInsurance(
@@ -457,4 +502,9 @@ export const VAULT_PUBLISHED_FEES: { group: string; label: string; price: string
   { group: "Release", label: "Liquidation commission", price: `${VAULT_FEE_SCHEDULE.liquidationCommission}% of sale value` },
   { group: "Release", label: "Wire transfer", price: `$${VAULT_FEE_SCHEDULE.wireTransferFee.toFixed(2)}` },
   { group: "Release", label: "Transfer to another vault", price: `$${VAULT_FEE_SCHEDULE.custodyTransferFee.toFixed(2)}` },
+  {
+    group: "Release",
+    label: `Demurrage for late collection (after ${VAULT_FEE_SCHEDULE.demurrageFreeDays} free days)`,
+    price: `$${VAULT_FEE_SCHEDULE.demurrageRatePerKgPerDay.toFixed(2)} per kg per day (min $${VAULT_FEE_SCHEDULE.demurrageMinPerDay.toFixed(2)} a day)`,
+  },
 ];

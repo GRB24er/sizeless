@@ -8,14 +8,13 @@
 import { useState, useTransition } from "react";
 import {
   AlertTriangle,
+  CalendarClock,
   Check,
   DollarSign,
   Gem,
-  Hash,
   Loader2,
   MapPin,
   Pencil,
-  Scale,
   Shield,
   Trash2,
   X,
@@ -97,6 +96,19 @@ export function EditDepositDialog({
   const [sourceOfFundsDetail, setSourceOfFundsDetail] = useState(deposit.sourceOfFundsDetail || "");
   const [complianceNotes, setComplianceNotes] = useState(deposit.complianceNotes || "");
 
+  // ── Milestone dates (yyyy-mm-dd for <input type="date">) ──
+  const toDateInput = (v: string | Date | null | undefined) => (v ? new Date(v).toISOString().slice(0, 10) : "");
+  const [depositDate, setDepositDate] = useState(toDateInput(deposit.depositDate));
+  const [appointmentDate, setAppointmentDate] = useState(toDateInput(deposit.appointmentDate));
+  const [kycApprovedAt, setKycApprovedAt] = useState(toDateInput(deposit.kycApprovedAt));
+  const [intakeCompletedAt, setIntakeCompletedAt] = useState(toDateInput(deposit.intakeCompletedAt));
+  const [assayCompletedAt, setAssayCompletedAt] = useState(toDateInput(deposit.assayCompletedAt));
+  const [verifiedAt, setVerifiedAt] = useState(toDateInput(deposit.verifiedAt));
+  const [storedAt, setStoredAt] = useState(toDateInput(deposit.storedAt));
+  const [releaseRequestedAt, setReleaseRequestedAt] = useState(toDateInput(deposit.releaseRequestedAt));
+  const [releaseApprovedAt, setReleaseApprovedAt] = useState(toDateInput(deposit.releaseApprovedAt));
+  const [releasedAt, setReleasedAt] = useState(toDateInput(deposit.releasedAt));
+
   if (!open) return null;
 
   const sections = [
@@ -104,7 +116,22 @@ export function EditDepositDialog({
     { id: "value", label: "Valuation", icon: DollarSign },
     { id: "vault", label: "Vault & Storage", icon: MapPin },
     { id: "insurance", label: "Insurance", icon: Shield },
+    { id: "dates", label: "Dates", icon: CalendarClock },
     { id: "compliance", label: "Compliance", icon: Shield },
+  ];
+
+  // Deposit date is required; the rest send "" to clear.
+  const DATE_FIELDS: { label: string; hint?: string; value: string; set: (v: string) => void; key: string }[] = [
+    { key: "depositDate", label: "Deposited on", hint: "When the client's metal was deposited", value: depositDate, set: setDepositDate },
+    { key: "kycApprovedAt", label: "Identity checks approved", value: kycApprovedAt, set: setKycApprovedAt },
+    { key: "appointmentDate", label: "Handover appointment", value: appointmentDate, set: setAppointmentDate },
+    { key: "intakeCompletedAt", label: "Metal received", value: intakeCompletedAt, set: setIntakeCompletedAt },
+    { key: "assayCompletedAt", label: "Testing completed", value: assayCompletedAt, set: setAssayCompletedAt },
+    { key: "verifiedAt", label: "Verified", value: verifiedAt, set: setVerifiedAt },
+    { key: "storedAt", label: "Placed in storage", value: storedAt, set: setStoredAt },
+    { key: "releaseRequestedAt", label: "Release requested", value: releaseRequestedAt, set: setReleaseRequestedAt },
+    { key: "releaseApprovedAt", label: "Release approved", value: releaseApprovedAt, set: setReleaseApprovedAt },
+    { key: "releasedAt", label: "Released", value: releasedAt, set: setReleasedAt },
   ];
 
   const handleSave = () => {
@@ -131,6 +158,17 @@ export function EditDepositDialog({
         sourceOfFunds: sourceOfFunds || undefined,
         sourceOfFundsDetail: sourceOfFundsDetail || undefined,
         complianceNotes: complianceNotes || undefined,
+        // Dates: send the value (blank clears an optional date).
+        depositDate: depositDate || undefined,
+        appointmentDate,
+        kycApprovedAt,
+        intakeCompletedAt,
+        assayCompletedAt,
+        verifiedAt,
+        storedAt,
+        releaseRequestedAt,
+        releaseApprovedAt,
+        releasedAt,
       });
 
       if (res.error) toast.error(res.error);
@@ -313,6 +351,25 @@ export function EditDepositDialog({
               <div>
                 <label className={labelClass}>Policy Number</label>
                 <input type="text" value={insurancePolicyNo} onChange={(e) => setInsurancePolicyNo(e.target.value)} className={`${inputClass} font-mono`} />
+              </div>
+            </div>
+          )}
+
+          {/* DATES */}
+          {activeSection === "dates" && (
+            <div className="space-y-4">
+              <p className="text-xs text-gray-500">
+                Correct any milestone date. These drive the client&apos;s timeline and demurrage. Leave a date blank to clear it (the
+                deposit date is required and cannot be cleared).
+              </p>
+              <div className="grid grid-cols-2 gap-3">
+                {DATE_FIELDS.map((f) => (
+                  <div key={f.key}>
+                    <label className={labelClass}>{f.label}</label>
+                    <input type="date" value={f.value} onChange={(e) => f.set(e.target.value)} className={inputClass} />
+                    {f.hint && <p className="mt-1 text-[11px] text-gray-400">{f.hint}</p>}
+                  </div>
+                ))}
               </div>
             </div>
           )}

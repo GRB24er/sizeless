@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { FEE_SCHEDULE } from "@/app/(root)/shipments/create/type";
-import { STORAGE_TYPE_CONFIG } from "@/lib/vault/types";
+import { STORAGE_TYPE_CONFIG, VAULT_FEE_SCHEDULE } from "@/lib/vault/types";
 import { COMPANY } from "@/lib/company";
 import { FaqItem } from "./faq";
 
@@ -108,6 +108,10 @@ export const VAULT_FAQ: FaqItem[] = [
   {
     q: "How do I get my metal back?",
     a: "Request a release from your account: physical collection, sale through a bullion dealer, or transfer to another vault. The fee for each is in the schedule you accepted when you deposited.",
+  },
+  {
+    q: "What is demurrage, and when would I pay it?",
+    a: `Demurrage is a late-collection charge. Once we approve a withdrawal, you have ${VAULT_FEE_SCHEDULE.demurrageFreeDays} days to collect at no extra cost. Metal still in the vault after that is charged $${VAULT_FEE_SCHEDULE.demurrageRatePerKgPerDay.toFixed(2)} per kilogram per day (minimum $${VAULT_FEE_SCHEDULE.demurrageMinPerDay.toFixed(2)} a day) until you collect it. It is separate from monthly storage, it is on the fee schedule you accept when you deposit, and your account shows it building up day by day so there is never a surprise.`,
   },
   {
     q: "Will you ever ask me to pay to release my holdings?",

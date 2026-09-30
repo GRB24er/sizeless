@@ -662,6 +662,14 @@ function DepositDetail({
         onSuccess={onRefresh}
       />
 
+      <EditDepositDialog
+        open={editDialogOpen}
+        onClose={() => setEditDialogOpen(false)}
+        deposit={deposit}
+        adminId={adminId}
+        onSuccess={onRefresh}
+      />
+
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">

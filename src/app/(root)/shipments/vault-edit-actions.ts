@@ -50,6 +50,19 @@ export async function editVaultDeposit(
     authorizedPersons?: string;
     withdrawalAuthMethod?: string;
     complianceNotes?: string;
+    // Milestone dates (yyyy-mm-dd strings). "" or null clears an optional date;
+    // depositDate is required, so a blank value leaves it unchanged.
+    depositDate?: string;
+    appointmentDate?: string | null;
+    kycApprovedAt?: string | null;
+    intakeCompletedAt?: string | null;
+    assayCompletedAt?: string | null;
+    verifiedAt?: string | null;
+    storedAt?: string | null;
+    storageStartDate?: string | null;
+    releaseRequestedAt?: string | null;
+    releaseApprovedAt?: string | null;
+    releasedAt?: string | null;
   }
 ) {
   adminId = (await requireAdmin()).id;
@@ -111,6 +124,37 @@ export async function editVaultDeposit(
     if (data.withdrawalAuthMethod !== undefined) updateData.withdrawalAuthMethod = data.withdrawalAuthMethod;
     if (data.complianceNotes !== undefined) updateData.complianceNotes = data.complianceNotes;
 
+    // Milestone dates the admin can correct.
+    const DATE_FIELDS: { key: string; label: string; nullable: boolean }[] = [
+      { key: "depositDate", label: "deposit date", nullable: false },
+      { key: "appointmentDate", label: "appointment", nullable: true },
+      { key: "kycApprovedAt", label: "identity checks approved", nullable: true },
+      { key: "intakeCompletedAt", label: "metal received", nullable: true },
+      { key: "assayCompletedAt", label: "testing completed", nullable: true },
+      { key: "verifiedAt", label: "verified", nullable: true },
+      { key: "storedAt", label: "placed in storage", nullable: true },
+      { key: "storageStartDate", label: "storage start", nullable: true },
+      { key: "releaseRequestedAt", label: "release requested", nullable: true },
+      { key: "releaseApprovedAt", label: "release approved", nullable: true },
+      { key: "releasedAt", label: "released", nullable: true },
+    ];
+    const asRecord = data as Record<string, string | null | undefined>;
+    for (const { key, label, nullable } of DATE_FIELDS) {
+      const raw = asRecord[key];
+      if (raw === undefined) continue;
+      if (raw === "" || raw === null) {
+        if (nullable) {
+          updateData[key] = null;
+          changes.push(`${label} cleared`);
+        }
+        continue;
+      }
+      const parsed = new Date(raw);
+      if (Number.isNaN(parsed.getTime())) continue;
+      updateData[key] = parsed;
+      changes.push(`${label} set to ${parsed.toISOString().slice(0, 10)}`);
+    }
+
     if (Object.keys(updateData).length === 0) {
       return { error: "No changes detected" };
     }
@@ -132,6 +176,7 @@ export async function editVaultDeposit(
 
     revalidatePath("/dashboard/vault");
     revalidatePath("/dashboard/shipments");
+    revalidatePath("/my-vault");
     return { success: true };
   } catch (error: any) {
     console.error("editVaultDeposit error:", error);
