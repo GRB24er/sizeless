@@ -8,7 +8,7 @@ const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Aegis Cargo — Global Shipping & Vault Services",
-  description: "Enterprise-grade logistics, worldwide shipping, real-time tracking, and secure gold vault storage. Trusted by businesses across 190+ countries.",
+  description: "Enterprise-grade logistics, worldwide shipping, real-time tracking, and secure gold vault storage. Itemized pricing agreed before you book.",
   icons: { icon: "/favicon.ico" },
   openGraph: {
     title: "Aegis Cargo — Global Shipping & Vault Services",

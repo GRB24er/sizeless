@@ -94,7 +94,6 @@ export function EditDepositDialog({
   const [insuredValue, setInsuredValue] = useState(String(deposit.insuredValue || ""));
   const [insuranceProvider, setInsuranceProvider] = useState(deposit.insuranceProvider || "");
   const [insurancePolicyNo, setInsurancePolicyNo] = useState(deposit.insurancePolicyNo || "");
-  const [monthlyFee, setMonthlyFee] = useState(String(deposit.monthlyStorageFee || ""));
   const [sourceOfFunds, setSourceOfFunds] = useState(deposit.sourceOfFunds || "");
   const [sourceOfFundsDetail, setSourceOfFundsDetail] = useState(deposit.sourceOfFundsDetail || "");
   const [complianceNotes, setComplianceNotes] = useState(deposit.complianceNotes || "");
@@ -130,7 +129,6 @@ export function EditDepositDialog({
         insuredValue: parseFloat(insuredValue) || undefined,
         insuranceProvider: insuranceProvider || undefined,
         insurancePolicyNo: insurancePolicyNo || undefined,
-        monthlyStorageFee: parseFloat(monthlyFee) || undefined,
         sourceOfFunds: sourceOfFunds || undefined,
         sourceOfFundsDetail: sourceOfFundsDetail || undefined,
         complianceNotes: complianceNotes || undefined,
@@ -275,10 +273,6 @@ export function EditDepositDialog({
                   </button>
                 </div>
               )}
-              <div>
-                <label className={labelClass}>Monthly Storage Fee ($)</label>
-                <input type="number" step="0.01" value={monthlyFee} onChange={(e) => setMonthlyFee(e.target.value)} className={`${inputClass} font-mono`} />
-              </div>
             </div>
           )}
 
@@ -315,7 +309,7 @@ export function EditDepositDialog({
               </div>
               <div>
                 <label className={labelClass}>Insurance Provider</label>
-                <input type="text" value={insuranceProvider} onChange={(e) => setInsuranceProvider(e.target.value)} placeholder="e.g. Lloyd's of London" className={inputClass} />
+                <input type="text" value={insuranceProvider} onChange={(e) => setInsuranceProvider(e.target.value)} placeholder="Insurer named on the policy" className={inputClass} />
               </div>
               <div>
                 <label className={labelClass}>Policy Number</label>

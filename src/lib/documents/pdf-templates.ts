@@ -154,15 +154,6 @@ function drawEmbossedSeal(doc: jsPDF, x: number, y: number, size: number = 22) {
   doc.setLineWidth(0.4);
   doc.line(x - 8, y + 3.5, x + 8, y + 3.5);
 
-  doc.setFontSize(4.5);
-  doc.setTextColor(...GOLD);
-  doc.text("EST. 2008", x, y + 7, { align: "center" });
-
-  // ISO badge
-  doc.setFontSize(3.5);
-  doc.setTextColor(...NAVY);
-  doc.text("ISO 9001", x, y + 10.5, { align: "center" });
-
   doc.restoreGraphicsState();
 }
 
@@ -226,14 +217,6 @@ function drawHeader(doc: jsPDF, title: string, docNumber: string) {
   // Date
   doc.setTextColor(180, 190, 200);
   doc.text(`Issued: ${fmtDate(new Date())}`, 195, 27, { align: "right" });
-
-  // Emerald badge
-  doc.setFillColor(...EMERALD);
-  doc.roundedRect(155, 29, 40, 4, 1, 1, "F");
-  doc.setFontSize(5);
-  doc.setTextColor(...WHITE);
-  doc.setFont("helvetica", "bold");
-  doc.text("ISO 9001 CERTIFIED", 175, 31.8, { align: "center" });
 }
 
 // ═══════════════════════════════════════════
@@ -256,14 +239,6 @@ function drawFooter(doc: jsPDF, page: number = 1) {
   doc.setFont("helvetica", "normal");
   doc.setFontSize(6.5);
   doc.text("Aegis Cargo Ltd  |  Registered in Romania  |  Strada Bulevardul Unirii 72, Floor 3, Office 12, 030833 Bucharest, Romania", 105, y + 8, { align: "center" });
-
-  // Certifications bar
-  doc.setFillColor(...NAVY);
-  doc.roundedRect(45, y + 10, 120, 5, 1, 1, "F");
-  doc.setFontSize(5);
-  doc.setTextColor(...WHITE);
-  doc.setFont("helvetica", "bold");
-  doc.text("ISO 9001  |  LBMA APPROVED  |  IATA MEMBER  |  AEO CERTIFIED", 105, y + 13.5, { align: "center" });
 
   // Page and copyright
   doc.setFontSize(5.5);
@@ -464,11 +439,6 @@ export async function generateAirwayBill(data: ShipmentData): Promise<Buffer> {
   doc.text("AIR WAYBILL", R - 2, 11, { align: "right" });
   doc.setFontSize(7); doc.setTextColor(...GOLD); doc.setFont("helvetica", "normal");
   doc.text("ORIGINAL — FOR SHIPPER", R - 2, 17, { align: "right" });
-  // ISO badge
-  doc.setFillColor(...EMERALD);
-  doc.roundedRect(163, 20, 35, 5, 1, 1, "F");
-  doc.setFontSize(5); doc.setTextColor(...WHITE); doc.setFont("helvetica", "bold");
-  doc.text("ISO 9001 CERTIFIED", 180.5, 23.5, { align: "center" });
 
   let y = 33;
 
@@ -678,8 +648,7 @@ export async function generateAirwayBill(data: ShipmentData): Promise<Buffer> {
   doc.setFontSize(8); doc.setFont("helvetica", "bold"); doc.setTextColor(...NAVY);
   doc.text("Aegis Cargo Ltd", cx + 3, y + 11);
   doc.setFontSize(6.5); doc.setFont("helvetica", "normal"); doc.setTextColor(...GRAY);
-  doc.text("IATA Code: AML  |  License: UK-AIR-2024-0891", cx + 3, y + 15.5);
-  doc.text("Strada Bulevardul Unirii 72, Floor 3, Office 12, 030833 Bucharest, Romania", cx + 3, y + 19.5);
+  doc.text("Strada Bulevardul Unirii 72, Floor 3, Office 12, 030833 Bucharest, Romania", cx + 3, y + 15.5);
 
   y += boxH + 7;
 
@@ -738,12 +707,6 @@ export async function generateAirwayBill(data: ShipmentData): Promise<Buffer> {
   // Company details
   doc.setFont("helvetica", "normal"); doc.setFontSize(5.5);
   doc.text("Aegis Cargo Ltd  |  Registered in Romania  |  Strada Bulevardul Unirii 72, Floor 3, Office 12, 030833 Bucharest, Romania", 105, y + 5, { align: "center" });
-
-  // Certifications bar
-  doc.setFillColor(...NAVY);
-  doc.roundedRect(40, y + 7, 130, 5, 1, 1, "F");
-  doc.setFontSize(4.5); doc.setTextColor(...WHITE); doc.setFont("helvetica", "bold");
-  doc.text("ISO 9001  |  LBMA APPROVED  |  IATA MEMBER  |  AEO CERTIFIED  |  TAPA FSR", 105, y + 10.5, { align: "center" });
 
   // Copyright
   doc.setFontSize(4.5); doc.setTextColor(...GRAY); doc.setFont("helvetica", "normal");
@@ -945,7 +908,7 @@ export async function generateShippingLabel(data: ShipmentData): Promise<Buffer>
   // Footer
   doc.setFillColor(...GOLD); doc.rect(0, 147, 100, 0.5, "F");
   doc.setFontSize(4.5); doc.setTextColor(...GRAY); doc.setFont("helvetica", "normal");
-  doc.text("Aegis Cargo Ltd  |  aegiscargo.org  |  ISO 9001", 50, 149, { align: "center" });
+  doc.text("Aegis Cargo Ltd  |  aegiscargo.org", 50, 149, { align: "center" });
 
   return Buffer.from(doc.output("arraybuffer"));
 }
@@ -1082,7 +1045,7 @@ export async function generateVaultCertificate(data: VaultData): Promise<Buffer>
     doc.text("AEGIS CARGO", 15, 16);
   }
   doc.setTextColor(180, 190, 200); doc.setFontSize(7); doc.setFont("helvetica", "normal");
-  doc.text("Vault Services Division  |  LBMA Approved", 15, 27);
+  doc.text("Vault Services Division", 15, 27);
   doc.text("admin@aegiscargo.org", 15, 31);
 
   doc.setFontSize(13); doc.setFont("helvetica", "bold"); doc.setTextColor(...GOLD);
@@ -1133,7 +1096,7 @@ export async function generateVaultCertificate(data: VaultData): Promise<Buffer>
   doc.setDrawColor(...GOLD); doc.roundedRect(15, y, 180, 20, 2, 2, "S");
   doc.setFontSize(6.5); doc.setFont("helvetica", "italic"); doc.setTextColor(...TEXT_MED);
   doc.text("This certifies that the assets described above have been received and are held in secure custody by Aegis Cargo", 20, y + 5, { maxWidth: 170 });
-  doc.text("Vault Services in accordance with LBMA standards. Assets are fully insured and subject to quarterly independent audits.", 20, y + 10, { maxWidth: 170 });
+  doc.text("Vault Services. Insurance, where purchased, is detailed on the separate insurance certificate.", 20, y + 10, { maxWidth: 170 });
   doc.text("This certificate must be presented for any release or transfer requests.", 20, y + 15, { maxWidth: 170 });
 
   // Seal & signature
@@ -1297,7 +1260,7 @@ export async function generateAssayReport(data: VaultAssayData): Promise<Buffer>
     doc.text("AEGIS CARGO", 15, 16);
   }
   doc.setTextColor(180, 190, 200); doc.setFontSize(7); doc.setFont("helvetica", "normal");
-  doc.text("Vault Assay & Verification Division  |  LBMA Approved Laboratory", 15, 27);
+  doc.text("Vault Assay & Verification Division", 15, 27);
   doc.text("admin@aegiscargo.org", 15, 31);
 
   doc.setFontSize(13); doc.setFont("helvetica", "bold"); doc.setTextColor(147, 51, 234);
@@ -1385,7 +1348,7 @@ export async function generateAssayReport(data: VaultAssayData): Promise<Buffer>
   doc.setDrawColor(147, 51, 234); doc.roundedRect(15, y, 180, 18, 2, 2, "S");
   doc.setFontSize(6.5); doc.setFont("helvetica", "italic"); doc.setTextColor(...TEXT_MED);
   doc.text("This report certifies the assay and verification results for the assets described above. Testing was performed", 20, y + 5, { maxWidth: 170 });
-  doc.text("in accordance with LBMA Good Delivery standards. Results are valid for 12 months from date of issue.", 20, y + 10, { maxWidth: 170 });
+  doc.text("using the method stated above. Results are valid for 12 months from date of issue.", 20, y + 10, { maxWidth: 170 });
   doc.text("Disputes must be raised within 30 days. Re-assay available upon request.", 20, y + 15, { maxWidth: 170 });
 
   drawSignatureBlock(doc, 218, { showSeal: true, sealX: 172, sealY: 240 });
@@ -1444,7 +1407,7 @@ export async function generateStorageAgreement(data: VaultStorageData): Promise<
   doc.text("Custodian:", 22, y + 2);
   doc.setFont("helvetica", "normal"); doc.setTextColor(...TEXT_MED);
   doc.text("Aegis Cargo Vault Services Ltd.", 22, y + 7);
-  doc.text("LBMA Approved Vault Operator | Registered in Romania", 22, y + 12);
+  doc.text("Registered in Romania", 22, y + 12);
 
   doc.setFont("helvetica", "bold"); doc.setTextColor(...TEXT_DARK);
   doc.text("Depositor:", 110, y + 2);
@@ -1501,11 +1464,11 @@ export async function generateStorageAgreement(data: VaultStorageData): Promise<
   doc.setFontSize(6); doc.setFont("helvetica", "normal"); doc.setTextColor(...TEXT_MED);
   const terms = [
     "1. The Custodian shall hold the Assets in secure storage and maintain adequate insurance at all times.",
-    "2. The Depositor shall pay the monthly storage fee on or before the 1st of each month. Late payments incur 1.5% interest per month.",
+    "2. Storage fees are charged monthly at the rate in the published fee schedule accepted at the time of deposit.",
     "3. Withdrawal requires 5 business days notice and presentation of this agreement or valid custody reference.",
-    "4. The Custodian shall provide quarterly inventory confirmations and annual independent audit reports.",
-    "5. Either party may terminate with 30 days written notice. Outstanding fees must be settled before asset release.",
-    "6. All disputes shall be governed by the laws of England and Wales, subject to LBMA arbitration procedures.",
+    "4. The Depositor may view the Assets' status and activity history at any time from the online vault dashboard.",
+    "5. Either party may terminate with 30 days written notice. No charge outside the published fee schedule may be made.",
+    "6. This agreement is governed by the laws of Romania.",
   ];
   terms.forEach((t, i) => {
     doc.text(t, 20, y + 10 + i * 3.5, { maxWidth: 170 });
@@ -1540,7 +1503,7 @@ export async function generateVaultInsuranceCertificate(data: VaultInsuranceData
     doc.text("AEGIS CARGO", 15, 16);
   }
   doc.setTextColor(180, 190, 200); doc.setFontSize(7); doc.setFont("helvetica", "normal");
-  doc.text("Vault Insurance Services  |  Underwritten by Lloyd's of London", 15, 27);
+  doc.text("Vault Insurance Services", 15, 27);
   doc.text("admin@aegiscargo.org", 15, 31);
 
   doc.setFontSize(13); doc.setFont("helvetica", "bold"); doc.setTextColor(37, 99, 235);

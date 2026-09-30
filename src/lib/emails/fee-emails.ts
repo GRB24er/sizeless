@@ -29,78 +29,70 @@ function formatCurrency(amount: number, currency: string): string {
 }
 
 // ═══════════════════════════════════════════
-// INVOICE EMAIL — sent when admin adds a fee
+// BOOKING CONFIRMATION — sent to the customer who booked, listing the
+// itemized charges they accepted. No charges are added after this.
 // ═══════════════════════════════════════════
-export async function sendFeeInvoiceEmail(data: FeeEmailData): Promise<boolean> {
-  const feeLabel = FEE_TYPE_LABELS[data.feeType] || data.feeType;
-  const formattedAmount = formatCurrency(data.amount, data.currency);
+export const BOOKING_FEE_LABEL = "Booking charges (accepted at booking)";
+
+export function formatQuoteLines(lines: { label: string; amount: number }[], currency: string): string {
+  return lines.map((l) => `${l.label}: ${formatCurrency(l.amount, currency)}`).join("\n");
+}
+
+type BookingEmailData = {
+  email: string;
+  name: string;
+  trackingNumber: string;
+  serviceLabel: string;
+  route: string;
+  lines: { label: string; amount: number }[];
+  total: number;
+  currency: string;
+};
+
+export async function sendBookingConfirmationEmail(data: BookingEmailData): Promise<boolean> {
+  const rows = data.lines
+    .map(
+      (l) => `
+        <tr>
+          <td style="padding:8px 0;color:#6b7280;font-size:14px;border-bottom:1px solid #e5e7eb;">${l.label}</td>
+          <td style="padding:8px 0;color:#111827;font-size:14px;text-align:right;border-bottom:1px solid #e5e7eb;">${formatCurrency(l.amount, data.currency)}</td>
+        </tr>`
+    )
+    .join("");
 
   try {
     await transporter.sendMail({
       from: FROM_EMAIL,
-      to: data.recipientEmail,
-      subject: `💰 Payment Required — ${feeLabel} for ${data.trackingNumber} | Aegis Cargo`,
+      to: data.email,
+      subject: `Booking Confirmed — ${data.trackingNumber} | Aegis Cargo`,
       html: `
 <div style="font-family:'Segoe UI',Arial,sans-serif;max-width:600px;margin:0 auto;background:#fff;">
-  <!-- Header -->
   <div style="background:linear-gradient(135deg,#0F1D2F 0%,#132640 100%);padding:32px;text-align:center;">
     <img src="https://www.aegiscargo.org/images/logo.png" alt="Aegis Cargo" style="height:48px;margin-bottom:16px;" />
-    <h1 style="color:#fff;font-size:22px;margin:0;font-weight:600;">Payment Required</h1>
-    <p style="color:#8C9EAF;font-size:14px;margin:8px 0 0;">Invoice ${data.invoiceNumber}</p>
+    <h1 style="color:#fff;font-size:22px;margin:0;font-weight:600;">Booking Confirmed</h1>
+    <p style="color:#8C9EAF;font-size:14px;margin:8px 0 0;">${data.trackingNumber}</p>
   </div>
 
-  <!-- Body -->
   <div style="padding:32px;">
-    <p style="color:#374151;font-size:15px;line-height:1.6;">Dear <strong>${data.recipientName}</strong>,</p>
-    <p style="color:#374151;font-size:15px;line-height:1.6;">A fee has been applied to your shipment and requires payment before processing can continue.</p>
+    <p style="color:#374151;font-size:15px;line-height:1.6;">Dear <strong>${data.name}</strong>,</p>
+    <p style="color:#374151;font-size:15px;line-height:1.6;">Your shipment is booked. These are the charges you accepted — this is the full price, and nothing will be added to it.</p>
 
-    <!-- Amount Banner -->
-    <div style="background:linear-gradient(135deg,#0F1D2F,#1E3A5F);border-radius:12px;padding:24px;text-align:center;margin:24px 0;">
-      <p style="color:#9ca3af;font-size:12px;text-transform:uppercase;letter-spacing:1px;margin:0 0 8px;">Amount Due</p>
-      <p style="color:#8C9EAF;font-size:36px;font-weight:700;margin:0;">${formattedAmount}</p>
-      <p style="color:#d1d5db;font-size:14px;margin:8px 0 0;">${feeLabel}</p>
-    </div>
-
-    <!-- Details Table -->
     <div style="background:#f9fafb;border-radius:12px;padding:20px;margin:24px 0;">
+      <p style="color:#6b7280;font-size:13px;margin:0 0 12px;">${data.serviceLabel} · ${data.route}</p>
       <table style="width:100%;border-collapse:collapse;">
+        ${rows}
         <tr>
-          <td style="padding:10px 0;color:#6b7280;font-size:14px;border-bottom:1px solid #e5e7eb;">Invoice Number</td>
-          <td style="padding:10px 0;color:#111827;font-size:14px;font-weight:600;text-align:right;border-bottom:1px solid #e5e7eb;">${data.invoiceNumber}</td>
-        </tr>
-        <tr>
-          <td style="padding:10px 0;color:#6b7280;font-size:14px;border-bottom:1px solid #e5e7eb;">Tracking Number</td>
-          <td style="padding:10px 0;color:#1E3A5F;font-size:14px;font-weight:600;text-align:right;border-bottom:1px solid #e5e7eb;">${data.trackingNumber}</td>
-        </tr>
-        <tr>
-          <td style="padding:10px 0;color:#6b7280;font-size:14px;border-bottom:1px solid #e5e7eb;">Fee Type</td>
-          <td style="padding:10px 0;color:#111827;font-size:14px;font-weight:500;text-align:right;border-bottom:1px solid #e5e7eb;">${feeLabel}</td>
-        </tr>
-        <tr>
-          <td style="padding:10px 0;color:#6b7280;font-size:14px;border-bottom:1px solid #e5e7eb;">Route</td>
-          <td style="padding:10px 0;color:#111827;font-size:14px;font-weight:500;text-align:right;border-bottom:1px solid #e5e7eb;">${data.shipmentOrigin} → ${data.shipmentDestination}</td>
-        </tr>
-        <tr>
-          <td style="padding:10px 0;color:#6b7280;font-size:14px;">Reason</td>
-          <td style="padding:10px 0;color:#111827;font-size:14px;font-weight:500;text-align:right;">${data.reason}</td>
+          <td style="padding:12px 0 0;color:#111827;font-size:15px;font-weight:700;">Total</td>
+          <td style="padding:12px 0 0;color:#1E3A5F;font-size:18px;font-weight:700;text-align:right;">${formatCurrency(data.total, data.currency)}</td>
         </tr>
       </table>
     </div>
 
-    <!-- Warning -->
-    <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:12px;padding:16px;margin:24px 0;">
-      <p style="color:#92400e;font-size:13px;margin:0;line-height:1.5;">
-        <strong>⚠️ Important:</strong> Your shipment will remain on hold until this payment is confirmed. Please contact us at <a href="mailto:admin@aegiscargo.org" style="color:#1E3A5F;">admin@aegiscargo.org</a> to arrange payment.
-      </p>
-    </div>
-
-    <!-- CTA -->
     <div style="text-align:center;margin:32px 0;">
       <a href="https://www.aegiscargo.org/track" style="display:inline-block;background:#1E3A5F;color:#fff;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:600;font-size:14px;">Track Your Shipment</a>
     </div>
   </div>
 
-  <!-- Footer -->
   <div style="background:#f9fafb;padding:24px 32px;border-top:1px solid #e5e7eb;text-align:center;">
     <p style="color:#9ca3af;font-size:12px;margin:0;">© ${new Date().getFullYear()} Aegis Cargo Ltd | Registered in Romania</p>
     <p style="color:#9ca3af;font-size:12px;margin:4px 0 0;">admin@aegiscargo.org</p>
@@ -109,7 +101,7 @@ export async function sendFeeInvoiceEmail(data: FeeEmailData): Promise<boolean> 
     });
     return true;
   } catch (error) {
-    console.error("Failed to send fee invoice email:", error);
+    console.error("Failed to send booking confirmation email:", error);
     return false;
   }
 }
@@ -118,9 +110,9 @@ export async function sendFeeInvoiceEmail(data: FeeEmailData): Promise<boolean> 
 // RECEIPT EMAIL — sent when admin marks fee as paid
 // ═══════════════════════════════════════════
 export async function sendFeeReceiptEmail(
-  data: FeeEmailData & { paidAt: Date; receiptPdf: Buffer }
+  data: FeeEmailData & { customType?: string | null; paidAt: Date; receiptPdf: Buffer }
 ): Promise<boolean> {
-  const feeLabel = FEE_TYPE_LABELS[data.feeType] || data.feeType;
+  const feeLabel = data.customType || FEE_TYPE_LABELS[data.feeType] || data.feeType;
   const formattedAmount = formatCurrency(data.amount, data.currency);
   const paidDate = data.paidAt.toLocaleDateString("en-GB", {
     day: "2-digit",

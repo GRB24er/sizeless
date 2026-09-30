@@ -3,25 +3,15 @@
 import { useState, useTransition } from "react";
 import {
   DollarSign,
-  Plus,
   CheckCircle,
   Clock,
   XCircle,
   Trash2,
   Loader2,
-  Send,
   Ban,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -33,7 +23,6 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import {
-  addShipmentFee,
   markFeePaid,
   waiveFee,
   deleteFee,
@@ -67,8 +56,6 @@ const FEE_TYPE_LABELS: Record<string, string> = {
   CUSTOM: "Custom Fee",
 };
 
-const CURRENCY_OPTIONS = ["USD", "GBP", "EUR", "GHS", "ZAR", "NGN", "AED", "CAD", "AUD"];
-
 function formatCurrency(amount: number, currency: string): string {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -87,17 +74,9 @@ function formatDate(d: string | null): string {
   });
 }
 
-export function FeesPanel({ shipmentId, fees: initialFees }: FeesPanelProps) {
+export function FeesPanel({ fees: initialFees }: FeesPanelProps) {
   const [fees, setFees] = useState(initialFees);
-  const [showAddForm, setShowAddForm] = useState(false);
   const [isPending, startTransition] = useTransition();
-
-  // Form state
-  const [feeType, setFeeType] = useState("AIRWAY_BILL");
-  const [customType, setCustomType] = useState("");
-  const [amount, setAmount] = useState("");
-  const [currency, setCurrency] = useState("USD");
-  const [reason, setReason] = useState("");
 
   // Confirmation dialogs
   const [payDialogOpen, setPayDialogOpen] = useState(false);
@@ -112,33 +91,6 @@ export function FeesPanel({ shipmentId, fees: initialFees }: FeesPanelProps) {
   const totalPaid = fees
     .filter((f) => f.status === "PAID")
     .reduce((sum, f) => sum + f.amount, 0);
-
-  const handleAddFee = async () => {
-    const formData = new FormData();
-    formData.set("shipmentId", shipmentId);
-    formData.set("type", feeType);
-    formData.set("customType", customType);
-    formData.set("amount", amount);
-    formData.set("currency", currency);
-    formData.set("reason", reason);
-
-    setActionLoading(true);
-    const result = await addShipmentFee(formData);
-    setActionLoading(false);
-
-    if (result.success) {
-      alert(result.message);
-      setShowAddForm(false);
-      setFeeType("AIRWAY_BILL");
-      setCustomType("");
-      setAmount("");
-      setReason("");
-      // Refresh the page to get updated fees
-      window.location.reload();
-    } else {
-      alert(result.message);
-    }
-  };
 
   const handleMarkPaid = async () => {
     if (!selectedFeeId) return;
@@ -199,14 +151,6 @@ export function FeesPanel({ shipmentId, fees: initialFees }: FeesPanelProps) {
               </Badge>
             )}
           </div>
-          <Button
-            size="sm"
-            onClick={() => setShowAddForm(!showAddForm)}
-            className="bg-emerald-600 hover:bg-emerald-700"
-          >
-            <Plus className="h-4 w-4 mr-1" />
-            Add Fee
-          </Button>
         </div>
       </div>
 
@@ -234,128 +178,15 @@ export function FeesPanel({ shipmentId, fees: initialFees }: FeesPanelProps) {
         </div>
       )}
 
-      {/* Add Fee Form */}
-      {showAddForm && (
-        <div className="px-4 py-4 border-b border-gray-200 bg-blue-50/50">
-          <h3 className="text-sm font-semibold text-gray-700 mb-3">
-            Add New Fee
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <div>
-              <label className="text-xs text-gray-500 block mb-1">
-                Fee Type
-              </label>
-              <Select value={feeType} onValueChange={setFeeType}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="AIRWAY_BILL">Airway Bill Fee</SelectItem>
-                  <SelectItem value="SHIPPING_FREIGHT">
-                    Shipping & Freight
-                  </SelectItem>
-                  <SelectItem value="HOLD_RELEASE">
-                    Hold Release Fee
-                  </SelectItem>
-                  <SelectItem value="CUSTOMS_DUTY">
-                    Customs & Duty
-                  </SelectItem>
-                  <SelectItem value="CUSTOM">Custom Fee</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            {feeType === "CUSTOM" && (
-              <div>
-                <label className="text-xs text-gray-500 block mb-1">
-                  Custom Fee Name
-                </label>
-                <Input
-                  placeholder="e.g. Inspection Fee"
-                  value={customType}
-                  onChange={(e) => setCustomType(e.target.value)}
-                />
-              </div>
-            )}
-
-            <div>
-              <label className="text-xs text-gray-500 block mb-1">
-                Amount
-              </label>
-              <Input
-                type="number"
-                step="0.01"
-                placeholder="0.00"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-              />
-            </div>
-
-            <div>
-              <label className="text-xs text-gray-500 block mb-1">
-                Currency
-              </label>
-              <Select value={currency} onValueChange={setCurrency}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {CURRENCY_OPTIONS.map((c) => (
-                    <SelectItem key={c} value={c}>
-                      {c}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="sm:col-span-2">
-              <label className="text-xs text-gray-500 block mb-1">
-                Reason (will be included in the email)
-              </label>
-              <Input
-                placeholder="e.g. Customs duty charges for import clearance in Accra, Ghana"
-                value={reason}
-                onChange={(e) => setReason(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 mt-4">
-            <Button
-              onClick={handleAddFee}
-              disabled={actionLoading || !amount || !reason}
-              className="bg-emerald-600 hover:bg-emerald-700"
-            >
-              {actionLoading ? (
-                <Loader2 className="h-4 w-4 mr-1 animate-spin" />
-              ) : (
-                <Send className="h-4 w-4 mr-1" />
-              )}
-              Add Fee & Email Invoice
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => setShowAddForm(false)}
-            >
-              Cancel
-            </Button>
-          </div>
-        </div>
-      )}
-
       {/* Fees List */}
       <div className="divide-y divide-gray-100">
         {fees.length === 0 ? (
           <div className="px-4 py-8 text-center text-gray-500 text-sm">
-            No fees added to this shipment
+            No charges on this shipment. Charges are created at booking from the quote the customer accepts.
           </div>
         ) : (
           fees.map((fee) => {
-            const feeLabel =
-              fee.type === "CUSTOM" && fee.customType
-                ? fee.customType
-                : FEE_TYPE_LABELS[fee.type] || fee.type;
+            const feeLabel = fee.customType || FEE_TYPE_LABELS[fee.type] || fee.type;
 
             return (
               <div
@@ -402,7 +233,7 @@ export function FeesPanel({ shipmentId, fees: initialFees }: FeesPanelProps) {
                         </Badge>
                       )}
                     </div>
-                    <p className="text-sm text-gray-600 mb-1">{fee.reason}</p>
+                    <p className="text-sm text-gray-600 mb-1 whitespace-pre-line">{fee.reason}</p>
                     <div className="flex items-center gap-4 text-xs text-gray-400">
                       <span>Invoice: {fee.invoiceNumber}</span>
                       <span>Added: {formatDate(fee.createdAt)}</span>

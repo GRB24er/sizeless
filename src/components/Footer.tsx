@@ -27,15 +27,7 @@ export const Footer = () => {
             <Link href="/" className="inline-block mb-6">
               <Image src="/images/logo.png" alt="Aegis Cargo" width={180} height={60} className="brightness-110" />
             </Link>
-            <p className="text-gray-400 text-sm leading-relaxed mb-6">Enterprise-grade global logistics, secure vault storage, and real-time shipment tracking. Trusted by businesses worldwide since 1998.</p>
-            <div className="flex items-center gap-4 mb-6">
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#1E3A5F]/20 border border-[#1E3A5F]/30">
-                <Shield className="w-3.5 h-3.5 text-[#B3C7DB]" /><span className="text-xs text-[#B3C7DB] font-medium">ISO 9001</span>
-              </div>
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#8C9EAF]/10 border border-[#8C9EAF]/20">
-                <Vault className="w-3.5 h-3.5 text-[#8C9EAF]" /><span className="text-xs text-[#8C9EAF] font-medium">LBMA Approved</span>
-              </div>
-            </div>
+            <p className="text-gray-400 text-sm leading-relaxed mb-6">Enterprise-grade global logistics, secure vault storage, and real-time shipment tracking.</p>
             <div className="flex gap-3">
               {[Facebook, Twitter, Linkedin, Instagram].map((Icon, i) => (
                 <a key={i} href="#" className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center hover:bg-[#1E3A5F]/30 hover:border-[#1E3A5F]/40 transition-all"><Icon className="w-4 h-4" /></a>
@@ -88,10 +80,10 @@ export const Footer = () => {
 
         <div className="mt-16 pt-8 border-t border-white/10">
           <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <p className="text-xs text-gray-500">&copy; {new Date().getFullYear()} Aegis Cargo. All rights reserved. Licensed & Bonded International Freight Carrier.</p>
+            <p className="text-xs text-gray-500">&copy; {new Date().getFullYear()} Aegis Cargo. All rights reserved.</p>
             <div className="flex items-center gap-6 text-xs text-gray-500">
               <span className="flex items-center gap-1.5"><Shield className="w-3 h-3 text-[#1E3A5F]" /> 256-bit SSL Encrypted</span>
-              <span className="flex items-center gap-1.5"><Vault className="w-3 h-3 text-[#8C9EAF]" /> Insured Vault Storage</span>
+              <span className="flex items-center gap-1.5"><Vault className="w-3 h-3 text-[#8C9EAF]" /> Secure Vault Storage</span>
             </div>
           </div>
         </div>

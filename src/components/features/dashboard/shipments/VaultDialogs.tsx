@@ -780,6 +780,7 @@ export function InsuranceDialog({
   const [isPending, startTransition] = useTransition();
   const [coverage, setCoverage] = useState("ALL_RISK");
   const [insuredValue, setInsuredValue] = useState(declaredValue.toString());
+  const [insurer, setInsurer] = useState("");
   const [policyNo, setPolicyNo] = useState("");
   const [expiryDate, setExpiryDate] = useState("");
 
@@ -790,7 +791,7 @@ export function InsuranceDialog({
   );
 
   const handleSubmit = () => {
-    if (!insuredValue || !policyNo || !expiryDate) {
+    if (!insuredValue || !insurer.trim() || !policyNo || !expiryDate) {
       toast.error("Please fill all required fields");
       return;
     }
@@ -798,7 +799,7 @@ export function InsuranceDialog({
     startTransition(async () => {
       const res = await setInsurance(depositId, adminId, {
         insuredValue: parseFloat(insuredValue),
-        insuranceProvider: selectedOption?.provider || "Lloyd's of London",
+        insuranceProvider: insurer.trim(),
         insurancePolicyNo: policyNo,
         insuranceCoverage: coverage,
         insuranceExpiryDate: expiryDate,
@@ -848,9 +849,6 @@ export function InsuranceDialog({
                   <p className="text-xs text-gray-500 mt-0.5">
                     {option.description}
                   </p>
-                  <p className="text-xs text-blue-600 mt-1">
-                    Underwriter: {option.provider}
-                  </p>
                 </div>
               </label>
             ))}
@@ -870,13 +868,24 @@ export function InsuranceDialog({
           </p>
         </FormField>
 
+        {/* Insurer */}
+        <FormField label="Insurer (as named on the policy)" required>
+          <input
+            type="text"
+            value={insurer}
+            onChange={(e) => setInsurer(e.target.value)}
+            placeholder="Insurance company that issued the policy"
+            className={inputClass}
+          />
+        </FormField>
+
         {/* Policy Number */}
         <FormField label="Policy Number" required>
           <input
             type="text"
             value={policyNo}
             onChange={(e) => setPolicyNo(e.target.value)}
-            placeholder="e.g. LLO-GLD-2026-78432"
+            placeholder="Policy number from the insurer"
             className={`${inputClass} font-mono`}
           />
         </FormField>

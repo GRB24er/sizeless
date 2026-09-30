@@ -215,7 +215,7 @@ export async function adminApproveKYC(kycId: string, notes?: string) {
           <p style="color:#065f46;font-size:12px;text-transform:uppercase;letter-spacing:2px;margin:0 0 8px 0;">Verification Status</p>
           <p style="color:#059669;font-size:24px;font-weight:700;margin:0;">✓ Approved</p>
         </div>
-        <p style="color:#374151;font-size:15px;line-height:1.6;">You can now submit vault deposit requests through your dashboard. All deposits are fully insured and stored in our LBMA-compliant high-security vaults.</p>
+        <p style="color:#374151;font-size:15px;line-height:1.6;">You can now submit vault deposit requests through your dashboard. Our full fee schedule is shown on the deposit form before you submit.</p>
         <div style="text-align:center;margin:24px 0;">
           <a href="https://www.aegiscargo.org/my-vault" style="display:inline-block;background:#D4A853;color:#0A1628;text-decoration:none;padding:14px 32px;border-radius:8px;font-weight:600;font-size:14px;">Go to My Vault</a>
         </div>`

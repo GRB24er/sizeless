@@ -258,7 +258,6 @@ export const INSURANCE_OPTIONS = [
   {
     id: "ALL_RISK",
     label: "All-Risk Coverage",
-    provider: "Lloyd's of London",
     description:
       "Comprehensive coverage: theft, fire, internal fraud, natural disasters, transit damage, political risk. Industry gold standard.",
     ratePercent: 0.12,
@@ -266,7 +265,6 @@ export const INSURANCE_OPTIONS = [
   {
     id: "THEFT_FIRE",
     label: "Theft & Fire Coverage",
-    provider: "Lloyd's of London",
     description:
       "Covers theft (including employee theft), fire, and explosion. Does not cover natural disasters or political risk.",
     ratePercent: 0.08,
@@ -274,7 +272,6 @@ export const INSURANCE_OPTIONS = [
   {
     id: "BASIC",
     label: "Basic Storage Coverage",
-    provider: "Aegis Cargo Underwriter",
     description:
       "Basic coverage for loss due to vault facility failure. Limited to storage premises only.",
     ratePercent: 0.05,
@@ -410,70 +407,10 @@ export function formatCurrencyAmount(amount: number, currencyCode: string = "USD
   }).format(amount);
 }
 
-// ─── DEMURRAGE / STORAGE CHARGE SCHEDULE ────────────────────
-
-export const DEMURRAGE_CONFIG = {
-  // Grace period (days) before demurrage charges begin after storage end date or overdue notice
-  gracePeriodDays: 14,
-
-  // Daily demurrage rate as percentage of declared value
-  dailyRates: {
-    STANDARD: 0.015,    // 0.015% per day (~5.475% p.a.)
-    EXTENDED: 0.025,    // 0.025% per day (~9.125% p.a.) — after 90 days overdue
-    CRITICAL: 0.040,    // 0.040% per day (~14.6% p.a.) — after 180 days overdue
-  },
-
-  // Minimum daily demurrage charge (in base currency)
-  minimumDailyCharge: 10.00,
-
-  // Flat late payment penalty applied once when invoice becomes overdue
-  latePaymentPenaltyPercent: 2.0, // 2% of outstanding balance
-
-  // Thresholds for rate escalation (days overdue)
-  extendedThresholdDays: 90,
-  criticalThresholdDays: 180,
-};
-
-export function calculateDemurrageCharge(
-  declaredValue: number,
-  daysOverdue: number,
-): number {
-  if (daysOverdue <= DEMURRAGE_CONFIG.gracePeriodDays) return 0;
-
-  const chargeableDays = daysOverdue - DEMURRAGE_CONFIG.gracePeriodDays;
-
-  let rate: number;
-  if (daysOverdue >= DEMURRAGE_CONFIG.criticalThresholdDays) {
-    rate = DEMURRAGE_CONFIG.dailyRates.CRITICAL;
-  } else if (daysOverdue >= DEMURRAGE_CONFIG.extendedThresholdDays) {
-    rate = DEMURRAGE_CONFIG.dailyRates.EXTENDED;
-  } else {
-    rate = DEMURRAGE_CONFIG.dailyRates.STANDARD;
-  }
-
-  const dailyCharge = Math.max(
-    declaredValue * (rate / 100),
-    DEMURRAGE_CONFIG.minimumDailyCharge
-  );
-
-  return Math.round(dailyCharge * chargeableDays * 100) / 100;
-}
-
-export function calculateLatePaymentPenalty(outstandingBalance: number): number {
-  return Math.round(outstandingBalance * (DEMURRAGE_CONFIG.latePaymentPenaltyPercent / 100) * 100) / 100;
-}
-
-export function getDemurrageRate(daysOverdue: number): { rate: number; tier: string } {
-  if (daysOverdue >= DEMURRAGE_CONFIG.criticalThresholdDays) {
-    return { rate: DEMURRAGE_CONFIG.dailyRates.CRITICAL, tier: "Critical" };
-  }
-  if (daysOverdue >= DEMURRAGE_CONFIG.extendedThresholdDays) {
-    return { rate: DEMURRAGE_CONFIG.dailyRates.EXTENDED, tier: "Extended" };
-  }
-  return { rate: DEMURRAGE_CONFIG.dailyRates.STANDARD, tier: "Standard" };
-}
-
 // ─── HELPER: Calculate monthly storage fee ───────────────────
+
+export const MIN_MONTHLY_STORAGE_FEE = 25;
+export const MIN_ANNUAL_INSURANCE_PREMIUM = 500;
 
 export function calculateMonthlyStorageFee(
   weightGrams: number,
@@ -482,7 +419,7 @@ export function calculateMonthlyStorageFee(
   const weightKg = weightGrams / 1000;
   const config = STORAGE_TYPE_CONFIG[storageType];
   if (!config) return 0;
-  return Math.max(weightKg * config.monthlyRatePerKg, 25); // Minimum 25/month
+  return Math.max(weightKg * config.monthlyRatePerKg, MIN_MONTHLY_STORAGE_FEE);
 }
 
 // ─── HELPER: Calculate annual insurance premium ──────────────
@@ -494,5 +431,30 @@ export function calculateAnnualInsurance(
   const rates = VAULT_FEE_SCHEDULE.insuranceRates;
   const rate =
     rates[coverageType as keyof typeof rates] ?? rates.ALL_RISK;
-  return Math.max(insuredValue * (rate / 100), 500); // Minimum 500/year
+  return Math.max(insuredValue * (rate / 100), MIN_ANNUAL_INSURANCE_PREMIUM);
 }
+
+// ─── PUBLISHED FEE LIST ──────────────────────────────────────
+// Shown to the client on the deposit form before they submit. Every vault
+// invoice is generated from these rates; nothing outside this list is charged.
+
+export const VAULT_PUBLISHED_FEES: { group: string; label: string; price: string }[] = [
+  ...Object.values(STORAGE_TYPE_CONFIG).map((s) => ({
+    group: "Storage (monthly)",
+    label: s.label,
+    price: `$${s.monthlyRatePerKg.toFixed(2)} per kg (min $${MIN_MONTHLY_STORAGE_FEE})`,
+  })),
+  { group: "Intake (one-time)", label: "KYC processing", price: `$${VAULT_FEE_SCHEDULE.kycProcessingFee.toFixed(2)}` },
+  { group: "Intake (one-time)", label: "Intake handling", price: `$${VAULT_FEE_SCHEDULE.intakeHandlingFee.toFixed(2)}` },
+  { group: "Intake (one-time)", label: "Armed escort (if we collect)", price: `$${VAULT_FEE_SCHEDULE.securityEscortFee.toFixed(2)}` },
+  ...ASSAY_METHODS.map((a) => ({ group: "Assay (if required)", label: a.label, price: `$${a.cost.toFixed(2)}` })),
+  ...INSURANCE_OPTIONS.map((o) => ({
+    group: "Insurance (optional, annual)",
+    label: o.label,
+    price: `${o.ratePercent}% of insured value (min $${MIN_ANNUAL_INSURANCE_PREMIUM})`,
+  })),
+  { group: "Release", label: "Physical withdrawal", price: `$${VAULT_FEE_SCHEDULE.physicalWithdrawalFee.toFixed(2)}` },
+  { group: "Release", label: "Liquidation commission", price: `${VAULT_FEE_SCHEDULE.liquidationCommission}% of sale value` },
+  { group: "Release", label: "Wire transfer", price: `$${VAULT_FEE_SCHEDULE.wireTransferFee.toFixed(2)}` },
+  { group: "Release", label: "Transfer to another vault", price: `$${VAULT_FEE_SCHEDULE.custodyTransferFee.toFixed(2)}` },
+];

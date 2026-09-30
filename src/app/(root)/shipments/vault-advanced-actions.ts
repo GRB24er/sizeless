@@ -64,7 +64,7 @@ export async function initiateVaultTransfer(
         itemsTransferred: data.itemsTransferred,
         estimatedArrival: data.estimatedArrival ? new Date(data.estimatedArrival) : null,
         transitInsuredValue: data.transitInsuredValue,
-        transitInsurer: data.transitInsurer || "Lloyd's of London",
+        transitInsurer: data.transitInsurer || null,
         transferFee: data.transferFee || 250,
         initiatedBy: adminId,
         notes: data.notes,

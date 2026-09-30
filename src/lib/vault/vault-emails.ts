@@ -30,7 +30,7 @@ function vaultEmailTemplate(
   <div style="background:linear-gradient(135deg,#0F1D2F 0%,#132640 100%);padding:32px;text-align:center;">
     <img src="${SITE}/images/logo.png" alt="Aegis Cargo" style="height:48px;margin-bottom:16px;" />
     <h1 style="color:#8C9EAF;font-size:20px;margin:0;font-weight:600;">Vault Custody Service</h1>
-    <p style="color:#94a3b8;font-size:12px;margin:8px 0 0 0;">LBMA Approved • Fully Insured • 24/7 Security</p>
+    <p style="color:#94a3b8;font-size:12px;margin:8px 0 0 0;">Secure Custody • Published Fees</p>
   </div>
   
   <!-- Gold accent bar -->
@@ -206,8 +206,7 @@ export async function notifyPlacedInStorage(
       detailRow("Custody Reference", `<strong>${custodyRef}</strong>`) +
       (storageUnit ? detailRow("Storage Unit", storageUnit) : "") +
       (monthlyFee ? detailRow("Monthly Storage Fee", `$${monthlyFee.toFixed(2)}`) : "") +
-      detailRow("Security", "24/7 Armed Guard • Biometric Access • CCTV") +
-      detailRow("Insurance", "Fully Insured — Lloyd's of London")
+      detailRow("Security", "24/7 Armed Guard • Biometric Access • CCTV")
     )}
     <p style="color:#374151;font-size:14px;line-height:1.7;">Your custody reference number is <strong style="font-family:monospace;color:#0F1D2F;font-size:16px;">${custodyRef}</strong>. Keep this safe — you'll need it for all future transactions.</p>
     <p style="color:#6b7280;font-size:13px;">Monthly storage fees will be invoiced on the 1st of each month. You can view your holdings and request withdrawals from your vault dashboard at any time.</p>`,
