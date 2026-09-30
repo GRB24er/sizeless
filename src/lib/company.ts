@@ -5,7 +5,11 @@
 export const COMPANY = {
   name: "Aegis Cargo",
   email: "admin@aegiscargo.org",
-  addressLines: ["Strada Bulevardul Unirii 72", "Floor 3, Office 12", "030833 Bucharest, Romania"],
+  addressLines: [
+    "Unit 6a Pompey Centre",
+    "Fratton Way",
+    "Southsea, PO4 8ER",
+  ],
   /** E.164 number shown with a tel: link. Leave empty to hide it. */
-  phone: "",
+  phone: "+447361617512",
 };
