@@ -143,7 +143,7 @@ export default async function DepositPage({ params }: { params: Promise<{ deposi
             </div>
             <div>
               <dt className="text-[13px] text-ink-3">{d.verifiedValue ? "Verified value" : "Declared value"}</dt>
-              <dd className="figures mt-0.5 text-ink">{usdCents(d.verifiedValue ?? d.declaredValue)}</dd>
+              <dd className="figures mt-0.5 text-ink">{cash(d.verifiedValue ?? d.declaredValue)}</dd>
             </div>
           </dl>
         </div>
@@ -164,11 +164,11 @@ export default async function DepositPage({ params }: { params: Promise<{ deposi
             {demurrageDays > 0 ? (
               <>
                 <h2 className="font-semibold text-ink">
-                  Demurrage is building up: <span className="figures">{usdCents(demurrageAccrued)}</span> so far
+                  Demurrage is building up: <span className="figures">{cash(demurrageAccrued)}</span> so far
                 </h2>
                 <p className="mt-1 max-w-[70ch] text-[15px] leading-relaxed text-ink-2">
                   Your withdrawal was approved and the {VAULT_FEE_SCHEDULE.demurrageFreeDays}-day free collection window has passed, so
-                  demurrage of <span className="figures">{usdCents(demurragePerDay(d.weightGrams))}</span> a day has applied for{" "}
+                  demurrage of <span className="figures">{cash(demurragePerDay(d.weightGrams))}</span> a day has applied for{" "}
                   {demurrageDays} {demurrageDays === 1 ? "day" : "days"}. It stops as soon as you collect. Contact us to arrange
                   collection.
                 </p>
@@ -178,7 +178,7 @@ export default async function DepositPage({ params }: { params: Promise<{ deposi
                 <h2 className="font-semibold text-ink">Ready to collect, free until {freeUntil ? format(freeUntil, "d MMMM yyyy") : "soon"}</h2>
                 <p className="mt-1 max-w-[70ch] text-[15px] leading-relaxed text-ink-2">
                   Your withdrawal is approved. Collection is free for {VAULT_FEE_SCHEDULE.demurrageFreeDays} days. After that, demurrage of{" "}
-                  <span className="figures">{usdCents(demurragePerDay(d.weightGrams))}</span> a day applies until you collect.
+                  <span className="figures">{cash(demurragePerDay(d.weightGrams))}</span> a day applies until you collect.
                 </p>
               </>
             )}
@@ -190,14 +190,24 @@ export default async function DepositPage({ params }: { params: Promise<{ deposi
         <div className="space-y-6 lg:col-span-8">
           <Panel title="What you deposited">
             <dl className="divide-y divide-line">
+              <Field label="Depositor">{demo?.depositorName}</Field>
+              <Field label="Origin">{demo?.originCountry}</Field>
               <Field label="Type">{assetLabel(d.assetType)}</Field>
               <Field label="Description">{d.description}</Field>
               <Field label="Items">{d.quantity}</Field>
               <Field label="Weight">{weightText(d.weightGrams)}</Field>
               <Field label="Purity">{purityText(d.purity, d.fineness)}</Field>
-              <Field label="Serial numbers" mono>
+              <Field label="Serial number" mono>
                 {d.serialNumbers}
               </Field>
+              <Field label="Security code" mono>
+                {demo?.securityCode}
+              </Field>
+              <Field label="Transaction code" mono>
+                {demo?.transactionCode}
+              </Field>
+              <Field label="Purpose of deposit">{demo?.depositPurpose}</Field>
+              <Field label="Next of kin">{demo?.nextOfKin}</Field>
               <Field label="Refiner">{d.refinerName}</Field>
               <Field label="Refiner's stamp">{d.refinerStamp}</Field>
               <Field label="LBMA Good Delivery bar">{d.isLBMACertified ? "Yes" : null}</Field>
@@ -208,13 +218,13 @@ export default async function DepositPage({ params }: { params: Promise<{ deposi
               </Field>
               <Field label="Cash">{d.cashAmount ? `${d.cashAmount.toLocaleString("en-US")} ${d.cashCurrency ?? ""}`.trim() : null}</Field>
               <Field label="Jewelry valuation" mono>
-                {d.jewelryValuation ? usdCents(d.jewelryValuation) : null}
+                {d.jewelryValuation ? cash(d.jewelryValuation) : null}
               </Field>
               <Field label="Declared value" mono>
-                {usdCents(d.declaredValue)}
+                {cash(d.declaredValue)}
               </Field>
               <Field label="Verified value" mono>
-                {d.verifiedValue ? usdCents(d.verifiedValue) : null}
+                {d.verifiedValue ? cash(d.verifiedValue) : null}
               </Field>
             </dl>
           </Panel>
@@ -245,10 +255,13 @@ export default async function DepositPage({ params }: { params: Promise<{ deposi
             <dl className="divide-y divide-line">
               <Field label="Storage type">
                 {storageLabel(d.storageType)}
-                {rate ? <span className="text-ink-3"> ({usdCents(rate)} per kg a month)</span> : null}
+                {rate ? <span className="text-ink-3"> ({cash(rate)} per kg a month)</span> : null}
               </Field>
               <Field label="Monthly storage" mono>
-                {usdCents(monthlyStorage)}
+                {cash(monthlyStorage)}
+              </Field>
+              <Field label="Demurrage" mono>
+                {demo?.flatDemurrage != null ? <>{cash(demo.flatDemurrage)} <span className="text-ink-3">(illustrative)</span></> : null}
               </Field>
               <Field label="Location">{d.vaultLocation}</Field>
               <Field label="Storage unit" mono>
@@ -259,8 +272,8 @@ export default async function DepositPage({ params }: { params: Promise<{ deposi
             <p className="mt-4 border-t border-line pt-4 text-sm leading-relaxed text-ink-3">
               Storage is billed monthly. If you request a withdrawal, collection is free for {VAULT_FEE_SCHEDULE.demurrageFreeDays} days
               after we approve it. Metal held past that is charged demurrage of{" "}
-              <span className="figures text-ink-2">{usdCents(VAULT_FEE_SCHEDULE.demurrageRatePerKgPerDay)}</span> per kg a day (minimum{" "}
-              <span className="figures text-ink-2">{usdCents(VAULT_FEE_SCHEDULE.demurrageMinPerDay)}</span> a day) until you collect. It
+              <span className="figures text-ink-2">{cash(VAULT_FEE_SCHEDULE.demurrageRatePerKgPerDay)}</span> per kg a day (minimum{" "}
+              <span className="figures text-ink-2">{cash(VAULT_FEE_SCHEDULE.demurrageMinPerDay)}</span> a day) until you collect. It
               is on the{" "}
               <Link href="/vault#fees" className="font-medium text-ink underline decoration-line-2 underline-offset-4">
                 published fee schedule
@@ -279,7 +292,7 @@ export default async function DepositPage({ params }: { params: Promise<{ deposi
                   </Field>
                   <Field label="Cover">{d.insuranceCoverage}</Field>
                   <Field label="Insured value" mono>
-                    {d.insuredValue ? usdCents(d.insuredValue) : null}
+                    {d.insuredValue ? cash(d.insuredValue) : null}
                   </Field>
                   <Field label="Expires">{day(d.insuranceExpiryDate)}</Field>
                 </dl>
@@ -309,7 +322,7 @@ export default async function DepositPage({ params }: { params: Promise<{ deposi
                       {w.completedAt && `, completed ${day(w.completedAt)}`}
                     </p>
                     {w.collectionDate && <p className="mt-1 text-sm text-ink-2">Collection: {format(w.collectionDate, "EEEE d MMMM yyyy, HH:mm")}</p>}
-                    {w.saleAmount && <p className="mt-1 text-sm text-ink-2">Sale amount: {usdCents(w.saleAmount)}</p>}
+                    {w.saleAmount && <p className="mt-1 text-sm text-ink-2">Sale amount: {cash(w.saleAmount)}</p>}
                     {w.rejectionReason && <p className="mt-1 text-sm text-[#B42318]">{w.rejectionReason}</p>}
                   </li>
                 ))}
@@ -405,7 +418,7 @@ export default async function DepositPage({ params }: { params: Promise<{ deposi
                         {inv.items.map((item) => (
                           <li key={item.id} className="flex justify-between gap-3 text-[13px]">
                             <span className="text-ink-2">{item.description}</span>
-                            <span className="figures shrink-0 text-ink">{usdCents(item.amount)}</span>
+                            <span className="figures shrink-0 text-ink">{cash(item.amount)}</span>
                           </li>
                         ))}
                       </ul>
@@ -414,7 +427,7 @@ export default async function DepositPage({ params }: { params: Promise<{ deposi
                           Issued {format(inv.issueDate, "d MMM yyyy")}
                           {inv.paidAt ? `, paid ${format(inv.paidAt, "d MMM yyyy")}` : `, due ${format(inv.dueDate, "d MMM yyyy")}`}
                         </span>
-                        <span className="figures font-medium text-ink">{usdCents(inv.total)}</span>
+                        <span className="figures font-medium text-ink">{cash(inv.total)}</span>
                       </p>
                     </li>
                   );

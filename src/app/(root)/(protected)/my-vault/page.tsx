@@ -9,7 +9,8 @@ import { AccountShell, PaymentNotice } from "@/components/account/account-shell"
 import { DepositRequest } from "@/components/account/deposit-request";
 import { PhaseBar, StatusBadge } from "@/components/account/vault-bits";
 import { assetLabel, storageLabel, weightText } from "@/components/account/vault-format";
-import { ButtonLink, TextLink, usdCents } from "@/components/landing/primitives";
+import { depositCurrency } from "@/lib/vault/demo-deposits";
+import { ButtonLink, TextLink, money } from "@/components/landing/primitives";
 
 export const metadata: Metadata = { title: "My vault | Aegis Cargo" };
 
@@ -98,7 +99,7 @@ export default async function MyVaultPage() {
                   </div>
                   <div>
                     <dt className="text-[13px] text-ink-3">{d.verifiedValue ? "Verified value" : "Declared value"}</dt>
-                    <dd className="figures mt-0.5 text-ink">{usdCents(d.verifiedValue ?? d.declaredValue)}</dd>
+                    <dd className="figures mt-0.5 text-ink">{money(d.verifiedValue ?? d.declaredValue, depositCurrency(d.depositNumber))}</dd>
                   </div>
                   <div>
                     <dt className="text-[13px] text-ink-3">Last update</dt>

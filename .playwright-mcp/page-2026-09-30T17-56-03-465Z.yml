@@ -1,0 +1,108 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e3]:
+      - generic [ref=e6]:
+        - list [ref=e8]:
+          - listitem [ref=e9]:
+            - link "Aegis Cargo home" [ref=e10] [cursor=pointer]:
+              - /url: /
+              - generic [ref=e11]: Aegis Cargo
+        - generic [ref=e12]:
+          - list [ref=e15]:
+            - listitem [ref=e16]:
+              - link [ref=e17] [cursor=pointer]:
+                - /url: /dashboard
+                - button "Dashboard" [ref=e18]
+            - listitem [ref=e25]:
+              - link [ref=e26] [cursor=pointer]:
+                - /url: /
+                - button "Website" [ref=e27]
+            - listitem [ref=e32]:
+              - link [ref=e33] [cursor=pointer]:
+                - /url: /dashboard/shipments
+                - button "Shipments" [ref=e34]
+            - listitem [ref=e38]:
+              - link [ref=e39] [cursor=pointer]:
+                - /url: /dashboard/fees
+                - button "Fees & Payments" [ref=e40]
+            - listitem [ref=e44]:
+              - link [ref=e45] [cursor=pointer]:
+                - /url: /dashboard/users
+                - button "Users" [ref=e46]
+            - listitem [ref=e53]:
+              - link [ref=e54] [cursor=pointer]:
+                - /url: /dashboard/vault
+                - button "Vault Management" [ref=e55]
+            - listitem [ref=e68]:
+              - link [ref=e69] [cursor=pointer]:
+                - /url: /dashboard/documents
+                - button "Documents" [ref=e70]
+          - list [ref=e77]:
+            - listitem [ref=e78]:
+              - link "Settings" [ref=e79] [cursor=pointer]:
+                - /url: "#"
+            - listitem [ref=e84]:
+              - link "Get Help" [ref=e85] [cursor=pointer]:
+                - /url: "#"
+        - list [ref=e91]:
+          - listitem [ref=e92]:
+            - button "CN" [ref=e93]
+      - main [ref=e100]:
+        - generic [ref=e104]:
+          - generic [ref=e105]:
+            - heading "Dashboard" [level=1] [ref=e106]
+            - paragraph [ref=e107]: Aegis Cargo Operations Overview
+          - generic [ref=e108]:
+            - generic [ref=e109]:
+              - generic [ref=e110]:
+                - generic [ref=e111]: Total Shipments
+                - generic [ref=e112]: "1"
+                - generic [ref=e113]: +12.5%
+              - generic [ref=e115]: Trending up this month
+            - generic [ref=e120]:
+              - generic [ref=e121]:
+                - generic [ref=e122]: Total Orders
+                - generic [ref=e123]: 23,234
+                - generic [ref=e124]: "-20%"
+              - generic [ref=e126]: Down 20% this period
+            - generic [ref=e131]:
+              - generic [ref=e132]:
+                - generic [ref=e133]: Revenue
+                - generic [ref=e134]: $45,678
+                - generic [ref=e135]: +12.5%
+              - generic [ref=e137]: Strong user retention
+            - generic [ref=e142]:
+              - generic [ref=e143]:
+                - generic [ref=e144]: Delivered
+                - generic [ref=e145]: "1"
+                - generic [ref=e146]: +4.5%
+              - generic [ref=e148]: Steady performance
+          - generic [ref=e154]:
+            - generic [ref=e155]:
+              - generic [ref=e156]: Total Visitors
+              - generic [ref=e157]: Total for the last 3 months
+              - group [ref=e160]:
+                - radio "Last 3 months" [ref=e161]
+                - radio "Last 30 days" [checked] [ref=e162]
+                - radio "Last 7 days" [ref=e163]
+            - img [ref=e168]:
+              - generic [ref=e172]:
+                - generic [ref=e173]: Jun 1
+                - generic [ref=e175]: Jun 3
+                - generic [ref=e177]: Jun 5
+                - generic [ref=e179]: Jun 7
+                - generic [ref=e181]: Jun 9
+                - generic [ref=e183]: Jun 11
+                - generic [ref=e185]: Jun 13
+                - generic [ref=e187]: Jun 15
+                - generic [ref=e189]: Jun 17
+                - generic [ref=e191]: Jun 19
+                - generic [ref=e193]: Jun 21
+                - generic [ref=e195]: Jun 23
+                - generic [ref=e197]: Jun 25
+                - generic [ref=e199]: Jun 27
+                - generic [ref=e201]: Jun 30
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e220] [cursor=pointer]
+  - alert [ref=e224]
+  - generic [aria-hidden] [ref=e225]: "25"
