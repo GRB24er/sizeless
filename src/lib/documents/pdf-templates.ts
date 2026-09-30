@@ -1,6 +1,6 @@
 import jsPDF from "jspdf";
 import { generateTrackingQR, generateVaultQR } from "./qr-generator";
-import { getLogoBase64, getLogoFormat } from "./logo-loader";
+import { drawLogo, finalizePdf } from "./branding";
 import { formatCurrencyAmount } from "@/lib/vault/types";
 
 // ═══════════════════════════════════════════
@@ -54,34 +54,6 @@ function fmtCurrency(n: number, currencyCode: string = "USD"): string {
 }
 function genDocId(): string { return "DOC-" + Math.random().toString(36).substring(2, 10).toUpperCase(); }
 function fmtPurity(p: string | null): string { if (!p) return "N/A"; return p === "dore" ? "Doré" : `${p}%`; }
-
-// ═══════════════════════════════════════════
-// WATERMARK — Diagonal "AEGIS CARGO" across page
-// ═══════════════════════════════════════════
-function drawWatermark(doc: jsPDF) {
-  doc.saveGraphicsState();
-  doc.setGState(new (doc as any).GState({ opacity: 0.04 }));
-  doc.setFontSize(60);
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(...NAVY);
-
-  // Rotate and draw diagonal watermark
-  const centerX = 105;
-  const centerY = 148;
-  doc.text("AEGIS CARGO", centerX, centerY, {
-    align: "center",
-    angle: 45,
-  });
-
-  // Second smaller watermark
-  doc.setFontSize(30);
-  doc.text("OFFICIAL DOCUMENT", centerX, centerY + 30, {
-    align: "center",
-    angle: 45,
-  });
-
-  doc.restoreGraphicsState();
-}
 
 // ═══════════════════════════════════════════
 // EMBOSSED CIRCULAR SEAL
@@ -147,7 +119,7 @@ function drawEmbossedSeal(doc: jsPDF, x: number, y: number, size: number = 22) {
   doc.setFont("helvetica", "bold");
   doc.setTextColor(...NAVY);
   doc.text("AEGIS", x, y - 3, { align: "center" });
-  doc.text("LOGISTICS", x, y + 1, { align: "center" });
+  doc.text("CARGO", x, y + 1, { align: "center" });
 
   // Gold line separator
   doc.setDrawColor(...GOLD);
@@ -173,27 +145,7 @@ function drawHeader(doc: jsPDF, title: string, docNumber: string) {
   doc.setFillColor(...EMERALD);
   doc.rect(0, 35.5, 210, 0.5, "F");
 
-  // Company logo
-  const logo = getLogoBase64();
-  if (logo) {
-    try {
-      doc.addImage(logo, getLogoFormat(), 12, 5, 50, 17);
-    } catch {
-      // Fallback to text if logo fails
-      doc.setTextColor(...WHITE);
-      doc.setFontSize(16);
-      doc.setFont("helvetica", "bold");
-      doc.text("AEGIS CARGO", 15, 16);
-    }
-  } else {
-    // Text fallback
-    doc.setTextColor(...WHITE);
-    doc.setFontSize(16);
-    doc.setFont("helvetica", "bold");
-    doc.text("AEGIS", 15, 14);
-    doc.setTextColor(...EMERALD);
-    doc.text("LOGISTICS", 48, 14);
-  }
+  drawLogo(doc, 12, 4, 17);
 
   // Subtitle
   doc.setTextColor(180, 190, 200);
@@ -408,9 +360,6 @@ export async function generateAirwayBill(data: ShipmentData): Promise<Buffer> {
     doc.text(txt, x + 2, y + 8.5);
   }
 
-  // ═══ WATERMARK ═══
-  drawWatermark(doc);
-
   // ═══════════════════════════════════════════
   // HEADER BAR
   // ═══════════════════════════════════════════
@@ -423,11 +372,7 @@ export async function generateAirwayBill(data: ShipmentData): Promise<Buffer> {
   doc.setFillColor(...EMERALD);
   doc.rect(0, 29.2, 210, 0.4, "F");
 
-  // Logo
-  const logo = getLogoBase64();
-  if (logo) {
-    try { doc.addImage(logo, getLogoFormat(), 12, 3, 42, 15); } catch {}
-  }
+  drawLogo(doc, 12, 2.5, 15);
   doc.setTextColor(...WHITE);
   doc.setFontSize(7); doc.setFont("helvetica", "normal");
   doc.text("Global Logistics & Vault Services", 12, 22);
@@ -712,7 +657,7 @@ export async function generateAirwayBill(data: ShipmentData): Promise<Buffer> {
   doc.setFontSize(4.5); doc.setTextColor(...GRAY); doc.setFont("helvetica", "normal");
   doc.text(`Generated: ${fmtDateTime(new Date())}  |  Page 1  |  © ${new Date().getFullYear()} Aegis Cargo. All rights reserved.`, 105, y + 15, { align: "center" });
 
-  return Buffer.from(doc.output("arraybuffer"));
+  return finalizePdf(doc);
 }
 
 // ═══════════════════════════════════════════
@@ -723,7 +668,6 @@ export async function generateCommercialInvoice(data: ShipmentData): Promise<Buf
   const docId = genDocId();
   const qr = await generateTrackingQR(data.trackingNumber);
 
-  drawWatermark(doc);
   drawHeader(doc, "Commercial Invoice", docId);
   drawQR(doc, qr, 170, 40, 25);
 
@@ -780,7 +724,7 @@ export async function generateCommercialInvoice(data: ShipmentData): Promise<Buf
 
   drawSignatureBlock(doc, 218);
   drawFooter(doc);
-  return Buffer.from(doc.output("arraybuffer"));
+  return finalizePdf(doc);
 }
 
 // ═══════════════════════════════════════════
@@ -791,7 +735,6 @@ export async function generatePackingList(data: ShipmentData): Promise<Buffer> {
   const docId = genDocId();
   const qr = await generateTrackingQR(data.trackingNumber);
 
-  drawWatermark(doc);
   drawHeader(doc, "Packing List", docId);
   drawQR(doc, qr, 170, 40, 25);
 
@@ -832,7 +775,7 @@ export async function generatePackingList(data: ShipmentData): Promise<Buffer> {
 
   drawSignatureBlock(doc, 218);
   drawFooter(doc);
-  return Buffer.from(doc.output("arraybuffer"));
+  return finalizePdf(doc);
 }
 
 // ═══════════════════════════════════════════
@@ -847,13 +790,7 @@ export async function generateShippingLabel(data: ShipmentData): Promise<Buffer>
   doc.setFillColor(...GOLD); doc.rect(0, 18, 100, 1, "F");
   doc.setFillColor(...EMERALD); doc.rect(0, 19, 100, 0.5, "F");
 
-  const logo = getLogoBase64();
-  if (logo) {
-    try { doc.addImage(logo, getLogoFormat(), 3, 2, 35, 12); } catch {}
-  } else {
-    doc.setTextColor(...WHITE); doc.setFontSize(10); doc.setFont("helvetica", "bold");
-    doc.text("AEGIS CARGO", 5, 10);
-  }
+  drawLogo(doc, 3, 1.5, 11);
   doc.setTextColor(...GOLD); doc.setFontSize(6); doc.setFont("helvetica", "bold");
   doc.text(data.serviceType.toUpperCase(), 5, 16);
 
@@ -910,7 +847,7 @@ export async function generateShippingLabel(data: ShipmentData): Promise<Buffer>
   doc.setFontSize(4.5); doc.setTextColor(...GRAY); doc.setFont("helvetica", "normal");
   doc.text("Aegis Cargo Ltd  |  aegiscargo.org", 50, 149, { align: "center" });
 
-  return Buffer.from(doc.output("arraybuffer"));
+  return finalizePdf(doc, { watermark: false }); // barcodes must stay scannable
 }
 
 // ═══════════════════════════════════════════
@@ -921,7 +858,6 @@ export async function generateDeliveryNote(data: ShipmentData): Promise<Buffer> 
   const docId = genDocId();
   const qr = await generateTrackingQR(data.trackingNumber);
 
-  drawWatermark(doc);
   drawHeader(doc, "Delivery Note", docId);
   drawQR(doc, qr, 170, 40, 25);
 
@@ -974,7 +910,7 @@ export async function generateDeliveryNote(data: ShipmentData): Promise<Buffer> 
   drawEmbossedSeal(doc, 172, y + 22, 18);
 
   drawFooter(doc);
-  return Buffer.from(doc.output("arraybuffer"));
+  return finalizePdf(doc);
 }
 
 // ═══════════════════════════════════════════
@@ -985,7 +921,6 @@ export async function generateProofOfDelivery(data: ShipmentData): Promise<Buffe
   const docId = genDocId();
   const qr = await generateTrackingQR(data.trackingNumber);
 
-  drawWatermark(doc);
   drawHeader(doc, "Proof of Delivery", docId);
   drawQR(doc, qr, 170, 40, 25);
 
@@ -993,7 +928,7 @@ export async function generateProofOfDelivery(data: ShipmentData): Promise<Buffe
   // Delivered banner
   doc.setFillColor(...EMERALD); doc.roundedRect(15, y, 145, 10, 2, 2, "F");
   doc.setTextColor(...WHITE); doc.setFontSize(10); doc.setFont("helvetica", "bold");
-  doc.text("✓  DELIVERED SUCCESSFULLY", 22, y + 7);
+  doc.text("DELIVERED SUCCESSFULLY", 22, y + 7);
 
   y += 18;
   drawKeyValue(doc, "AWB Number", data.trackingNumber, 15, y);
@@ -1019,7 +954,7 @@ export async function generateProofOfDelivery(data: ShipmentData): Promise<Buffe
   drawSignatureBlock(doc, 210, { showSeal: true, sealX: 172, sealY: 232 });
 
   drawFooter(doc);
-  return Buffer.from(doc.output("arraybuffer"));
+  return finalizePdf(doc);
 }
 
 // ═══════════════════════════════════════════
@@ -1030,20 +965,13 @@ export async function generateVaultCertificate(data: VaultData): Promise<Buffer>
   const docId = genDocId();
   const qr = await generateVaultQR(data.depositNumber);
 
-  drawWatermark(doc);
 
   // Custom gold-accented header
   doc.setFillColor(...NAVY); doc.rect(0, 0, 210, 36, "F");
   doc.setFillColor(...GOLD); doc.rect(0, 36, 210, 2, "F");
   doc.setFillColor(...EMERALD); doc.rect(0, 38, 210, 0.5, "F");
 
-  const logo = getLogoBase64();
-  if (logo) {
-    try { doc.addImage(logo, getLogoFormat(), 12, 5, 50, 17); } catch {}
-  } else {
-    doc.setTextColor(...WHITE); doc.setFontSize(16); doc.setFont("helvetica", "bold");
-    doc.text("AEGIS CARGO", 15, 16);
-  }
+  drawLogo(doc, 12, 4, 17);
   doc.setTextColor(180, 190, 200); doc.setFontSize(7); doc.setFont("helvetica", "normal");
   doc.text("Vault Services Division", 15, 27);
   doc.text("admin@aegiscargo.org", 15, 31);
@@ -1103,7 +1031,7 @@ export async function generateVaultCertificate(data: VaultData): Promise<Buffer>
   drawSignatureBlock(doc, 218, { showSeal: true, sealX: 172, sealY: 240 });
 
   drawFooter(doc);
-  return Buffer.from(doc.output("arraybuffer"));
+  return finalizePdf(doc);
 }
 
 // ═══════════════════════════════════════════
@@ -1114,7 +1042,6 @@ export async function generateInsuranceCertificate(data: ShipmentData): Promise<
   const docId = genDocId();
   const qr = await generateTrackingQR(data.trackingNumber);
 
-  drawWatermark(doc);
   drawHeader(doc, "Insurance Certificate", docId);
   drawQR(doc, qr, 170, 40, 25);
 
@@ -1145,7 +1072,7 @@ export async function generateInsuranceCertificate(data: ShipmentData): Promise<
   drawKeyValue(doc, "Coverage Type", "All-Risk (Door to Door)", 22, y);
   drawKeyValue(doc, "Packages Insured", `${insuredPkgs.length} of ${data.packages.length}`, 110, y);
   y += 14;
-  drawKeyValue(doc, "Route", `${data.originCity}, ${data.originCountry} → ${data.destinationCity}, ${data.destinationCountry}`, 22, y);
+  drawKeyValue(doc, "Route", `${data.originCity}, ${data.originCountry} to ${data.destinationCity}, ${data.destinationCountry}`, 22, y);
 
   y += 18;
   doc.setFillColor(240, 253, 244); doc.roundedRect(15, y, 180, 22, 2, 2, "F");
@@ -1158,7 +1085,7 @@ export async function generateInsuranceCertificate(data: ShipmentData): Promise<
   drawSignatureBlock(doc, 218, { showSeal: true, sealX: 172, sealY: 240 });
 
   drawFooter(doc);
-  return Buffer.from(doc.output("arraybuffer"));
+  return finalizePdf(doc);
 }
 
 // ═══════════════════════════════════════════
@@ -1245,20 +1172,13 @@ export async function generateAssayReport(data: VaultAssayData): Promise<Buffer>
   const docId = genDocId();
   const qr = await generateVaultQR(data.depositNumber);
 
-  drawWatermark(doc);
 
   // Header — purple-accented for assay
   doc.setFillColor(...NAVY); doc.rect(0, 0, 210, 36, "F");
   doc.setFillColor(147, 51, 234); doc.rect(0, 36, 210, 2, "F"); // purple
   doc.setFillColor(...GOLD); doc.rect(0, 38, 210, 0.5, "F");
 
-  const logo = getLogoBase64();
-  if (logo) {
-    try { doc.addImage(logo, getLogoFormat(), 12, 5, 50, 17); } catch {}
-  } else {
-    doc.setTextColor(...WHITE); doc.setFontSize(16); doc.setFont("helvetica", "bold");
-    doc.text("AEGIS CARGO", 15, 16);
-  }
+  drawLogo(doc, 12, 4, 17);
   doc.setTextColor(180, 190, 200); doc.setFontSize(7); doc.setFont("helvetica", "normal");
   doc.text("Vault Assay & Verification Division", 15, 27);
   doc.text("admin@aegiscargo.org", 15, 31);
@@ -1287,7 +1207,7 @@ export async function generateAssayReport(data: VaultAssayData): Promise<Buffer>
     doc.setFillColor(236, 253, 245); doc.roundedRect(120, y - 1, 40, 18, 2, 2, "F");
     doc.setDrawColor(16, 185, 129); doc.roundedRect(120, y - 1, 40, 18, 2, 2, "S");
     doc.setFontSize(11); doc.setFont("helvetica", "bold"); doc.setTextColor(5, 150, 105);
-    doc.text("✓ PASSED", 125, y + 11);
+    doc.text("PASSED", 125, y + 11);
   } else {
     doc.setFillColor(254, 242, 242); doc.roundedRect(120, y - 1, 40, 18, 2, 2, "F");
     doc.setDrawColor(239, 68, 68); doc.roundedRect(120, y - 1, 40, 18, 2, 2, "S");
@@ -1353,7 +1273,7 @@ export async function generateAssayReport(data: VaultAssayData): Promise<Buffer>
 
   drawSignatureBlock(doc, 218, { showSeal: true, sealX: 172, sealY: 240 });
   drawFooter(doc);
-  return Buffer.from(doc.output("arraybuffer"));
+  return finalizePdf(doc);
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1365,20 +1285,13 @@ export async function generateStorageAgreement(data: VaultStorageData): Promise<
   const docId = genDocId();
   const qr = await generateVaultQR(data.depositNumber);
 
-  drawWatermark(doc);
 
   // Header
   doc.setFillColor(...NAVY); doc.rect(0, 0, 210, 36, "F");
   doc.setFillColor(...GOLD); doc.rect(0, 36, 210, 2, "F");
   doc.setFillColor(...EMERALD); doc.rect(0, 38, 210, 0.5, "F");
 
-  const logo = getLogoBase64();
-  if (logo) {
-    try { doc.addImage(logo, getLogoFormat(), 12, 5, 50, 17); } catch {}
-  } else {
-    doc.setTextColor(...WHITE); doc.setFontSize(16); doc.setFont("helvetica", "bold");
-    doc.text("AEGIS CARGO", 15, 16);
-  }
+  drawLogo(doc, 12, 4, 17);
   doc.setTextColor(180, 190, 200); doc.setFontSize(7); doc.setFont("helvetica", "normal");
   doc.text("Vault Services Division  |  Secure Custody & Storage", 15, 27);
   doc.text("admin@aegiscargo.org", 15, 31);
@@ -1476,7 +1389,7 @@ export async function generateStorageAgreement(data: VaultStorageData): Promise<
 
   drawSignatureBlock(doc, 218, { showSeal: true, sealX: 172, sealY: 240 });
   drawFooter(doc);
-  return Buffer.from(doc.output("arraybuffer"));
+  return finalizePdf(doc);
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -1488,20 +1401,13 @@ export async function generateVaultInsuranceCertificate(data: VaultInsuranceData
   const docId = genDocId();
   const qr = await generateVaultQR(data.depositNumber);
 
-  drawWatermark(doc);
 
   // Header — blue-accented for insurance
   doc.setFillColor(...NAVY); doc.rect(0, 0, 210, 36, "F");
   doc.setFillColor(37, 99, 235); doc.rect(0, 36, 210, 2, "F"); // blue
   doc.setFillColor(...GOLD); doc.rect(0, 38, 210, 0.5, "F");
 
-  const logo = getLogoBase64();
-  if (logo) {
-    try { doc.addImage(logo, getLogoFormat(), 12, 5, 50, 17); } catch {}
-  } else {
-    doc.setTextColor(...WHITE); doc.setFontSize(16); doc.setFont("helvetica", "bold");
-    doc.text("AEGIS CARGO", 15, 16);
-  }
+  drawLogo(doc, 12, 4, 17);
   doc.setTextColor(180, 190, 200); doc.setFontSize(7); doc.setFont("helvetica", "normal");
   doc.text("Vault Insurance Services", 15, 27);
   doc.text("admin@aegiscargo.org", 15, 31);
@@ -1577,7 +1483,7 @@ export async function generateVaultInsuranceCertificate(data: VaultInsuranceData
 
   drawSignatureBlock(doc, 218, { showSeal: true, sealX: 172, sealY: 240 });
   drawFooter(doc);
-  return Buffer.from(doc.output("arraybuffer"));
+  return finalizePdf(doc);
 }
 
 // EXPORT MAP
