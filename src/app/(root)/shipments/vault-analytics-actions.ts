@@ -6,10 +6,15 @@
 // ═══════════════════════════════════════════════════════════════
 
 import { prisma } from "@/constants/config/db";
+import { requireAdmin } from "@/lib/auth-guards";
+
+// All actions in this file are admin-only. Where an action takes an adminId,
+// it is replaced with the signed-in admin's id rather than trusted from the caller.
 
 // ─── VAULT OVERVIEW STATS ────────────────────────────────────
 
 export async function getVaultOverview() {
+  await requireAdmin();
   try {
     const deposits = await prisma.vaultDeposit.findMany({
       select: {
@@ -112,6 +117,7 @@ export async function getVaultOverview() {
 // ─── CLIENT PORTFOLIO SUMMARY ────────────────────────────────
 
 export async function getClientPortfolios() {
+  await requireAdmin();
   try {
     const deposits = await prisma.vaultDeposit.findMany({
       where: { status: "IN_STORAGE" },
@@ -170,6 +176,7 @@ export async function getClientPortfolios() {
 // ─── REVENUE ANALYTICS ──────────────────────────────────────
 
 export async function getRevenueAnalytics() {
+  await requireAdmin();
   try {
     const invoices = await prisma.vaultInvoice.findMany({
       include: { items: true },
@@ -244,6 +251,7 @@ export async function getVaultActivityLog(options?: {
   limit?: number;
   depositId?: string;
 }) {
+  await requireAdmin();
   try {
     const where: any = {};
     if (options?.depositId) where.depositId = options.depositId;
@@ -269,6 +277,7 @@ export async function getVaultActivityLog(options?: {
 // ─── WITHDRAWAL ANALYTICS ───────────────────────────────────
 
 export async function getWithdrawalAnalytics() {
+  await requireAdmin();
   try {
     const withdrawals = await prisma.vaultWithdrawal.findMany({
       include: {

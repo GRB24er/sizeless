@@ -11,17 +11,12 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/constants/config/db";
-import { auth } from "~/auth";
+import { requireAdmin } from "@/lib/auth-guards";
 import {
   VAULT_FEE_SCHEDULE,
   ASSAY_METHODS,
   calculateMonthlyStorageFee,
 } from "@/lib/vault/types";
-
-async function requireAdmin() {
-  const session = await auth();
-  if (session?.user?.role !== "ADMIN") throw new Error("Admin access required");
-}
 
 // ─── HELPERS ─────────────────────────────────────────────────
 

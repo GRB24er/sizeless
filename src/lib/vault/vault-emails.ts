@@ -1,5 +1,3 @@
-"use server";
-
 // ═══════════════════════════════════════════════════════════════
 // src/lib/vault/vault-emails.ts
 // Vault Email Notifications — Status change emails to clients

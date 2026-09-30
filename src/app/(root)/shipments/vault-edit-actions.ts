@@ -7,6 +7,10 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/constants/config/db";
+import { requireAdmin } from "@/lib/auth-guards";
+
+// All actions in this file are admin-only. Where an action takes an adminId,
+// it is replaced with the signed-in admin's id rather than trusted from the caller.
 
 // ─── EDIT VAULT DEPOSIT ──────────────────────────────────────
 
@@ -48,6 +52,7 @@ export async function editVaultDeposit(
     complianceNotes?: string;
   }
 ) {
+  adminId = (await requireAdmin()).id;
   try {
     const deposit = await prisma.vaultDeposit.findUnique({
       where: { id: depositId },
@@ -137,6 +142,7 @@ export async function editVaultDeposit(
 // ─── DELETE VAULT CLIENT (User + All Deposits) ──────────────
 
 export async function deleteVaultClient(userId: string, adminId: string) {
+  adminId = (await requireAdmin()).id;
   try {
     if (userId === adminId) return { error: "Cannot delete your own account" };
 

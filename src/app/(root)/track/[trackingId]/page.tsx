@@ -2,6 +2,7 @@ import TrackingResult from "@/components/features/tracking.result";
 import Link from "next/link";
 import { prisma } from "@/constants/config/db";
 import { Metadata } from "next";
+import { currentUser, canAccessShipment } from "@/lib/auth-guards";
 
 export async function generateMetadata({ params }: { params: Promise<{ trackingId: string }> }): Promise<Metadata> {
   const { trackingId } = await params;
@@ -16,7 +17,7 @@ async function getTrackingData(trackingNumber: string) {
     return await prisma.shipment.findUnique({
       where: { trackingNumber },
       select: {
-        trackingNumber: true, estimatedDelivery: true, deliveredAt: true, isPaid: true,
+        trackingNumber: true, estimatedDelivery: true, deliveredAt: true, isPaid: true, userId: true,
         originAddress: true, originCity: true, originState: true, originPostalCode: true, originCountry: true,
         destinationAddress: true, destinationCity: true, destinationState: true, destinationPostalCode: true, destinationCountry: true,
         serviceType: true, specialInstructions: true,
@@ -115,6 +116,26 @@ export default async function TrackingResultsPage({ params }: { params: Promise<
   const trackingData = await getTrackingData(sanitizedTrackingNumber);
   if (!trackingData) return <TrackingError type="not-found" trackingNumber={sanitizedTrackingNumber} />;
 
+  // Anyone with the tracking number sees status and route. Contact details,
+  // street addresses and declared values go only to the sender and admins.
+  const viewer = await currentUser();
+  const detailsHidden = !viewer || !canAccessShipment(viewer, trackingData);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { userId: _owner, ...shipment } = trackingData;
+  const data = detailsHidden
+    ? {
+        ...shipment,
+        originAddress: "",
+        originPostalCode: "",
+        destinationAddress: "",
+        destinationPostalCode: "",
+        specialInstructions: null,
+        recipient: { ...shipment.recipient, email: null, phone: "" },
+        Sender: shipment.Sender ? { ...shipment.Sender, email: null } : null,
+        packages: shipment.packages.map((p) => ({ ...p, declaredValue: null })),
+      }
+    : shipment;
+
   try {
     return (
       <div className="min-h-screen bg-gradient-to-b from-[#0A1628] via-slate-900 to-[#0A1628]">
@@ -139,7 +160,7 @@ export default async function TrackingResultsPage({ params }: { params: Promise<
             </div>
           </div>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <TrackingResult data={trackingData} />
+            <TrackingResult data={data} detailsHidden={detailsHidden} />
           </div>
         </div>
       </div>

@@ -53,7 +53,7 @@ interface Recipient {
 
 interface Sender {
   name: string;
-  email: string;
+  email?: string | null;
   phone?: string;
 }
 
@@ -83,9 +83,11 @@ interface TrackingData {
 
 type TrackingResultProps = {
   data: TrackingData;
+  /** Public view: contact details, street addresses and values are withheld. */
+  detailsHidden?: boolean;
 };
 
-export default function AdvancedTrackingResult({ data }: TrackingResultProps) {
+export default function AdvancedTrackingResult({ data, detailsHidden = false }: TrackingResultProps) {
   const [activeTab, setActiveTab] = useState<"timeline" | "details" | "documents">("timeline");
   const [isRefreshing, setIsRefreshing] = useState(false);
 
@@ -115,6 +117,11 @@ export default function AdvancedTrackingResult({ data }: TrackingResultProps) {
     try {
       toast.loading("Generating Airway Bill...");
       const response = await fetch(`/api/generate-airway-bill/${data.trackingNumber}`);
+      if (response.status === 401 || response.status === 404) {
+        toast.dismiss();
+        toast.error("Sign in with the account that booked this shipment to download the air waybill.");
+        return;
+      }
       if (!response.ok) throw new Error("Failed to generate Airway Bill");
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
@@ -324,7 +331,7 @@ export default function AdvancedTrackingResult({ data }: TrackingResultProps) {
         {[
           { label: "Total Pieces", value: `${totalPieces}`, sub: `${data.packages.length} package${data.packages.length !== 1 ? "s" : ""}`, icon: PackageIcon, color: "text-emerald-400", bg: "bg-emerald-500/10" },
           { label: "Total Weight", value: `${totalWeight.toFixed(1)} kg`, sub: `${(totalWeight * 2.205).toFixed(1)} lbs`, icon: Weight, color: "text-blue-400", bg: "bg-blue-500/10" },
-          { label: "Declared Value", value: formatCurrency(totalValue), sub: data.isPaid ? "Prepaid" : "Collect", icon: DollarSign, color: "text-amber-400", bg: "bg-amber-500/10" },
+          { label: "Declared Value", value: detailsHidden ? "Private" : formatCurrency(totalValue), sub: data.isPaid ? "Prepaid" : "Collect", icon: DollarSign, color: "text-amber-400", bg: "bg-amber-500/10" },
           { label: "Updates", value: `${data.TrackingUpdates.length}`, sub: hoursSinceLastUpdate !== null ? `${hoursSinceLastUpdate}h ago` : "No updates", icon: Bell, color: "text-violet-400", bg: "bg-violet-500/10" },
         ].map((stat, idx) => (
           <div key={idx} className="rounded-xl bg-slate-800/30 border border-slate-700/50 p-5 hover:border-slate-600/50 transition-colors">
@@ -454,8 +461,8 @@ export default function AdvancedTrackingResult({ data }: TrackingResultProps) {
                 <div>
                   <p className="text-xs text-slate-500 uppercase tracking-wider font-medium">Origin</p>
                   <p className="font-semibold text-white">{data.originCity}, {data.originState}</p>
-                  <p className="text-sm text-slate-400">{data.originAddress}</p>
-                  <p className="text-xs text-slate-500">{data.originPostalCode}, {data.originCountry}</p>
+                  {data.originAddress && <p className="text-sm text-slate-400">{data.originAddress}</p>}
+                  <p className="text-xs text-slate-500">{[data.originPostalCode, data.originCountry].filter(Boolean).join(", ")}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3 pl-5">
@@ -469,8 +476,8 @@ export default function AdvancedTrackingResult({ data }: TrackingResultProps) {
                 <div>
                   <p className="text-xs text-slate-500 uppercase tracking-wider font-medium">Destination</p>
                   <p className="font-semibold text-white">{data.destinationCity}, {data.destinationState}</p>
-                  <p className="text-sm text-slate-400">{data.destinationAddress}</p>
-                  <p className="text-xs text-slate-500">{data.destinationPostalCode}, {data.destinationCountry}</p>
+                  {data.destinationAddress && <p className="text-sm text-slate-400">{data.destinationAddress}</p>}
+                  <p className="text-xs text-slate-500">{[data.destinationPostalCode, data.destinationCountry].filter(Boolean).join(", ")}</p>
                 </div>
               </div>
             </div>
@@ -486,7 +493,7 @@ export default function AdvancedTrackingResult({ data }: TrackingResultProps) {
                 { label: "Service", value: data.serviceType },
                 { label: "Total Pieces", value: String(totalPieces) },
                 { label: "Total Weight", value: `${totalWeight.toFixed(1)} kg` },
-                { label: "Declared Value", value: formatCurrency(totalValue) },
+                { label: "Declared Value", value: detailsHidden ? "Private" : formatCurrency(totalValue) },
                 { label: "Payment", value: data.isPaid ? "Prepaid" : "Collect" },
                 { label: "Created", value: format(data.createdAt, "MMM d, yyyy") },
               ].map((item, idx) => (
@@ -520,6 +527,11 @@ export default function AdvancedTrackingResult({ data }: TrackingResultProps) {
           </div>
 
           <TabsContent value="timeline" className="p-6">
+            {detailsHidden && (
+              <p className="mb-4 text-xs text-slate-400">
+                Contact details, street addresses and declared values are only shown to the sender. Sign in with the account that booked this shipment to see them.
+              </p>
+            )}
             <div className="grid md:grid-cols-2 gap-6">
               {/* Sender */}
               <div className="rounded-xl bg-slate-900/50 border border-slate-700/30 p-5">
@@ -532,7 +544,7 @@ export default function AdvancedTrackingResult({ data }: TrackingResultProps) {
                   {data.Sender?.email && <div><p className="text-xs text-slate-500 uppercase">Email</p><p className="text-sm text-slate-300">{data.Sender.email}</p></div>}
                   <div className="pt-2 border-t border-slate-700/30">
                     <p className="text-xs text-slate-500 uppercase">Address</p>
-                    <p className="text-sm text-slate-300">{data.originAddress}</p>
+                    {data.originAddress && <p className="text-sm text-slate-300">{data.originAddress}</p>}
                     <p className="text-sm text-slate-300">{data.originCity}, {data.originState} {data.originPostalCode}</p>
                     <p className="text-sm text-slate-400">{data.originCountry}</p>
                   </div>
@@ -548,10 +560,10 @@ export default function AdvancedTrackingResult({ data }: TrackingResultProps) {
                   <div><p className="text-xs text-slate-500 uppercase">Name</p><p className="font-medium text-white">{data.recipient.name}</p></div>
                   {data.recipient.company && <div><p className="text-xs text-slate-500 uppercase">Company</p><p className="text-sm text-slate-300">{data.recipient.company}</p></div>}
                   {data.recipient.email && <div><p className="text-xs text-slate-500 uppercase">Email</p><p className="text-sm text-slate-300">{data.recipient.email}</p></div>}
-                  <div><p className="text-xs text-slate-500 uppercase">Phone</p><p className="text-sm text-slate-300">{data.recipient.phone}</p></div>
+                  {data.recipient.phone && <div><p className="text-xs text-slate-500 uppercase">Phone</p><p className="text-sm text-slate-300">{data.recipient.phone}</p></div>}
                   <div className="pt-2 border-t border-slate-700/30">
                     <p className="text-xs text-slate-500 uppercase">Address</p>
-                    <p className="text-sm text-slate-300">{data.destinationAddress}</p>
+                    {data.destinationAddress && <p className="text-sm text-slate-300">{data.destinationAddress}</p>}
                     <p className="text-sm text-slate-300">{data.destinationCity}, {data.destinationState} {data.destinationPostalCode}</p>
                     <p className="text-sm text-slate-400">{data.destinationCountry}</p>
                   </div>
@@ -582,7 +594,7 @@ export default function AdvancedTrackingResult({ data }: TrackingResultProps) {
                       {[
                         { label: "Dimensions", value: `${pkg.length} × ${pkg.width} × ${pkg.height} cm` },
                         { label: "Pieces", value: String(pkg.pieces) },
-                        { label: "Declared Value", value: formatCurrency(pkg.declaredValue || 0) },
+                        { label: "Declared Value", value: detailsHidden ? "Private" : formatCurrency(pkg.declaredValue || 0) },
                       ].map((item, i) => (
                         <div key={i} className="flex justify-between py-1.5 border-b border-slate-700/20">
                           <span className="text-sm text-slate-400">{item.label}</span>

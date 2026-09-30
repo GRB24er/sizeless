@@ -25,7 +25,8 @@ export async function GET(
       },
     });
 
-    if (!shipment) {
+    // Clients can only download documents for shipments they booked
+    if (!shipment || (session.user.role !== "ADMIN" && shipment.userId !== session.user.id)) {
       return NextResponse.json(
         { error: "Shipment not found" },
         { status: 404 }

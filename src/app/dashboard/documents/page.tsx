@@ -5,7 +5,7 @@ import { AdminDocumentPanel } from "@/components/features/dashboard/admin-docume
 
 export default async function AdminDocumentsPage() {
   const session = await auth();
-  if (!session?.user) redirect("/");
+  if (session?.user?.role !== "ADMIN") redirect("/");
 
   const shipments = await getShipmentsForDocuments();
 

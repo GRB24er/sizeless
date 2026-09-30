@@ -22,16 +22,11 @@ export async function GET() {
     );
   }
 
-  // Everything is valid; update the user to mark the email as verified
+  // Undelivered shipments: all of them for admins, only their own for clients
   const activeShipmentCount = await prisma.shipment.count({
     where: {
-      TrackingUpdates: {
-        some: {
-          status: {
-            not: "delivered",
-          },
-        },
-      },
+      deliveredAt: null,
+      ...(user.role === "ADMIN" ? {} : { userId: user.id }),
     },
   });
 
