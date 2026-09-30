@@ -40,7 +40,7 @@ const sections = [
   {
     title: "7. Payment Terms",
     content:
-      "All fees and charges for services rendered are due in accordance with the payment terms specified in the service agreement or invoice. Late payments may be subject to interest charges and service suspension. Aegis Cargo reserves the right to hold shipments or vault-stored items until all outstanding balances are settled. Pricing is subject to change; however, any price changes will not affect services already in progress under an existing agreement.",
+      "Shipment charges are calculated from our published rate card and shown to you, itemized, before you book. The total you accept at booking is the full price of that shipment and is payable before dispatch; we do not add hold, release, clearance, or any other charges afterwards. Vault fees are charged only at the rates in the published vault fee schedule shown to you before you deposit. We will never ask you to pay an additional fee to release a shipment or a vault-stored item. If anyone asks you to, do not pay and contact us at admin@aegiscargo.org. Price changes apply only to new bookings and deposits.",
   },
   {
     title: "8. Privacy",

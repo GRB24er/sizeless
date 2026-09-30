@@ -13,16 +13,16 @@ export default function VaultPage() {
 
   const features = [
     { icon: Lock, title: "High-Security Vaults", desc: "State-of-the-art biometric access, 24/7 armed surveillance, and multi-layer security protocols." },
-    { icon: Shield, title: "Fully Insured", desc: "Every asset insured up to its full declared value through Lloyd's of London underwriters." },
-    { icon: Eye, title: "Independent Audits", desc: "Quarterly third-party audits with full transparency reports available to all depositors." },
+    { icon: Shield, title: "Insurance Options", desc: "Optional cover priced from the published fee schedule. Your insurer and policy number appear on your certificate." },
+    { icon: Eye, title: "Online Holdings", desc: "See each deposit's weight, purity, status, and activity history from your vault dashboard." },
     { icon: Clock, title: "Flexible Access", desc: "Schedule withdrawals with 48-hour advance notice. Emergency releases available for verified clients." },
-    { icon: FileCheck, title: "LBMA Approved", desc: "Our vault operations meet London Bullion Market Association standards for precious metals custody." },
+    { icon: FileCheck, title: "Published Fees", desc: "Storage, handling, and withdrawal fees are shown before you deposit. Nothing is added afterwards." },
     { icon: Vault, title: "Climate Controlled", desc: "Precision temperature and humidity control to preserve asset integrity long-term." },
   ];
 
   const steps = [
     { num: "01", title: "Submit Deposit Request", desc: "Complete our secure deposit form with asset details, weight, purity, and declared value." },
-    { num: "02", title: "Verification & Assay", desc: "Our certified team verifies authenticity, weight, and purity. Serial numbers are recorded." },
+    { num: "02", title: "Verification & Assay", desc: "Our team verifies authenticity, weight, and purity. Serial numbers are recorded." },
     { num: "03", title: "Secure Storage", desc: "Assets are catalogued, insured, and placed in your assigned high-security vault unit." },
     { num: "04", title: "Monitor & Release", desc: "Track your assets in real-time. Request release anytime through your secure dashboard." },
   ];
@@ -42,7 +42,7 @@ export default function VaultPage() {
             <motion.div initial={{ opacity: 0, y: 30 }} animate={heroInView ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.8 }}>
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#D4A853]/10 border border-[#D4A853]/20 mb-8">
                 <Vault className="w-4 h-4 text-[#D4A853]" />
-                <span className="text-sm font-medium text-[#D4A853]">LBMA Approved Vault Services</span>
+                <span className="text-sm font-medium text-[#D4A853]">Secure Vault Services</span>
               </div>
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-[1.1] mb-6">
                 Secure{" "}
@@ -50,7 +50,7 @@ export default function VaultPage() {
                 <br />Storage
               </h1>
               <p className="text-lg text-slate-400 leading-relaxed mb-10 max-w-xl">
-                Insured precious metals custody in high-security, climate-controlled vaults. Independent audits, real-time monitoring, and flexible access when you need it.
+                Precious metals custody in high-security, climate-controlled vaults. Documented intake, published fees, and online access to your holdings.
               </p>
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link href="/login" className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-r from-[#D4A853] to-[#C09740] text-[#0A1628] font-semibold text-sm hover:from-[#F5DEB3] hover:to-[#D4A853] transition-all shadow-lg shadow-[#D4A853]/25">
@@ -71,9 +71,9 @@ export default function VaultPage() {
               <motion.div initial={{ opacity: 0, y: 20 }} animate={heroInView ? { opacity: 1, y: 0 } : {}} transition={{ delay: 1 }}
                 className="absolute -bottom-6 left-6 right-6 p-5 bg-[#0A1628]/90 backdrop-blur-xl rounded-2xl border border-[#D4A853]/20">
                 <div className="grid grid-cols-3 gap-4 text-center">
-                  <div><p className="text-xl font-bold text-[#D4A853]">$48M+</p><p className="text-xs text-slate-400">Assets Secured</p></div>
-                  <div><p className="text-xl font-bold text-[#D4A853]">99.99%</p><p className="text-xs text-slate-400">Security Rating</p></div>
-                  <div><p className="text-xl font-bold text-emerald-400">24/7</p><p className="text-xs text-slate-400">Monitoring</p></div>
+                  <div><p className="text-xl font-bold text-[#D4A853]">Fixed</p><p className="text-xs text-slate-400">Fee Schedule</p></div>
+                  <div><p className="text-xl font-bold text-[#D4A853]">Itemized</p><p className="text-xs text-slate-400">Invoices</p></div>
+                  <div><p className="text-xl font-bold text-emerald-400">Online</p><p className="text-xs text-slate-400">Holdings</p></div>
                 </div>
               </motion.div>
             </motion.div>
@@ -136,7 +136,7 @@ export default function VaultPage() {
             <div className="relative z-10">
               <Vault className="w-12 h-12 text-[#D4A853] mx-auto mb-6" />
               <h2 className="text-3xl font-bold text-white mb-4">Start Securing Your Assets Today</h2>
-              <p className="text-slate-400 max-w-xl mx-auto mb-8">Join institutional and private clients who trust Aegis Cargo for secure precious metals custody.</p>
+              <p className="text-slate-400 max-w-xl mx-auto mb-8">Open a vault account and see every fee before you make a deposit.</p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link href="/login" className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-r from-[#D4A853] to-[#C09740] text-[#0A1628] font-semibold text-sm hover:from-[#F5DEB3] hover:to-[#D4A853] transition-all shadow-lg shadow-[#D4A853]/25">
                   Get Started <ArrowRight className="w-4 h-4" />

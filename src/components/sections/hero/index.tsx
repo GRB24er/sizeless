@@ -2,7 +2,7 @@
 
 import { motion } from "motion/react";
 import { useInView } from "react-intersection-observer";
-import { ArrowRight, Shield, Globe, Vault, Package, Truck } from "lucide-react";
+import { ArrowRight, Shield, Globe, Vault, Truck } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 
@@ -18,32 +18,13 @@ export const Hero = () => {
         <div className="absolute inset-0 opacity-[0.015]" style={{ backgroundImage: `radial-gradient(circle at 1px 1px, rgba(30,58,95,0.4) 1px, transparent 0)`, backgroundSize: "60px 60px" }} />
       </div>
 
-      {/* Floating elements */}
-      <motion.div className="absolute top-32 right-[15%] hidden lg:block" animate={{ y: [0, -15, 0] }} transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}>
-        <div className="p-4 bg-white/5 backdrop-blur-xl rounded-2xl border border-white/10 shadow-2xl">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#1E3A5F]/20 flex items-center justify-center"><Package className="w-5 h-5 text-[#8C9EAF]" /></div>
-            <div><p className="text-xs text-slate-400">Active Shipments</p><p className="text-lg font-bold text-white">2,847</p></div>
-          </div>
-        </div>
-      </motion.div>
-
-      <motion.div className="absolute bottom-40 right-[10%] hidden lg:block" animate={{ y: [0, 12, 0] }} transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}>
-        <div className="p-4 bg-white/5 backdrop-blur-xl rounded-2xl border border-[#8C9EAF]/20 shadow-2xl">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#8C9EAF]/20 flex items-center justify-center"><Vault className="w-5 h-5 text-[#8C9EAF]" /></div>
-            <div><p className="text-xs text-slate-400">Vault Secured</p><p className="text-lg font-bold text-[#8C9EAF]">$48.2M</p></div>
-          </div>
-        </div>
-      </motion.div>
-
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10 pt-32 pb-20">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left content */}
           <motion.div initial={{ opacity: 0, y: 30 }} animate={inView ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.8 }}>
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1E3A5F]/10 border border-[#1E3A5F]/20 mb-8">
               <Shield className="w-4 h-4 text-[#8C9EAF]" />
-              <span className="text-sm font-medium text-[#B3C7DB]">ISO 9001 Certified & LBMA Approved</span>
+              <span className="text-sm font-medium text-[#B3C7DB]">Shipping & Secure Vault Storage</span>
             </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-[1.1] mb-6">
@@ -54,7 +35,7 @@ export const Hero = () => {
             </h1>
 
             <p className="text-lg text-slate-400 leading-relaxed mb-10 max-w-xl">
-              Enterprise-grade logistics across 190+ countries with secure gold vault storage. Real-time tracking, customs clearance, and insured precious metals custody — all under one roof.
+              International shipping and secure gold vault storage. Every charge is itemized and agreed before you book, every handover is logged on your tracking page, and vault clients can view their holdings online.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 mb-12">
@@ -69,9 +50,9 @@ export const Hero = () => {
             {/* Trust stats */}
             <div className="grid grid-cols-3 gap-8">
               {[
-                { value: "190+", label: "Countries" },
-                { value: "50K+", label: "Shipments/Month" },
-                { value: "99.8%", label: "On-Time Rate" },
+                { value: "Fixed", label: "Price at booking" },
+                { value: "Itemized", label: "Every charge listed" },
+                { value: "Online", label: "Vault holdings" },
               ].map((stat, i) => (
                 <motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={inView ? { opacity: 1, y: 0 } : {}} transition={{ delay: 0.5 + i * 0.15 }}>
                   <p className="text-2xl sm:text-3xl font-bold text-white">{stat.value}</p>

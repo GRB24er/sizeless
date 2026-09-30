@@ -9,10 +9,10 @@ export const GlobalNetwork = () => {
   const { ref: sectionRef, inView: isSectionInView } = useInView({ triggerOnce: true, threshold: 0.2 });
 
   const features = [
-    { icon: MapPin, title: "220+ Countries & Territories", description: "Comprehensive global coverage for all your shipping needs with local expertise" },
+    { icon: MapPin, title: "International Routes", description: "Door-to-door shipping with customs brokerage included in your quote" },
     { icon: Globe, title: "Strategic Global Hubs", description: "Optimized routing through key logistics centers for faster delivery times" },
     { icon: Truck, title: "Multi-Modal Transport", description: "Seamless integration of air, sea, and ground freight solutions" },
-    { icon: Clock, title: "24/7 Operations", description: "Round-the-clock logistics support ensuring uninterrupted service" },
+    { icon: Clock, title: "Logged Handovers", description: "Every status change is recorded on your tracking page and emailed to you" },
   ];
 
   const networkPoints = [
@@ -42,7 +42,7 @@ export const GlobalNetwork = () => {
             Connecting Businesses{" "}
             <span className="bg-gradient-to-r from-emerald-400 to-emerald-300 bg-clip-text text-transparent">Worldwide</span>
           </h2>
-          <p className="text-lg text-slate-400 max-w-2xl mx-auto">Our extensive global network ensures your shipments reach virtually any destination with efficiency and reliability.</p>
+          <p className="text-lg text-slate-400 max-w-2xl mx-auto">Air, sea, and road freight on international routes, priced upfront and tracked at every handover.</p>
         </motion.div>
 
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
@@ -92,9 +92,9 @@ export const GlobalNetwork = () => {
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.5 }}
                   className="absolute bottom-4 left-4 right-4 p-4 bg-slate-900/90 backdrop-blur-sm rounded-xl border border-emerald-900/50">
                   <div className="grid grid-cols-3 gap-4 text-center">
-                    <div><p className="text-xl font-bold text-emerald-400">50+</p><p className="text-xs text-slate-400">Distribution Hubs</p></div>
-                    <div><p className="text-xl font-bold text-[#D4A853]">24/7</p><p className="text-xs text-slate-400">Operations</p></div>
-                    <div><p className="text-xl font-bold text-emerald-400">99%</p><p className="text-xs text-slate-400">Uptime</p></div>
+                    <div><p className="text-xl font-bold text-emerald-400">Air</p><p className="text-xs text-slate-400">Freight</p></div>
+                    <div><p className="text-xl font-bold text-[#D4A853]">Sea</p><p className="text-xs text-slate-400">Freight</p></div>
+                    <div><p className="text-xl font-bold text-emerald-400">Road</p><p className="text-xs text-slate-400">Freight</p></div>
                   </div>
                 </motion.div>
               </div>

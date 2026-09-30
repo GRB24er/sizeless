@@ -16,7 +16,7 @@ import {
   Truck,
 } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -56,6 +56,8 @@ import {
   PACKAGE_TYPES,
   PURITY_OPTIONS,
   FEE_SCHEDULE,
+  QUOTE_GROUPS,
+  calculateShipmentQuote,
 } from "./type";
 
 function formatCurrency(amount: number): string {
@@ -112,6 +114,10 @@ export default function CreateShipmentPage() {
     name: "packages",
   });
 
+  // The total the customer ticked "I accept" against. If the quote changes
+  // afterwards, the checkbox clears and they must accept the new total.
+  const [acceptedTotal, setAcceptedTotal] = useState<number | null>(null);
+
   useEffect(() => {
     if (status === "loading") return;
     if (status === "unauthenticated") {
@@ -144,8 +150,15 @@ export default function CreateShipmentPage() {
   }
 
   const onSubmit = async (data: ShipmentFormValues) => {
+    const quote = calculateShipmentQuote(data.packages, data.serviceType);
+    if (!quote || acceptedTotal !== quote.total) {
+      toast.error("Please review and accept the total before booking.");
+      return;
+    }
+
     try {
       const formData = new FormData();
+      formData.append("acceptedTotal", String(acceptedTotal));
 
       Object.entries(data).forEach(([key, value]) => {
         if (key !== "packages") {
@@ -166,9 +179,10 @@ export default function CreateShipmentPage() {
       const result = await createShipment(formData);
       if (result.error) {
         toast.error(result.error);
+        setAcceptedTotal(null);
         console.error("Validation issues:", result.issues);
       } else {
-        toast.success("Shipment created successfully!");
+        toast.success("Shipment booked. A confirmation with your charges has been emailed to you.");
         router.push("/shipments/history");
       }
     } catch (error) {
@@ -178,96 +192,12 @@ export default function CreateShipmentPage() {
   };
 
   // ═══════════════════════════════════════════════════
-  // REALISTIC GOLD CONSIGNMENT COST CALCULATION
+  // PRICE — from the shared rate card (same function the server uses)
   // ═══════════════════════════════════════════════════
   const calculateSummary = () => {
     const packages = form.watch("packages");
     const serviceType = form.watch("serviceType");
-
-    const selectedShipping = SHIPPING_OPTIONS.find(
-      (option) => option.id === serviceType
-    );
-
-    if (!selectedShipping) {
-      return {
-        packages: [],
-        shippingOption: SHIPPING_OPTIONS[0],
-        baseFreight: 0,
-        weightSurcharge: 0,
-        insurancePremium: 0,
-        securitySurcharge: 0,
-        vaultHandling: 0,
-        customsBrokerage: 0,
-        exportPermit: 0,
-        customsDuty: 0,
-        tamperSeals: 0,
-        subtotal: 0,
-        totalDeclaredValue: 0,
-        totalWeight: 0,
-        totalPieces: 0,
-      };
-    }
-
-    const totalWeight = packages.reduce((s, p) => s + (p.weight || 0), 0);
-    const totalDeclaredValue = packages.reduce(
-      (s, p) => s + (p.declaredValue || 0),
-      0
-    );
-    const totalPieces = packages.reduce((s, p) => s + (p.pieces || 0), 0);
-    const hasInsurance = packages.some((p) => p.insurance);
-
-    // ── Base freight (flat + per-kg) ──
-    const baseFreight = selectedShipping.price;
-    const weightSurcharge = totalWeight * selectedShipping.perKgRate;
-
-    // ── Insurance: % of declared value, minimum $500 ──
-    let insurancePremium = 0;
-    if (hasInsurance && totalDeclaredValue > 0) {
-      insurancePremium = Math.max(
-        totalDeclaredValue * (selectedShipping.insuranceRate / 100),
-        FEE_SCHEDULE.minInsuranceValue
-      );
-    }
-
-    // ── Security surcharge (only for armored/secure tiers) ──
-    const securitySurcharge =
-      selectedShipping.id === "armored_express" ||
-      selectedShipping.id === "secure_freight"
-        ? FEE_SCHEDULE.securitySurcharge
-        : 0;
-
-    // ── Vault handling ──
-    const vaultHandling = FEE_SCHEDULE.vaultHandlingFee;
-
-    // ── Customs brokerage ──
-    const customsBrokerage = FEE_SCHEDULE.customsBrokerageFee;
-
-    // ── Export permit ──
-    const exportPermit = FEE_SCHEDULE.exportPermitFee;
-
-    // ── Customs duty: 5% of declared value ──
-    const customsDuty = totalDeclaredValue * FEE_SCHEDULE.customsDutyRate;
-
-    // ── Tamper seals per package ──
-    const tamperSeals = packages.length * FEE_SCHEDULE.tamperSealFee;
-
-    // ── Heavy cargo surcharge ──
-    let heavyCargo = 0;
-    if (totalWeight > FEE_SCHEDULE.heavyCargoSurchargeKg) {
-      heavyCargo = totalDeclaredValue * FEE_SCHEDULE.heavyCargoRate;
-    }
-
-    const subtotal =
-      baseFreight +
-      weightSurcharge +
-      insurancePremium +
-      securitySurcharge +
-      vaultHandling +
-      customsBrokerage +
-      exportPermit +
-      customsDuty +
-      tamperSeals +
-      heavyCargo;
+    const quote = calculateShipmentQuote(packages, serviceType);
 
     const packageSummary = packages.map((pkg, index) => ({
       number: index + 1,
@@ -282,21 +212,9 @@ export default function CreateShipmentPage() {
 
     return {
       packages: packageSummary,
-      shippingOption: selectedShipping,
-      baseFreight,
-      weightSurcharge,
-      insurancePremium,
-      securitySurcharge,
-      vaultHandling,
-      customsBrokerage,
-      exportPermit,
-      customsDuty,
-      tamperSeals,
-      heavyCargo,
-      subtotal,
-      totalDeclaredValue,
-      totalWeight,
-      totalPieces,
+      shippingOption: quote?.option ?? SHIPPING_OPTIONS[0],
+      lines: quote?.lines ?? [],
+      total: quote?.total ?? 0,
     };
   };
 
@@ -323,15 +241,9 @@ export default function CreateShipmentPage() {
             </div>
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-4 py-2">
-                <Shield className="h-4 w-4 text-emerald-400" />
-                <span className="text-white text-xs font-medium">
-                  LBMA Approved
-                </span>
-              </div>
-              <div className="flex items-center gap-2 bg-white/5 border border-white/10 rounded-lg px-4 py-2">
                 <Lock className="h-4 w-4 text-amber-400" />
                 <span className="text-white text-xs font-medium">
-                  ISO 9001 Certified
+                  Price fixed at booking
                 </span>
               </div>
             </div>
@@ -1045,144 +957,66 @@ export default function CreateShipmentPage() {
 
                     <Separator />
 
-                    {/* Detailed cost breakdown */}
-                    <div className="space-y-2">
-                      <p className="text-xs font-semibold text-gray-700 uppercase tracking-wide">
-                        Freight & Handling
-                      </p>
-                      <div className="grid grid-cols-2 text-xs">
-                        <span className="text-gray-500">Base Freight</span>
-                        <span className="text-right">
-                          {formatCurrency(summary.baseFreight)}
-                        </span>
-                      </div>
-                      <div className="grid grid-cols-2 text-xs">
-                        <span className="text-gray-500">
-                          Weight Surcharge ({summary.totalWeight} kg)
-                        </span>
-                        <span className="text-right">
-                          {formatCurrency(summary.weightSurcharge)}
-                        </span>
-                      </div>
-                      {summary.securitySurcharge > 0 && (
-                        <div className="grid grid-cols-2 text-xs">
-                          <span className="text-gray-500">
-                            Armed Security Escort
-                          </span>
-                          <span className="text-right">
-                            {formatCurrency(summary.securitySurcharge)}
-                          </span>
+                    {/* Itemized charges */}
+                    {QUOTE_GROUPS.map((group) => {
+                      const lines = summary.lines.filter((l) => l.group === group);
+                      if (lines.length === 0) return null;
+                      return (
+                        <div key={group} className="space-y-2">
+                          <p className="text-xs font-semibold text-gray-700 uppercase tracking-wide">
+                            {group}
+                          </p>
+                          {lines.map((line) => (
+                            <div key={line.label} className="grid grid-cols-2 text-xs">
+                              <span className="text-gray-500">{line.label}</span>
+                              <span className="text-right">{formatCurrency(line.amount)}</span>
+                            </div>
+                          ))}
+                          <Separator />
                         </div>
-                      )}
-                      <div className="grid grid-cols-2 text-xs">
-                        <span className="text-gray-500">
-                          Vault Handling
-                        </span>
-                        <span className="text-right">
-                          {formatCurrency(summary.vaultHandling)}
-                        </span>
-                      </div>
-                      <div className="grid grid-cols-2 text-xs">
-                        <span className="text-gray-500">
-                          Tamper-Evident Seals (×{form.watch("packages").length})
-                        </span>
-                        <span className="text-right">
-                          {formatCurrency(summary.tamperSeals)}
-                        </span>
-                      </div>
-                    </div>
-
-                    <Separator />
-
-                    <div className="space-y-2">
-                      <p className="text-xs font-semibold text-gray-700 uppercase tracking-wide">
-                        Customs & Compliance
-                      </p>
-                      <div className="grid grid-cols-2 text-xs">
-                        <span className="text-gray-500">Export Permit</span>
-                        <span className="text-right">
-                          {formatCurrency(summary.exportPermit)}
-                        </span>
-                      </div>
-                      <div className="grid grid-cols-2 text-xs">
-                        <span className="text-gray-500">
-                          Customs Brokerage
-                        </span>
-                        <span className="text-right">
-                          {formatCurrency(summary.customsBrokerage)}
-                        </span>
-                      </div>
-                      <div className="grid grid-cols-2 text-xs">
-                        <span className="text-gray-500">
-                          Import Duty (5%)
-                        </span>
-                        <span className="text-right">
-                          {formatCurrency(summary.customsDuty)}
-                        </span>
-                      </div>
-                    </div>
-
-                    <Separator />
-
-                    <div className="space-y-2">
-                      <p className="text-xs font-semibold text-gray-700 uppercase tracking-wide">
-                        Insurance
-                      </p>
-                      <div className="grid grid-cols-2 text-xs">
-                        <span className="text-gray-500">
-                          Full-Value Coverage (
-                          {summary.shippingOption.insuranceRate}%)
-                        </span>
-                        <span className="text-right">
-                          {formatCurrency(summary.insurancePremium)}
-                        </span>
-                      </div>
-                      {summary.totalDeclaredValue > 0 && (
-                        <p className="text-[10px] text-gray-400 pl-0">
-                          Insuring{" "}
-                          {formatCurrency(summary.totalDeclaredValue)} in
-                          declared value
-                        </p>
-                      )}
-                    </div>
-
-                    {summary.heavyCargo && summary.heavyCargo > 0 && (
-                      <>
-                        <Separator />
-                        <div className="grid grid-cols-2 text-xs">
-                          <span className="text-gray-500">
-                            Heavy Cargo Surcharge (&gt;50kg)
-                          </span>
-                          <span className="text-right">
-                            {formatCurrency(summary.heavyCargo)}
-                          </span>
-                        </div>
-                      </>
-                    )}
-
-                    <Separator />
+                      );
+                    })}
 
                     {/* Total */}
                     <div className="bg-gradient-to-r from-[#0a1628] to-[#122041] -mx-6 px-6 py-4 rounded-lg">
                       <div className="grid grid-cols-2">
                         <span className="text-gray-300 text-sm font-medium">
-                          Estimated Total
+                          Total
                         </span>
                         <span className="text-right text-xl font-bold text-emerald-400">
-                          {formatCurrency(summary.subtotal)}
+                          {formatCurrency(summary.total)}
                         </span>
                       </div>
-                      <p className="text-gray-500 text-[10px] mt-1">
-                        Final amount confirmed after customs clearance &
-                        weight verification
+                      <p className="text-gray-400 text-[10px] mt-1">
+                        This is the full price. It is fixed when you book and
+                        no charges are added afterwards.
                       </p>
                     </div>
+
+                    <label className="flex items-start gap-2 text-xs text-gray-700 cursor-pointer">
+                      <Checkbox
+                        className="mt-0.5"
+                        checked={summary.total > 0 && acceptedTotal === summary.total}
+                        disabled={summary.total <= 0}
+                        onCheckedChange={(checked) =>
+                          setAcceptedTotal(checked === true ? summary.total : null)
+                        }
+                      />
+                      <span>
+                        I accept the itemized charges above and a total of{" "}
+                        <strong>{formatCurrency(summary.total)}</strong>.
+                      </span>
+                    </label>
                   </CardContent>
 
                   <CardFooter className="flex flex-col gap-3 pt-2">
                     <Button
                       className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold h-11"
-                      disabled={form.formState.isSubmitting}
+                      disabled={
+                        form.formState.isSubmitting ||
+                        summary.total <= 0 ||
+                        acceptedTotal !== summary.total
+                      }
                       type="submit"
                     >
                       {form.formState.isSubmitting ? (
@@ -1193,7 +1027,7 @@ export default function CreateShipmentPage() {
                       ) : (
                         <>
                           <Lock className="h-4 w-4 mr-2" />
-                          Create Secure Shipment
+                          Book for {formatCurrency(summary.total)}
                         </>
                       )}
                     </Button>
@@ -1212,8 +1046,8 @@ export default function CreateShipmentPage() {
                     </div>
                     <p className="text-[10px] text-gray-400 text-center leading-relaxed">
                       By creating this shipment you agree to Aegis Cargo
-                      terms of service, insurance policy, and LBMA
-                      chain-of-custody requirements.
+                      terms of service and the itemized charges shown
+                      above. No other charges will be added after booking.
                     </p>
                   </CardFooter>
                 </Card>

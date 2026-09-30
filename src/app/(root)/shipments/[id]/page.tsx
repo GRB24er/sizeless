@@ -29,7 +29,8 @@ export default async function ShipmentDetailPage({
     },
   });
 
-  if (!shipment) {
+  // Clients can only open shipments they booked; admins can open any
+  if (!shipment || (session.user.role !== "ADMIN" && shipment.userId !== session.user.id)) {
     notFound();
   }
 

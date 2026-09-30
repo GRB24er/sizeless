@@ -185,7 +185,7 @@ function buildEmailHTML(params: {
               <tr>
                 <td><p style="color:#9CA3AF;font-size:11px;margin:0;">© ${new Date().getFullYear()} Aegis Cargo Ltd.</p>
                 <p style="color:#9CA3AF;font-size:10px;margin:4px 0 0 0;">Strada Bulevardul Unirii 72, Floor 3, Office 12, 030833 Bucharest, Romania</p></td>
-                <td align="right"><p style="color:#9CA3AF;font-size:10px;margin:0;">ISO 9001 Certified | LBMA Approved</p></td>
+                <td align="right"><p style="color:#9CA3AF;font-size:10px;margin:0;">Aegis Cargo</p></td>
               </tr>
             </table>
           </td></tr>

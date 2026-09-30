@@ -16,6 +16,12 @@ import {
   generateDepositNumber,
   generateCustodyReference,
 } from "@/lib/vault/types";
+import { requireAdmin, requireUser } from "@/lib/auth-guards";
+
+// All actions in this file are admin-only, except createWithdrawalRequest which
+// the deposit's owner may also call. Where an action takes an adminId (or
+// requestedBy), it is replaced with the signed-in user's id rather than trusted
+// from the caller.
 
 // ─── HELPER: Log vault activity ──────────────────────────────
 
@@ -40,6 +46,7 @@ async function logVaultActivity(
 // ─── CREATE VAULT DEPOSIT ────────────────────────────────────
 
 export async function createVaultDeposit(formData: FormData) {
+  await requireAdmin();
   try {
     const clientId = formData.get("clientId") as string;
     const assetType = formData.get("assetType") as string;
@@ -108,6 +115,7 @@ export async function updateVaultStatus(
   adminId: string,
   notes?: string
 ) {
+  adminId = (await requireAdmin()).id;
   try {
     const deposit = await prisma.vaultDeposit.findUnique({
       where: { id: depositId },
@@ -196,6 +204,7 @@ export async function updateVaultStatus(
 // ─── APPROVE / REJECT KYC ────────────────────────────────────
 
 export async function approveKYC(depositId: string, adminId: string) {
+  adminId = (await requireAdmin()).id;
   const result = await updateVaultStatus(depositId, "KYC_APPROVED", adminId, "KYC approved - client cleared for vault deposit");
   // Email
   const dep = await prisma.vaultDeposit.findUnique({ where: { id: depositId }, include: { client: true } });
@@ -208,6 +217,7 @@ export async function rejectKYC(
   adminId: string,
   reason: string
 ) {
+  adminId = (await requireAdmin()).id;
   try {
     await prisma.vaultDeposit.update({
       where: { id: depositId },
@@ -242,6 +252,7 @@ export async function scheduleIntake(
   intakeMethod: string,
   securityEscortRef?: string
 ) {
+  adminId = (await requireAdmin()).id;
   try {
     await prisma.vaultDeposit.update({
       where: { id: depositId },
@@ -285,6 +296,7 @@ export async function recordAssayResult(
     passed: boolean;
   }
 ) {
+  adminId = (await requireAdmin()).id;
   try {
     const deposit = await prisma.vaultDeposit.findUnique({
       where: { id: depositId },
@@ -332,6 +344,7 @@ export async function recordAssayResult(
 // ─── WAIVE ASSAY (LBMA-CERTIFIED) ────────────────────────────
 
 export async function waiveAssay(depositId: string, adminId: string) {
+  adminId = (await requireAdmin()).id;
   try {
     const deposit = await prisma.vaultDeposit.findUnique({
       where: { id: depositId },
@@ -379,6 +392,7 @@ export async function setInsurance(
     insuranceExpiryDate: string;
   }
 ) {
+  adminId = (await requireAdmin()).id;
   try {
     await prisma.vaultDeposit.update({
       where: { id: depositId },
@@ -422,6 +436,7 @@ export async function placeInStorage(
     monthlyStorageFee: number;
   }
 ) {
+  adminId = (await requireAdmin()).id;
   try {
     await prisma.vaultDeposit.update({
       where: { id: depositId },
@@ -468,11 +483,17 @@ export async function createWithdrawalRequest(
     bankAccountRef?: string;
   }
 ) {
+  const user = await requireUser();
+  requestedBy = user.id;
+
   try {
     const deposit = await prisma.vaultDeposit.findUnique({
       where: { id: depositId },
     });
-    if (!deposit) return { error: "Deposit not found" };
+    // Clients may only request withdrawals from their own deposits
+    if (!deposit || (user.role !== "ADMIN" && deposit.clientId !== user.id)) {
+      return { error: "Deposit not found" };
+    }
     if (deposit.status !== "IN_STORAGE") {
       return { error: "Deposit must be in storage to request withdrawal" };
     }
@@ -528,6 +549,7 @@ export async function approveWithdrawal(
   adminId: string,
   notes?: string
 ) {
+  adminId = (await requireAdmin()).id;
   try {
     const withdrawal = await prisma.vaultWithdrawal.update({
       where: { id: withdrawalId },
@@ -572,6 +594,7 @@ export async function completeWithdrawal(
     wireTransferRef?: string;
   }
 ) {
+  adminId = (await requireAdmin()).id;
   try {
     const updateData: Record<string, unknown> = {
       status: "COMPLETED" as any,
@@ -627,6 +650,7 @@ export async function getVaultDeposits(filters?: {
   status?: string;
   clientId?: string;
 }) {
+  await requireAdmin();
   try {
     const where: Record<string, unknown> = {};
     if (filters?.status) where.status = filters.status;
@@ -652,6 +676,7 @@ export async function getVaultDeposits(filters?: {
 // ─── GET SINGLE DEPOSIT DETAIL ───────────────────────────────
 
 export async function getVaultDepositDetail(depositId: string) {
+  await requireAdmin();
   try {
     const deposit = await prisma.vaultDeposit.findUnique({
       where: { id: depositId },
@@ -678,6 +703,7 @@ export async function addVaultNote(
   adminId: string,
   note: string
 ) {
+  adminId = (await requireAdmin()).id;
   try {
     await logVaultActivity(depositId, "NOTE_ADDED", note, adminId);
     revalidatePath("/dashboard/shipments");
@@ -690,6 +716,7 @@ export async function addVaultNote(
 // ─── DELETE VAULT DEPOSIT ────────────────────────────────────
 
 export async function deleteVaultDeposit(depositId: string) {
+  await requireAdmin();
   try {
     await prisma.vaultWithdrawal.deleteMany({ where: { depositId } });
     await prisma.vaultActivity.deleteMany({ where: { depositId } });

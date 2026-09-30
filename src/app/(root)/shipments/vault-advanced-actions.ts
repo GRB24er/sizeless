@@ -7,6 +7,10 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/constants/config/db";
+import { requireAdmin } from "@/lib/auth-guards";
+
+// All actions in this file are admin-only. Where an action takes an adminId,
+// it is replaced with the signed-in admin's id rather than trusted from the caller.
 
 // ─── HELPERS ─────────────────────────────────────────────────
 
@@ -40,6 +44,7 @@ export async function initiateVaultTransfer(
     notes?: string;
   }
 ) {
+  adminId = (await requireAdmin()).id;
   try {
     const deposit = await prisma.vaultDeposit.findUnique({
       where: { id: depositId },
@@ -64,7 +69,7 @@ export async function initiateVaultTransfer(
         itemsTransferred: data.itemsTransferred,
         estimatedArrival: data.estimatedArrival ? new Date(data.estimatedArrival) : null,
         transitInsuredValue: data.transitInsuredValue,
-        transitInsurer: data.transitInsurer || "Lloyd's of London",
+        transitInsurer: data.transitInsurer || null,
         transferFee: data.transferFee || 250,
         initiatedBy: adminId,
         notes: data.notes,
@@ -108,6 +113,7 @@ export async function updateTransferStatus(
     notes?: string;
   }
 ) {
+  adminId = (await requireAdmin()).id;
   try {
     const updateData: Record<string, unknown> = {
       status: newStatus as any,
@@ -192,6 +198,7 @@ export async function updateTransferStatus(
 }
 
 export async function getVaultTransfers(depositId?: string) {
+  await requireAdmin();
   try {
     const where: any = {};
     if (depositId) where.depositId = depositId;
@@ -227,6 +234,7 @@ export async function createPartialWithdrawal(
     bankAccountRef?: string;
   }
 ) {
+  await requireAdmin();
   try {
     const deposit = await prisma.vaultDeposit.findUnique({
       where: { id: depositId },
@@ -288,6 +296,7 @@ export async function completePartialWithdrawal(
     wireTransferRef?: string;
   }
 ) {
+  adminId = (await requireAdmin()).id;
   try {
     const withdrawal = await prisma.vaultWithdrawal.findUnique({
       where: { id: withdrawalId },
@@ -378,6 +387,7 @@ export async function addBeneficiary(
     notes?: string;
   }
 ) {
+  adminId = (await requireAdmin()).id;
   try {
     const deposit = await prisma.vaultDeposit.findUnique({
       where: { id: depositId },
@@ -436,6 +446,7 @@ export async function verifyBeneficiary(
   approved: boolean,
   reason?: string
 ) {
+  adminId = (await requireAdmin()).id;
   try {
     await (prisma as any).vaultBeneficiary.update({
       where: { id: beneficiaryId },
@@ -469,6 +480,7 @@ export async function verifyBeneficiary(
 }
 
 export async function revokeBeneficiary(beneficiaryId: string, adminId: string) {
+  adminId = (await requireAdmin()).id;
   try {
     const ben = await (prisma as any).vaultBeneficiary.update({
       where: { id: beneficiaryId },
@@ -493,6 +505,7 @@ export async function revokeBeneficiary(beneficiaryId: string, adminId: string) 
 }
 
 export async function removeBeneficiary(beneficiaryId: string, adminId: string) {
+  adminId = (await requireAdmin()).id;
   try {
     const ben = await (prisma as any).vaultBeneficiary.findUnique({
       where: { id: beneficiaryId },
@@ -521,6 +534,7 @@ export async function removeBeneficiary(beneficiaryId: string, adminId: string) 
 }
 
 export async function getBeneficiaries(depositId: string) {
+  await requireAdmin();
   try {
     const beneficiaries = await (prisma as any).vaultBeneficiary.findMany({
       where: { depositId },

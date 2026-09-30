@@ -1,12 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/constants/config/db";
 import { generateAirwayBill } from "@/lib/documents/pdf-templates";
+import { currentUser, canAccessShipment } from "@/lib/auth-guards";
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ trackingNumber: string }> }
 ) {
   try {
+    // The waybill has full addresses and phone numbers: sender or admin only
+    const user = await currentUser();
+    if (!user) {
+      return NextResponse.json({ error: "Sign in to download the air waybill" }, { status: 401 });
+    }
+
     const { trackingNumber } = await params;
 
     const shipment = await prisma.shipment.findUnique({
@@ -19,7 +26,7 @@ export async function GET(
       },
     });
 
-    if (!shipment) {
+    if (!shipment || !canAccessShipment(user, shipment)) {
       return NextResponse.json({ error: "Shipment not found" }, { status: 404 });
     }
 

@@ -19,7 +19,7 @@ export const SHIPPING_OPTIONS: ShippingOption[] = [
     id: "armored_express",
     label: "Armored Express Courier",
     description:
-      "Armed escort, GPS-tracked armored vehicle, dedicated vault-to-vault transfer. Real-time chain-of-custody reporting. LBMA & ISO 17025 compliant.",
+      "Armed escort, armored vehicle, dedicated vault-to-vault transfer. Chain-of-custody logged at every handover.",
     price: 1250.0,
     perKgRate: 85.0,
     transitDays: "3–5 business days",
@@ -30,7 +30,7 @@ export const SHIPPING_OPTIONS: ShippingOption[] = [
     id: "secure_freight",
     label: "Secure Freight",
     description:
-      "Sealed tamper-evident containers, bonded warehouse transfers, armed checkpoint inspections. GPS monitoring with 15-min position updates.",
+      "Sealed tamper-evident containers, bonded warehouse transfers, armed checkpoint inspections. Tracking updated at every handover.",
     price: 750.0,
     perKgRate: 55.0,
     transitDays: "5–8 business days",
@@ -86,6 +86,86 @@ export const FEE_SCHEDULE = {
   heavyCargoSurchargeKg: 50,    // Above 50kg = heavy cargo surcharge
   heavyCargoRate: 0.02,         // 2% extra on declared value
 };
+
+// ═══════════════════════════════════════════════════════
+// QUOTE — single source of truth for shipment pricing.
+// Used by the booking page (to show the price) and by the
+// server (to recalculate and store it). Nothing else may
+// create shipment charges.
+// ═══════════════════════════════════════════════════════
+
+export type QuoteGroup = "Freight & Handling" | "Customs & Compliance" | "Insurance";
+
+export const QUOTE_GROUPS: QuoteGroup[] = ["Freight & Handling", "Customs & Compliance", "Insurance"];
+
+export type QuoteLine = { group: QuoteGroup; label: string; amount: number };
+
+export type QuotePackage = { weight: number | string; declaredValue?: number | string; insurance?: boolean };
+
+export type ShipmentQuote = {
+  option: ShippingOption;
+  lines: QuoteLine[];
+  total: number;
+  totalWeight: number;
+  totalDeclaredValue: number;
+};
+
+export const QUOTE_CURRENCY = "USD";
+
+const round2 = (n: number) => Math.round(n * 100) / 100;
+
+export function calculateShipmentQuote(
+  packages: QuotePackage[],
+  serviceType: string
+): ShipmentQuote | null {
+  const option = SHIPPING_OPTIONS.find((o) => o.id === serviceType);
+  if (!option) return null;
+
+  const totalWeight = round2(packages.reduce((s, p) => s + (Number(p.weight) || 0), 0));
+  const totalDeclaredValue = round2(packages.reduce((s, p) => s + (Number(p.declaredValue) || 0), 0));
+  const hasInsurance = packages.some((p) => p.insurance);
+  const isSecureTier = option.id === "armored_express" || option.id === "secure_freight";
+
+  const lines: QuoteLine[] = [
+    { group: "Freight & Handling", label: "Base freight", amount: option.price },
+    { group: "Freight & Handling", label: `Weight surcharge (${totalWeight} kg)`, amount: totalWeight * option.perKgRate },
+  ];
+  if (isSecureTier) {
+    lines.push({ group: "Freight & Handling", label: "Armed security escort", amount: FEE_SCHEDULE.securitySurcharge });
+  }
+  lines.push(
+    { group: "Freight & Handling", label: "Vault handling", amount: FEE_SCHEDULE.vaultHandlingFee },
+    { group: "Freight & Handling", label: `Tamper-evident seals (×${packages.length})`, amount: packages.length * FEE_SCHEDULE.tamperSealFee },
+  );
+  if (totalWeight > FEE_SCHEDULE.heavyCargoSurchargeKg) {
+    lines.push({
+      group: "Freight & Handling",
+      label: `Heavy cargo surcharge (over ${FEE_SCHEDULE.heavyCargoSurchargeKg} kg)`,
+      amount: totalDeclaredValue * FEE_SCHEDULE.heavyCargoRate,
+    });
+  }
+  lines.push(
+    { group: "Customs & Compliance", label: "Export permit", amount: FEE_SCHEDULE.exportPermitFee },
+    { group: "Customs & Compliance", label: "Customs brokerage", amount: FEE_SCHEDULE.customsBrokerageFee },
+    {
+      group: "Customs & Compliance",
+      label: `Import duty (${FEE_SCHEDULE.customsDutyRate * 100}% of declared value)`,
+      amount: totalDeclaredValue * FEE_SCHEDULE.customsDutyRate,
+    },
+  );
+  if (hasInsurance && totalDeclaredValue > 0) {
+    lines.push({
+      group: "Insurance",
+      label: `Full-value cover (${option.insuranceRate}% of declared value)`,
+      amount: Math.max(totalDeclaredValue * (option.insuranceRate / 100), FEE_SCHEDULE.minInsuranceValue),
+    });
+  }
+
+  const rounded = lines.map((l) => ({ ...l, amount: round2(l.amount) }));
+  const total = round2(rounded.reduce((s, l) => s + l.amount, 0));
+
+  return { option, lines: rounded, total, totalWeight, totalDeclaredValue };
+}
 
 // Package types specific to gold/precious metals logistics
 export const PACKAGE_TYPES = [

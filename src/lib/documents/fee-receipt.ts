@@ -49,10 +49,10 @@ type FeeReceiptData = {
   trackingNumber: string;
   shipmentOrigin: string;
   shipmentDestination: string;
+  payerName: string;
+  payerEmail?: string | null;
+  payerPhone: string;
   recipientName: string;
-  recipientEmail?: string | null;
-  recipientPhone: string;
-  senderName?: string;
 };
 
 export async function generateFeeReceiptPDF(
@@ -60,10 +60,7 @@ export async function generateFeeReceiptPDF(
 ): Promise<Buffer> {
   const doc = new jsPDF();
   const qr = await generateTrackingQR(data.trackingNumber);
-  const feeLabel =
-    data.feeType === "CUSTOM" && data.customType
-      ? data.customType
-      : FEE_TYPE_LABELS[data.feeType] || data.feeType;
+  const feeLabel = data.customType || FEE_TYPE_LABELS[data.feeType] || data.feeType;
 
   // ─── WATERMARK ───
   doc.saveGraphicsState();
@@ -113,14 +110,6 @@ export async function generateFeeReceiptPDF(
   doc.text(data.invoiceNumber, 195, 21, { align: "right" });
   doc.setTextColor(180, 190, 200);
   doc.text(`Issued: ${fmtDate(new Date())}`, 195, 28, { align: "right" });
-
-  // ISO badge
-  doc.setFillColor(...EMERALD);
-  doc.roundedRect(155, 30, 40, 4, 1, 1, "F");
-  doc.setFontSize(5);
-  doc.setTextColor(...WHITE);
-  doc.setFont("helvetica", "bold");
-  doc.text("ISO 9001 CERTIFIED", 175, 32.8, { align: "center" });
 
   // QR code
   doc.setFillColor(...WHITE);
@@ -204,8 +193,16 @@ export async function generateFeeReceiptPDF(
   drawKV("Status", "PAID", 155, y);
   y += 16;
 
-  drawKV("Reason", data.reason, 22, y);
-  y += 18;
+  // Itemized charges (one per line), wrapped to the page width
+  doc.setFontSize(6.5);
+  doc.setFont("helvetica", "normal");
+  doc.setTextColor(...GRAY);
+  doc.text("DETAILS", 22, y);
+  doc.setFontSize(8);
+  doc.setTextColor(...TEXT_DARK);
+  const detailLines: string[] = doc.splitTextToSize(data.reason || "—", 166);
+  doc.text(detailLines, 22, y + 5);
+  y += 8 + detailLines.length * 3.6;
 
   // Section: Shipment Details
   doc.setFillColor(...GOLD);
@@ -221,7 +218,7 @@ export async function generateFeeReceiptPDF(
   y += 16;
 
   drawKV("Destination", data.shipmentDestination, 22, y);
-  drawKV("Sender", data.senderName || "—", 90, y);
+  drawKV("Recipient", data.recipientName, 90, y);
   y += 18;
 
   // Section: Recipient Details
@@ -233,9 +230,9 @@ export async function generateFeeReceiptPDF(
   doc.text("Paid By", 22, y + 5);
   y += 14;
 
-  drawKV("Name", data.recipientName, 22, y);
-  drawKV("Email", data.recipientEmail || "—", 90, y);
-  drawKV("Phone", data.recipientPhone, 155, y);
+  drawKV("Name", data.payerName, 22, y);
+  drawKV("Email", data.payerEmail || "—", 90, y);
+  drawKV("Phone", data.payerPhone, 155, y);
   y += 20;
 
   // Confirmation statement
@@ -283,17 +280,6 @@ export async function generateFeeReceiptPDF(
     { align: "center" }
   );
 
-  doc.setFillColor(...NAVY);
-  doc.roundedRect(45, fy + 10, 120, 5, 1, 1, "F");
-  doc.setFontSize(5);
-  doc.setTextColor(...WHITE);
-  doc.setFont("helvetica", "bold");
-  doc.text(
-    "ISO 9001  |  LBMA APPROVED  |  IATA MEMBER  |  AEO CERTIFIED",
-    105,
-    fy + 13.5,
-    { align: "center" }
-  );
 
   doc.setFontSize(5.5);
   doc.setTextColor(...GRAY);

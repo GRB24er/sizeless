@@ -58,6 +58,10 @@ export async function requestVaultDeposit(formData: FormData) {
     return { error: "Please fill in all required fields." };
   }
 
+  if (formData.get("feesAccepted") !== "true") {
+    return { error: "Please review and accept the vault fee schedule before submitting." };
+  }
+
   const depositNumber = generateDepositNumber();
 
   const deposit = await prisma.vaultDeposit.create({
@@ -66,7 +70,7 @@ export async function requestVaultDeposit(formData: FormData) {
       quantity, declaredValue, serialNumbers: serialNumbers || null,
       client: { connect: { id: session.user.id } },
       activities: {
-        create: { action: "PLACED_IN_STORAGE" as any, description: `Deposit request submitted for ${quantity}x ${assetType} (${weightGrams}g)`, performedBy: session.user.name },
+        create: { action: "NOTE_ADDED" as any, description: `Deposit request submitted (published fee schedule accepted) for ${quantity}x ${assetType} (${weightGrams}g)`, performedBy: session.user.name },
       },
     },
   });

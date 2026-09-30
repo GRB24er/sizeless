@@ -46,7 +46,7 @@ export const Quota = () => {
             <div className="space-y-4">
               {[
                 { icon: Shield, title: "Fully Insured Shipments", desc: "Every package covered with comprehensive cargo insurance.", color: "emerald" },
-                { icon: Vault, title: "Certified Vault Storage", desc: "LBMA-approved facilities for gold and precious metals custody.", color: "gold" },
+                { icon: Vault, title: "Secure Vault Storage", desc: "Custody for gold and precious metals, with fees published before you deposit.", color: "gold" },
               ].map((item, i) => {
                 const isGold = item.color === "gold";
                 return (

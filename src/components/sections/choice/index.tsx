@@ -8,12 +8,12 @@ export const Choice = () => {
   const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.15 });
 
   const reasons = [
-    { icon: Globe, title: "190+ Country Network", desc: "Seamless logistics coverage spanning every major trade corridor on the planet.", color: "emerald" },
-    { icon: Shield, title: "ISO 9001 & LBMA Certified", desc: "Industry-leading compliance and accreditation for shipping and vault operations.", color: "emerald" },
-    { icon: Clock, title: "Real-Time Visibility", desc: "Track every shipment with pinpoint accuracy from origin to final delivery.", color: "emerald" },
+    { icon: Globe, title: "International Shipping", desc: "Door-to-door shipping with customs brokerage included in your quote.", color: "emerald" },
+    { icon: Shield, title: "KYC-Verified Vault Clients", desc: "Identity and source-of-funds checks before any vault deposit is accepted.", color: "emerald" },
+    { icon: Clock, title: "Logged Handovers", desc: "Every status change is recorded on your tracking page and emailed to you.", color: "emerald" },
     { icon: Vault, title: "Secure Vault Storage", desc: "Insured gold and precious metals custody in high-security, climate-controlled vaults.", color: "gold" },
-    { icon: Headphones, title: "24/7 Dedicated Support", desc: "Round-the-clock expert assistance for shipments, customs, and vault inquiries.", color: "emerald" },
-    { icon: BarChart3, title: "Transparent Pricing", desc: "Competitive rates with no hidden fees. Full cost breakdown before you ship.", color: "emerald" },
+    { icon: Headphones, title: "Dedicated Support", desc: "Live chat and email support for shipments, customs, and vault enquiries.", color: "emerald" },
+    { icon: BarChart3, title: "Transparent Pricing", desc: "Every charge is itemized and agreed before you book. Nothing is added afterwards.", color: "emerald" },
   ];
 
   return (
@@ -33,7 +33,7 @@ export const Choice = () => {
             The Smart Choice for{" "}
             <span className="bg-gradient-to-r from-[#8C9EAF] to-[#B3C7DB] bg-clip-text text-transparent">Global Logistics</span>
           </h2>
-          <p className="text-lg text-slate-400 max-w-2xl mx-auto">Trusted by thousands of businesses worldwide to move cargo safely, efficiently, and on time.</p>
+          <p className="text-lg text-slate-400 max-w-2xl mx-auto">Clear pricing, logged handovers, and secure custody for high-value cargo.</p>
         </motion.div>
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">

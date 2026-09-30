@@ -5,15 +5,17 @@
 // Vault Billing — Invoice generation, payments, monthly batch
 // ═══════════════════════════════════════════════════════════════
 
+// Every invoice here is generated from the published fee list
+// (VAULT_PUBLISHED_FEES in lib/vault/types.ts) that the client sees before
+// depositing. There is no free-form invoice, demurrage, or late penalty.
+
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/constants/config/db";
+import { requireAdmin } from "@/lib/auth-guards";
 import {
   VAULT_FEE_SCHEDULE,
-  calculateDemurrageCharge,
-  calculateLatePaymentPenalty,
-  getDemurrageRate,
-  DEMURRAGE_CONFIG,
-  formatCurrencyAmount,
+  ASSAY_METHODS,
+  calculateMonthlyStorageFee,
 } from "@/lib/vault/types";
 
 // ─── HELPERS ─────────────────────────────────────────────────
@@ -33,83 +35,12 @@ function addDays(date: Date, days: number): Date {
 }
 
 // ═══════════════════════════════════════════════════════════════
-// CREATE SINGLE INVOICE (Manual)
-// ═══════════════════════════════════════════════════════════════
-
-export async function createVaultInvoice(
-  depositId: string,
-  adminId: string,
-  items: {
-    type: string;
-    description: string;
-    quantity: number;
-    unitPrice: number;
-  }[],
-  options?: {
-    notes?: string;
-    dueDays?: number;
-    periodStart?: string;
-    periodEnd?: string;
-    currency?: string;
-  }
-) {
-  try {
-    const deposit = await prisma.vaultDeposit.findUnique({
-      where: { id: depositId },
-      include: { client: true },
-    });
-    if (!deposit) return { error: "Deposit not found" };
-
-    const invoiceItems = items.map((item) => ({
-      type: item.type as any,
-      description: item.description,
-      quantity: item.quantity,
-      unitPrice: item.unitPrice,
-      amount: item.quantity * item.unitPrice,
-    }));
-
-    const subtotal = invoiceItems.reduce((sum: number, item: any) => sum + item.amount, 0);
-    const taxRate = 0; // No VAT for gold storage (exempt in many jurisdictions)
-    const taxAmount = subtotal * (taxRate / 100);
-    const total = subtotal + taxAmount;
-
-    const invoice = await prisma.vaultInvoice.create({
-      data: {
-        invoiceNumber: generateInvoiceNumber(),
-        depositId,
-        clientId: deposit.clientId,
-        issueDate: new Date(),
-        dueDate: addDays(new Date(), options?.dueDays || 30),
-        periodStart: options?.periodStart ? new Date(options.periodStart) : null,
-        periodEnd: options?.periodEnd ? new Date(options.periodEnd) : null,
-        subtotal,
-        taxRate,
-        taxAmount,
-        total,
-        balanceDue: total,
-        status: "SENT" as any,
-        notes: options?.notes,
-        items: {
-          create: invoiceItems,
-        },
-      },
-      include: { items: true },
-    });
-
-    revalidatePath("/dashboard/shipments");
-    return { success: true, invoiceId: invoice.id, invoiceNumber: invoice.invoiceNumber };
-  } catch (error) {
-    console.error("createVaultInvoice error:", error);
-    return { error: "Failed to create invoice" };
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════
 // GENERATE MONTHLY STORAGE INVOICES (Batch)
 // ═══════════════════════════════════════════════════════════════
 
 export async function generateMonthlyInvoices(adminId: string) {
   try {
+    await requireAdmin();
     const now = new Date();
     const periodStart = new Date(now.getFullYear(), now.getMonth(), 1);
     const periodEnd = new Date(now.getFullYear(), now.getMonth() + 1, 0);
@@ -119,7 +50,6 @@ export async function generateMonthlyInvoices(adminId: string) {
     const deposits = await prisma.vaultDeposit.findMany({
       where: {
         status: "IN_STORAGE",
-        monthlyStorageFee: { gt: 0 },
       },
       include: { client: true },
     });
@@ -145,7 +75,7 @@ export async function generateMonthlyInvoices(adminId: string) {
       if (alreadyInvoiced.has(deposit.id)) continue;
 
       try {
-        const storageFee = deposit.monthlyStorageFee || 0;
+        const storageFee = Math.round(calculateMonthlyStorageFee(deposit.weightGrams, deposit.storageType) * 100) / 100;
         const insuranceFee = deposit.insuredValue && deposit.insuranceFeeRate
           ? (deposit.insuredValue * deposit.insuranceFeeRate / 100) / 12
           : 0;
@@ -222,6 +152,7 @@ export async function generateTransactionInvoice(
   feeType: string
 ) {
   try {
+    await requireAdmin();
     const deposit = await prisma.vaultDeposit.findUnique({
       where: { id: depositId },
       include: { client: true },
@@ -239,14 +170,24 @@ export async function generateTransactionInvoice(
         { type: "KYC_FEE", description: "KYC processing fee", amount: VAULT_FEE_SCHEDULE.kycProcessingFee },
       ],
       ASSAY: [
-        { type: "ASSAY_FEE", description: `Assay testing (${deposit.assayMethod || "Standard"})`, amount: deposit.assayFee || VAULT_FEE_SCHEDULE.assayMinimumFee },
+        {
+          type: "ASSAY_FEE",
+          description: `Assay testing (${deposit.assayMethod || "Standard"})`,
+          amount:
+            ASSAY_METHODS.find((m) => m.id === deposit.assayMethod || m.label === deposit.assayMethod)?.cost ??
+            VAULT_FEE_SCHEDULE.assayMinimumFee,
+        },
       ],
       WITHDRAWAL: [
-        { type: "WITHDRAWAL_FEE", description: "Physical withdrawal handling", amount: 350 },
+        { type: "WITHDRAWAL_FEE", description: "Physical withdrawal handling", amount: VAULT_FEE_SCHEDULE.physicalWithdrawalFee },
       ],
       LIQUIDATION: [
-        { type: "LIQUIDATION_COMMISSION", description: "Liquidation commission (0.5%)", amount: deposit.declaredValue * 0.005 },
-        { type: "WIRE_TRANSFER_FEE", description: "Wire transfer fee", amount: 35 },
+        {
+          type: "LIQUIDATION_COMMISSION",
+          description: `Liquidation commission (${VAULT_FEE_SCHEDULE.liquidationCommission}%)`,
+          amount: Math.round(deposit.declaredValue * VAULT_FEE_SCHEDULE.liquidationCommission) / 100,
+        },
+        { type: "WIRE_TRANSFER_FEE", description: "Wire transfer fee", amount: VAULT_FEE_SCHEDULE.wireTransferFee },
       ],
     };
 
@@ -302,6 +243,7 @@ export async function recordInvoicePayment(
   }
 ) {
   try {
+    await requireAdmin();
     const invoice = await prisma.vaultInvoice.findUnique({
       where: { id: invoiceId },
     });
@@ -337,6 +279,7 @@ export async function recordInvoicePayment(
 
 export async function cancelInvoice(invoiceId: string, adminId: string) {
   try {
+    await requireAdmin();
     await prisma.vaultInvoice.update({
       where: { id: invoiceId },
       data: { status: "CANCELLED" as any, balanceDue: 0 },
@@ -359,6 +302,7 @@ export async function getVaultInvoices(filters?: {
   status?: string;
 }) {
   try {
+    await requireAdmin();
     const where: any = {};
     if (filters?.depositId) where.depositId = filters.depositId;
     if (filters?.clientId) where.clientId = filters.clientId;
@@ -383,6 +327,7 @@ export async function getVaultInvoices(filters?: {
 
 export async function getBillingStats() {
   try {
+    await requireAdmin();
     const invoices = await prisma.vaultInvoice.findMany({
       select: { status: true, total: true, balanceDue: true, amountPaid: true },
     });
@@ -401,230 +346,5 @@ export async function getBillingStats() {
   } catch (error) {
     console.error("getBillingStats error:", error);
     return { stats: { totalInvoiced: 0, totalPaid: 0, totalOutstanding: 0, invoiceCount: 0, paidCount: 0, overdueCount: 0, sentCount: 0 } };
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════
-// GENERATE DEMURRAGE INVOICES
-// Uses OTHER invoice item type (no schema change needed)
-// Currency is passed as application-level data only
-// ═══════════════════════════════════════════════════════════════
-
-export async function generateDemurrageInvoice(
-  depositId: string,
-  adminId: string,
-  options?: { overrideDays?: number; currency?: string }
-) {
-  try {
-    const deposit = await prisma.vaultDeposit.findUnique({
-      where: { id: depositId },
-      include: { client: true },
-    });
-    if (!deposit) return { error: "Deposit not found" };
-
-    const referenceDate = deposit.storageEndDate || null;
-
-    if (!referenceDate && !options?.overrideDays) {
-      return { error: "No storage end date set for this deposit. Use override days or set a storage end date." };
-    }
-
-    const now = new Date();
-    const daysOverdue = options?.overrideDays
-      ?? Math.floor((now.getTime() - new Date(referenceDate!).getTime()) / (1000 * 60 * 60 * 24));
-
-    if (daysOverdue <= DEMURRAGE_CONFIG.gracePeriodDays) {
-      return { error: `Deposit is within the ${DEMURRAGE_CONFIG.gracePeriodDays}-day grace period (${daysOverdue} days). No demurrage applies.` };
-    }
-
-    const demurrageAmount = calculateDemurrageCharge(deposit.declaredValue, daysOverdue);
-    const { rate, tier } = getDemurrageRate(daysOverdue);
-    const chargeableDays = daysOverdue - DEMURRAGE_CONFIG.gracePeriodDays;
-    const depositCurrency = options?.currency || "USD";
-
-    const invoiceItems: any[] = [
-      {
-        type: "OTHER",
-        description: `Demurrage charge — ${chargeableDays} day(s) at ${tier} rate (${rate}%/day) on declared value ${formatCurrencyAmount(deposit.declaredValue, depositCurrency)}`,
-        quantity: chargeableDays,
-        unitPrice: Math.max(deposit.declaredValue * (rate / 100), DEMURRAGE_CONFIG.minimumDailyCharge),
-        amount: demurrageAmount,
-      },
-    ];
-
-    const invoice = await prisma.vaultInvoice.create({
-      data: {
-        invoiceNumber: generateInvoiceNumber(),
-        depositId,
-        clientId: deposit.clientId,
-        issueDate: new Date(),
-        dueDate: addDays(new Date(), 14),
-        subtotal: demurrageAmount,
-        taxRate: 0,
-        taxAmount: 0,
-        total: demurrageAmount,
-        balanceDue: demurrageAmount,
-        status: "SENT" as any,
-        notes: `Demurrage charges for deposit ${deposit.depositNumber} — ${daysOverdue} day(s) overdue (${tier} tier) [${depositCurrency}]`,
-        items: { create: invoiceItems },
-      },
-    });
-
-    // Update deposit total fees
-    await prisma.vaultDeposit.update({
-      where: { id: depositId },
-      data: {
-        totalFeesCharged: { increment: demurrageAmount },
-      },
-    });
-
-    // Log activity
-    await (prisma as any).vaultActivity.create({
-      data: {
-        depositId,
-        action: "FEE_CHARGED",
-        description: `Demurrage invoice ${invoice.invoiceNumber}: ${formatCurrencyAmount(demurrageAmount, depositCurrency)} for ${chargeableDays} day(s) at ${tier} rate`,
-        performedBy: adminId,
-      },
-    });
-
-    revalidatePath("/dashboard/shipments");
-    return {
-      success: true,
-      invoiceId: invoice.id,
-      invoiceNumber: invoice.invoiceNumber,
-      demurrageAmount,
-      daysOverdue,
-      chargeableDays,
-      tier,
-      currency: depositCurrency,
-    };
-  } catch (error) {
-    console.error("generateDemurrageInvoice error:", error);
-    return { error: "Failed to generate demurrage invoice" };
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════
-// GENERATE LATE PAYMENT PENALTY
-// ═══════════════════════════════════════════════════════════════
-
-export async function generateLatePaymentPenalty(
-  invoiceId: string,
-  adminId: string,
-  currency?: string
-) {
-  try {
-    const invoice = await prisma.vaultInvoice.findUnique({
-      where: { id: invoiceId },
-      include: { deposit: true },
-    });
-    if (!invoice) return { error: "Invoice not found" };
-    if (invoice.status === "PAID" || invoice.status === "CANCELLED") {
-      return { error: "Invoice is already paid or cancelled" };
-    }
-
-    const penalty = calculateLatePaymentPenalty(invoice.balanceDue);
-    const depositCurrency = currency || "USD";
-
-    const penaltyInvoice = await prisma.vaultInvoice.create({
-      data: {
-        invoiceNumber: generateInvoiceNumber(),
-        depositId: invoice.depositId,
-        clientId: invoice.clientId,
-        issueDate: new Date(),
-        dueDate: addDays(new Date(), 14),
-        subtotal: penalty,
-        taxRate: 0,
-        taxAmount: 0,
-        total: penalty,
-        balanceDue: penalty,
-        status: "SENT" as any,
-        notes: `Late payment penalty (${DEMURRAGE_CONFIG.latePaymentPenaltyPercent}%) on overdue invoice ${invoice.invoiceNumber} [${depositCurrency}]`,
-        items: {
-          create: [{
-            type: "LATE_FEE" as any,
-            description: `Late payment penalty — ${DEMURRAGE_CONFIG.latePaymentPenaltyPercent}% of outstanding balance ${formatCurrencyAmount(invoice.balanceDue, depositCurrency)}`,
-            quantity: 1,
-            unitPrice: penalty,
-            amount: penalty,
-          }],
-        },
-      },
-    });
-
-    // Mark original invoice as overdue
-    await prisma.vaultInvoice.update({
-      where: { id: invoiceId },
-      data: { status: "OVERDUE" as any },
-    });
-
-    revalidatePath("/dashboard/shipments");
-    return {
-      success: true,
-      penaltyInvoiceId: penaltyInvoice.id,
-      penaltyInvoiceNumber: penaltyInvoice.invoiceNumber,
-      penaltyAmount: penalty,
-      currency: depositCurrency,
-    };
-  } catch (error) {
-    console.error("generateLatePaymentPenalty error:", error);
-    return { error: "Failed to generate late payment penalty" };
-  }
-}
-
-// ═══════════════════════════════════════════════════════════════
-// GET DEMURRAGE SUMMARY FOR A DEPOSIT
-// ═══════════════════════════════════════════════════════════════
-
-export async function getDemurrageSummary(depositId: string, currency?: string) {
-  try {
-    const deposit = await prisma.vaultDeposit.findUnique({
-      where: { id: depositId },
-    });
-    if (!deposit) return { error: "Deposit not found" };
-
-    const referenceDate = deposit.storageEndDate || null;
-
-    const now = new Date();
-    const daysOverdue = referenceDate
-      ? Math.floor((now.getTime() - new Date(referenceDate).getTime()) / (1000 * 60 * 60 * 24))
-      : 0;
-
-    const depositCurrency = currency || "USD";
-    const { rate, tier } = getDemurrageRate(daysOverdue);
-    const currentDemurrage = calculateDemurrageCharge(deposit.declaredValue, daysOverdue);
-
-    // Get existing demurrage invoices (identified by "Demurrage" in notes)
-    const demurrageInvoices = await prisma.vaultInvoice.findMany({
-      where: {
-        depositId,
-        notes: { contains: "Demurrage" },
-      },
-      include: { items: true },
-      orderBy: { createdAt: "desc" },
-    });
-
-    const totalCharged = demurrageInvoices.reduce((s: number, inv: any) => s + inv.total, 0);
-
-    return {
-      depositNumber: deposit.depositNumber,
-      currency: depositCurrency,
-      declaredValue: deposit.declaredValue,
-      daysOverdue: Math.max(daysOverdue, 0),
-      gracePeriodDays: DEMURRAGE_CONFIG.gracePeriodDays,
-      currentTier: tier,
-      currentRate: rate,
-      projectedDemurrage: currentDemurrage,
-      totalDemurrageCharged: totalCharged,
-      demurrageInvoices: demurrageInvoices.map((inv: any) => ({
-        invoiceNumber: inv.invoiceNumber,
-        amount: inv.total,
-        status: inv.status,
-        issueDate: inv.issueDate,
-      })),
-    };
-  } catch (error) {
-    console.error("getDemurrageSummary error:", error);
-    return { error: "Failed to get demurrage summary" };
   }
 }

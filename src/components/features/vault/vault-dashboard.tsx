@@ -11,6 +11,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Badge } from "@/components/ui/badge";
 import { requestVaultDeposit, requestVaultRelease } from "@/app/(root)/(protected)/vault/actions";
 import { toast } from "sonner";
+import { VAULT_PUBLISHED_FEES, STORAGE_TYPE_CONFIG, calculateMonthlyStorageFee } from "@/lib/vault/types";
+
+const FEE_GROUPS = Array.from(new Set(VAULT_PUBLISHED_FEES.map((f) => f.group)));
 
 type VaultDeposit = {
   id: string; depositNumber: string; status: string; assetType: string; description: string;
@@ -35,6 +38,8 @@ export function VaultDashboard({ deposits }: { deposits: VaultDeposit[] }) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [selectedDeposit, setSelectedDeposit] = useState<VaultDeposit | null>(null);
+  const [weightInput, setWeightInput] = useState("");
+  const weightForEstimate = parseFloat(weightInput) || 0;
 
   const totalValue = deposits.filter(d => d.status !== "RELEASED").reduce((sum, d) => sum + d.declaredValue, 0);
   const inStorage = deposits.filter(d => d.status === "IN_STORAGE").length;
@@ -44,7 +49,7 @@ export function VaultDashboard({ deposits }: { deposits: VaultDeposit[] }) {
     setLoading(true);
     const result = await requestVaultDeposit(formData);
     setLoading(false);
-    if (result.success) { toast.success(`Deposit ${result.depositNumber} submitted successfully.`); setOpen(false); }
+    if (result.success) { toast.success(`Deposit ${result.depositNumber} submitted successfully.`); setOpen(false); setWeightInput(""); }
     else toast.error(result.error);
   }
 
@@ -84,7 +89,7 @@ export function VaultDashboard({ deposits }: { deposits: VaultDeposit[] }) {
               <Plus className="w-4 h-4 mr-2" /> New Deposit
             </Button>
           </DialogTrigger>
-          <DialogContent className="bg-[#0D1F35] border-[#D4A853]/20 text-white max-w-lg">
+          <DialogContent className="bg-[#0D1F35] border-[#D4A853]/20 text-white max-w-lg max-h-[90vh] overflow-y-auto">
             <DialogHeader><DialogTitle className="text-[#D4A853]">Request Vault Deposit</DialogTitle></DialogHeader>
             <form action={handleDeposit} className="space-y-4 mt-4">
               <div className="grid grid-cols-2 gap-4">
@@ -116,13 +121,44 @@ export function VaultDashboard({ deposits }: { deposits: VaultDeposit[] }) {
                 <Textarea name="description" required placeholder="e.g. 1kg LBMA-approved gold bar, PAMP Suisse" className="bg-slate-800/50 border-slate-700 text-white" />
               </div>
               <div className="grid grid-cols-3 gap-4">
-                <div><Label className="text-slate-300">Weight (g) *</Label><Input name="weightGrams" type="number" step="0.01" required className="bg-slate-800/50 border-slate-700 text-white" /></div>
+                <div><Label className="text-slate-300">Weight (g) *</Label><Input name="weightGrams" type="number" step="0.01" required value={weightInput} onChange={(e) => setWeightInput(e.target.value)} className="bg-slate-800/50 border-slate-700 text-white" /></div>
                 <div><Label className="text-slate-300">Quantity *</Label><Input name="quantity" type="number" defaultValue={1} min={1} required className="bg-slate-800/50 border-slate-700 text-white" /></div>
                 <div><Label className="text-slate-300">Value (USD) *</Label><Input name="declaredValue" type="number" step="0.01" required className="bg-slate-800/50 border-slate-700 text-white" /></div>
               </div>
               <div>
                 <Label className="text-slate-300">Serial Numbers (optional)</Label>
                 <Input name="serialNumbers" placeholder="Comma-separated if multiple" className="bg-slate-800/50 border-slate-700 text-white" />
+              </div>
+              {/* Published fees — shown before the client commits */}
+              <div className="rounded-xl border border-[#D4A853]/20 bg-slate-900/40 p-4 space-y-3">
+                <p className="text-sm font-semibold text-[#D4A853]">Fee schedule</p>
+                {weightForEstimate > 0 && (
+                  <div className="text-xs text-slate-300 space-y-0.5">
+                    <p className="text-slate-400">Monthly storage for {weightForEstimate.toLocaleString()} g:</p>
+                    {Object.entries(STORAGE_TYPE_CONFIG).map(([key, cfg]) => (
+                      <p key={key} className="flex justify-between">
+                        <span>{cfg.label}</span>
+                        <span className="font-medium text-white">${calculateMonthlyStorageFee(weightForEstimate, key).toFixed(2)}/month</span>
+                      </p>
+                    ))}
+                  </div>
+                )}
+                {FEE_GROUPS.map((group) => (
+                  <div key={group} className="text-xs space-y-0.5">
+                    <p className="text-slate-400">{group}</p>
+                    {VAULT_PUBLISHED_FEES.filter((f) => f.group === group).map((f) => (
+                      <p key={f.label} className="flex justify-between gap-3">
+                        <span className="text-slate-300">{f.label}</span>
+                        <span className="text-white text-right">{f.price}</span>
+                      </p>
+                    ))}
+                  </div>
+                ))}
+                <p className="text-[11px] text-slate-400">These are the only fees we charge. Nothing outside this list is added to your account.</p>
+                <label className="flex items-start gap-2 text-xs text-slate-200 cursor-pointer">
+                  <input type="checkbox" name="feesAccepted" value="true" required className="mt-0.5 accent-[#D4A853]" />
+                  <span>I have read and accept this fee schedule.</span>
+                </label>
               </div>
               <Button type="submit" disabled={loading} className="w-full bg-gradient-to-r from-[#D4A853] to-[#C09740] text-[#0A1628] font-semibold">
                 {loading ? "Submitting..." : "Submit Deposit Request"}

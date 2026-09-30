@@ -41,7 +41,7 @@ const LoginPage = async () => {
                 </div>
                 <div>
                   <h3 className="font-semibold text-sm mb-0.5">Global Shipping Network</h3>
-                  <p className="text-xs text-gray-400">Access to 190+ countries and territories worldwide</p>
+                  <p className="text-xs text-gray-400">International shipping with prices fixed at booking</p>
                 </div>
               </div>
               <div className="flex items-start gap-3 bg-white/5 backdrop-blur-sm border border-white/10 p-4 rounded-xl">

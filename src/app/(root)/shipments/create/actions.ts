@@ -6,6 +6,8 @@ import { revalidatePath } from "next/cache";
 import { prisma } from "@/constants/config/db";
 import { shipmentSchema } from "@/store/schema";
 import { auth } from "~/auth";
+import { calculateShipmentQuote, QUOTE_CURRENCY } from "./type";
+import { sendBookingConfirmationEmail, BOOKING_FEE_LABEL, formatQuoteLines } from "@/lib/emails/fee-emails";
 
 // Helper function to generate a tracking number
 function generateTrackingNumber(): string {
@@ -83,6 +85,19 @@ export async function createShipment(formData: FormData) {
     const validatedData = shipmentSchema.parse(rawFormData);
     const { packages, recipient, ...shipmentData } = validatedData;
 
+    // Recalculate the price from the rate card and only book if the customer
+    // accepted exactly this total. This is the only place shipment charges are created.
+    const quote = calculateShipmentQuote(packages, shipmentData.serviceType);
+    if (!quote) {
+      return { error: "Unknown service type." };
+    }
+    const acceptedTotal = Number(formData.get("acceptedTotal"));
+    if (!Number.isFinite(acceptedTotal) || Math.abs(acceptedTotal - quote.total) > 0.005) {
+      return {
+        error: "The price has changed since you accepted it. Please review the total and accept it again.",
+      };
+    }
+
     // Generate server-side fields
     const trackingNumber = generateTrackingNumber();
     // Calculate estimatedDelivery based on the serviceType from shipmentData
@@ -109,16 +124,35 @@ export async function createShipment(formData: FormData) {
             // You can optionally include location or other fields here if needed.
           },
         },
+        // Packages and the accepted charge are created in the same write as the shipment
+        packages: { create: packages },
+        fees: {
+          create: {
+            type: "SHIPPING_FREIGHT",
+            customType: BOOKING_FEE_LABEL,
+            amount: quote.total,
+            currency: QUOTE_CURRENCY,
+            reason: formatQuoteLines(quote.lines, QUOTE_CURRENCY),
+            status: "UNPAID",
+            invoiceSentAt: new Date(),
+          },
+        },
       },
+      include: { Sender: true },
     });
 
-    // Create nested package records for the shipment
-    await prisma.package.createMany({
-      data: packages.map((item) => ({
-        ...item,
-        shipmentId: result.id,
-      })),
-    });
+    if (result.Sender?.email) {
+      await sendBookingConfirmationEmail({
+        email: result.Sender.email,
+        name: result.Sender.name,
+        trackingNumber,
+        serviceLabel: quote.option.label,
+        route: `${shipmentData.originCity}, ${shipmentData.originCountry} → ${shipmentData.destinationCity}, ${shipmentData.destinationCountry}`,
+        lines: quote.lines,
+        total: quote.total,
+        currency: QUOTE_CURRENCY,
+      });
+    }
 
     revalidatePath("/shipments");
 

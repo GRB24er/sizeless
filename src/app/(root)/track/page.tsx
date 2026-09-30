@@ -9,11 +9,11 @@ const features = [
   {
     icon: Clock,
     title: "Real-Time Updates",
-    description: "Track every movement with live GPS positioning and instant status notifications across our global network.",
+    description: "Each handover is logged with its time, location, and status, and you get an email with every update.",
   },
   {
     icon: Globe,
-    title: "190+ Countries",
+    title: "International Shipments",
     description: "Seamless tracking across international borders with unified logistics visibility and customs integration.",
   },
   {
@@ -26,7 +26,7 @@ const features = [
 const faqs = [
   {
     question: "How quickly does tracking information become available?",
-    answer: "Tracking data is synchronized within minutes of pickup. Initial scans typically appear within 15-30 minutes, with full tracking history available as your shipment moves through our global network.",
+    answer: "Tracking is available as soon as your shipment is booked. A new update is posted each time your shipment is picked up, departs, or arrives at a facility, and you receive an email for each one.",
   },
   {
     question: "What should I do if tracking hasn't updated?",
