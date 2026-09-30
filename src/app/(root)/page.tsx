@@ -1,19 +1,15 @@
-import { Hero } from "@/components/sections/hero";
-import { Choice } from "@/components/sections/choice";
-import { Commitments } from "@/components/sections/archieve";
-import { Service } from "@/components/sections/Services";
-import { GlobalNetwork } from "@/components/sections/network";
-import { Quota } from "@/components/sections/quota";
+import { HomeHero, Commitments, ServiceTiers, HowItWorks, VaultTeaser, HomeFaq, ClosingCta } from "@/components/landing/home";
 
 export default function HomePage() {
   return (
     <>
-      <Hero />
-      <Choice />
+      <HomeHero />
       <Commitments />
-      <Service />
-      <GlobalNetwork />
-      <Quota />
+      <ServiceTiers compact />
+      <HowItWorks />
+      <VaultTeaser />
+      <HomeFaq />
+      <ClosingCta />
     </>
   );
 }

@@ -15,7 +15,8 @@ export const Logo = () => (
         alt="Aegis Cargo"
         width={130}
         height={80}
-        className="transition-all duration-300 object-contain"
+        priority
+        className="h-12 w-auto rounded-md object-contain transition-all duration-300"
       />
     </Link>
   </MotionDiv>

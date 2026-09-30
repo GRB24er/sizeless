@@ -55,6 +55,15 @@
 body { font-family: var(--font-sans); }
 
 @theme inline {
+  /* Client-facing site: classic serif display over Inter, ivory / navy / gold */
+  --font-display: var(--font-fraunces), Georgia, "Times New Roman", serif;
+  --color-ivory: #F7F4EE;
+  --color-ivory-deep: #EFEAE0;
+  --color-ink: #0B1726;
+  --color-navy: #0F1D2F;
+  --color-navy-soft: #1E3A5F;
+  --color-gold: #C9A24D;
+  --color-gold-deep: #9C7A2E;
   --color-top-header: var(--top-header-bg);
   --color-silver: var(--silver);
   --color-silver-light: var(--silver-light);

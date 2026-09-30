@@ -39,9 +39,9 @@ export const SHIPPING_OPTIONS: ShippingOption[] = [
   },
   {
     id: "standard_insured",
-    label: "Standard Insured Delivery",
+    label: "Standard Secure Delivery",
     description:
-      "Fully insured standard freight with sealed packaging, customs brokerage included. Suitable for lower-value consignments and refined metals.",
+      "Standard freight with sealed packaging, customs brokerage included, and optional insurance. Suitable for lower-value consignments and refined metals.",
     price: 350.0,
     perKgRate: 32.0,
     transitDays: "8–14 business days",
