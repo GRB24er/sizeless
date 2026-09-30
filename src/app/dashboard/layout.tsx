@@ -13,7 +13,7 @@ const DashboardLayout = async ({ children }: { children: ReactNode }) => {
   if (user.role !== "ADMIN") redirect("/");
 
   return (
-    <SidebarProvider>
+    <SidebarProvider className="font-admin">
       <AppSidebar variant="inset" />
       <SidebarInset>
         <div className="flex flex-1 flex-col">

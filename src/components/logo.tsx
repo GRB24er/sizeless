@@ -1,23 +1,40 @@
 import Image from "next/image";
 import Link from "next/link";
-import { MotionDiv } from "./motion.div";
+import { ComponentProps } from "react";
+import { cn } from "@/lib/utils";
 
-export const Logo = () => (
-  <MotionDiv
-    className="flex items-center gap-5 "
-    initial={{ x: -20, opacity: 0 }}
-    animate={{ x: 0, opacity: 1 }}
-    transition={{ duration: 0.5, delay: 0.1 }}
+/**
+ * Header lockup: the container-and-shield emblem from the logo, set next to
+ * the company name. `tone="light"` turns the single-tone emblem white for
+ * dark backgrounds. Extra props are forwarded so it can sit inside
+ * `asChild` components such as the dashboard sidebar button.
+ */
+export const Logo = ({
+  tone = "dark",
+  className,
+  ...props
+}: { tone?: "dark" | "light" } & Omit<ComponentProps<typeof Link>, "href">) => (
+  <Link
+    href="/"
+    aria-label="Aegis Cargo home"
+    className={cn("inline-flex shrink-0 items-center gap-2.5", className)}
+    {...props}
   >
-    <Link href="/">
-      <Image
-        src="/images/logo.png"
-        alt="Aegis Cargo"
-        width={130}
-        height={80}
-        priority
-        className="h-12 w-auto rounded-md object-contain transition-all duration-300"
-      />
-    </Link>
-  </MotionDiv>
+    <Image
+      src="/images/logo-mark.png"
+      alt=""
+      width={222}
+      height={184}
+      priority
+      className={cn("h-7 w-auto", tone === "light" && "brightness-0 invert")}
+    />
+    <span
+      className={cn(
+        "type-display text-[17px] font-semibold leading-none",
+        tone === "light" ? "text-white" : "text-ink"
+      )}
+    >
+      Aegis Cargo
+    </span>
+  </Link>
 );

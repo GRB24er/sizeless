@@ -1,13 +1,13 @@
-import { HomeHero, Commitments, ServiceTiers, HowItWorks, VaultTeaser, HomeFaq, ClosingCta } from "@/components/landing/home";
+import { HomeHero, ServiceLevels, AfterBooking, VaultSection, Commitments, HomeFaq, ClosingCta } from "@/components/landing/home";
 
 export default function HomePage() {
   return (
     <>
       <HomeHero />
+      <ServiceLevels />
+      <AfterBooking />
+      <VaultSection />
       <Commitments />
-      <ServiceTiers compact />
-      <HowItWorks />
-      <VaultTeaser />
       <HomeFaq />
       <ClosingCta />
     </>

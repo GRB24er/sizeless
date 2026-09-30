@@ -78,6 +78,8 @@ export async function createClientAccount(formData: FormData) {
         phone,
         password: hash,
         role: role === "ADMIN" ? "ADMIN" : role === "MANAGER" ? "MANAGER" : "USER",
+        // Same as self-registration, so the client's profile page works on first sign-in.
+        profile: { create: {} },
       },
     });
 

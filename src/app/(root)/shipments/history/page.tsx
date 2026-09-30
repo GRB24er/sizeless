@@ -1,167 +1,142 @@
-import { Metadata } from "next";
+import type { Metadata } from "next";
+import Link from "next/link";
 import { redirect } from "next/navigation";
+import { format } from "date-fns";
 import { auth } from "~/auth";
-
-import { prisma } from "@/constants/config/db";
-import { ShipmentsPage } from "@/components/features/shipment/shipment.page";
-import { ShipmentStatus } from "@/components/features/shipment/shipment.page";
+import { COMPANY } from "@/lib/company";
+import { getClientShipments } from "@/lib/client-account";
+import { SHIPPING_OPTIONS } from "@/app/(root)/shipments/create/type";
+import { SHIPMENT_STAGES, shipmentStage, shipmentStatusLabel, shipmentStatusTone } from "@/lib/shipment-status";
+import { cn } from "@/lib/utils";
+import { AccountShell, PaymentNotice } from "@/components/account/account-shell";
+import { TONE_BADGE } from "@/components/account/vault-format";
+import { ButtonLink, buttonClass } from "@/components/landing/primitives";
 
 export const metadata: Metadata = {
-  title: "My Shipments | Shipping Dashboard",
-  description: "Manage and track all your shipments in one place",
+  title: "My shipments | Aegis Cargo",
+  description: "Every shipment you've booked, with its status and documents.",
 };
 
-function mapStatus(dbStatus: string | null | undefined): ShipmentStatus {
-  if (!dbStatus) return "Proccessing";
-  
-  const status = dbStatus.toLowerCase();
-  
-  if (status === "Delivered") return "Delivered";
-  if (status === "In_transit" || status === "In-transit") return "In_transit";
-  if (status === "Picked_up") return "Picked_up";
-  if (status === "Departed") return "Departed";
-  if (status === "Arrived") return "Arrived";
-  if (status === "On_hold") return "On_hold";
-  if (status === "Failed") return "Failed";
-  if (status === "Returned") return "Returned";
-  if (status === "Information_received") return "Information_received";
-  
-  return "Proccessing";
-}
+const serviceLabel = (id: string) => SHIPPING_OPTIONS.find((o) => o.id === id)?.label ?? id.replace(/_/g, " ");
 
-export default async function ShipmentsRoute() {
+export default async function MyShipmentsPage() {
   const session = await auth();
+  if (!session?.user?.id) redirect("/login?next=/shipments/history");
 
-  console.log("========== DEBUG ==========");
-  console.log("SESSION:", session ? "EXISTS" : "NULL");
-  console.log("USER ID:", session?.user?.id);
-  console.log("USER ROLE:", session?.user?.role);
+  const shipments = await getClientShipments(session.user.id);
 
-  if (!session) {
-    console.log("NO SESSION - REDIRECTING TO LOGIN");
-    redirect("/login");
-  }
+  return (
+    <AccountShell
+      active="shipments"
+      title="Your shipments"
+      intro="Everything you've booked, with the latest handover and the documents for each."
+      actions={
+        <ButtonLink href="/shipments/create" size="sm" arrow>
+          Book a shipment
+        </ButtonLink>
+      }
+    >
+      {shipments.length === 0 ? (
+        <div className="rounded-xl border border-line bg-surface px-6 py-14 text-center">
+          <p className="type-display text-xl font-semibold text-ink">No shipments yet</p>
+          <p className="mx-auto mt-2 max-w-md text-[15px] text-ink-2">
+            When you book a shipment it appears here with its tracking number, status and documents.
+          </p>
+          <div className="mt-6 flex flex-wrap justify-center gap-3">
+            <ButtonLink href="/shipments/create" size="sm" arrow>
+              Book a shipment
+            </ButtonLink>
+            <ButtonLink href="/services" variant="outline" size="sm">
+              Prices and services
+            </ButtonLink>
+          </div>
+        </div>
+      ) : (
+        <ul className="grid gap-4">
+          {shipments.map((s) => {
+            const latest = s.TrackingUpdates[0];
+            const stage = shipmentStage(latest?.status);
+            const weight = s.packages.reduce((sum, p) => sum + (p.weight || 0), 0);
+            return (
+              <li key={s.id} className="rounded-xl border border-line bg-surface p-5 sm:p-6">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div className="min-w-0">
+                    <Link
+                      href={`/track/${s.trackingNumber}`}
+                      className="figures text-[17px] text-ink underline decoration-transparent underline-offset-4 transition-colors hover:decoration-ink/40"
+                    >
+                      {s.trackingNumber}
+                    </Link>
+                    <p className="mt-0.5 text-[15px] text-ink-2">
+                      {s.originCity}, {s.originCountry} to {s.destinationCity}, {s.destinationCountry}
+                    </p>
+                  </div>
+                  <span className={cn("self-start whitespace-nowrap rounded-md px-2 py-0.5 text-[13px] font-medium", TONE_BADGE[shipmentStatusTone(latest?.status)])}>
+                    {shipmentStatusLabel(latest?.status)}
+                  </span>
+                </div>
 
-  // Get user-specific shipments
-  const shipments = await prisma.shipment.findMany({
-    where: {
-      userId: session.user.id,
-    },
-    select: {
-      id: true,
-      userId: true,
-      originCity: true,
-      originCountry: true,
-      destinationCity: true,
-      destinationCountry: true,
-      createdAt: true,
-      estimatedDelivery: true,
-      deliveredAt: true,
-      trackingNumber: true,
-      originPostalCode: true,
-      destinationPostalCode: true,
-      packages: {
-        select: {
-          id: true,
-          weight: true,
-          description: true,
-          packageType: true,
-          declaredValue: true,
-        },
-      },
-      recipient: {
-        select: {
-          name: true,
-          company: true,
-          email: true,
-          phone: true,
-        },
-      },
-      serviceType: true,
-      TrackingUpdates: {
-        orderBy: {
-          timestamp: "desc",
-        },
-        take: 1,
-        select: {
-          message: true,
-          status: true,
-          location: true,
-        },
-      },
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-  });
+                <dl className="mt-5 grid grid-cols-2 gap-x-6 gap-y-3 text-sm sm:grid-cols-4">
+                  <div>
+                    <dt className="text-[13px] text-ink-3">Service</dt>
+                    <dd className="mt-0.5 text-ink">{serviceLabel(s.serviceType)}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-[13px] text-ink-3">Booked</dt>
+                    <dd className="mt-0.5 text-ink">{format(s.createdAt, "d MMM yyyy")}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-[13px] text-ink-3">{s.deliveredAt ? "Delivered" : "Estimated delivery"}</dt>
+                    <dd className="mt-0.5 text-ink">{format(s.deliveredAt ?? s.estimatedDelivery, "d MMM yyyy")}</dd>
+                  </div>
+                  <div>
+                    <dt className="text-[13px] text-ink-3">Packages</dt>
+                    <dd className="mt-0.5 text-ink">
+                      {s.packages.length}, <span className="figures">{weight.toFixed(1)} kg</span>
+                    </dd>
+                  </div>
+                </dl>
 
-  console.log("SHIPMENTS FOUND FOR USER:", shipments.length);
-  
-  if (shipments.length > 0) {
-    console.log("FIRST SHIPMENT ID:", shipments[0].id);
-    console.log("FIRST SHIPMENT USER_ID:", shipments[0].userId);
-    console.log("FIRST SHIPMENT TRACKING:", shipments[0].trackingNumber);
-    console.log("FIRST SHIPMENT STATUS:", shipments[0].TrackingUpdates[0]?.status);
-  }
-  
-  console.log("========== END DEBUG ==========");
+                {latest?.location && (
+                  <p className="mt-4 text-sm text-ink-3">
+                    Last handover {format(latest.timestamp, "d MMM yyyy, HH:mm")}, {latest.location}
+                  </p>
+                )}
 
-  const formattedShipments = shipments.map((shipment) => {
-    const origin = `${shipment.originCity}, ${shipment.originCountry}`;
-    const destination = `${shipment.destinationCity}, ${shipment.destinationCountry}`;
+                {stage !== undefined && (
+                  <ol aria-label="Progress" className="mt-4 grid max-w-xl grid-cols-4 gap-1.5">
+                    {SHIPMENT_STAGES.map((label, i) => (
+                      <li key={label}>
+                        <span aria-hidden className={cn("block h-[3px] rounded-full", i <= stage ? "bg-signal" : "bg-line")} />
+                        <span className={cn("mt-1.5 block text-[12px]", i === stage ? "font-medium text-ink" : "text-ink-3")}>
+                          {label}
+                          {i === stage && <span className="sr-only"> (current)</span>}
+                        </span>
+                      </li>
+                    ))}
+                  </ol>
+                )}
 
-    const totalWeight = shipment.packages.reduce(
-      (acc, pkg) => acc + (pkg.weight || 0),
-      0
-    );
-    const totalValue = shipment.packages.reduce(
-      (acc, pkg) => acc + (pkg.declaredValue || 0),
-      0
-    );
+                <div className="mt-5 flex flex-wrap gap-2 border-t border-line pt-4">
+                  <Link href={`/track/${s.trackingNumber}`} className={buttonClass("dark", "sm")}>
+                    View shipment
+                  </Link>
+                  <a href={`/api/shipments/${s.id}/receipt`} className={buttonClass("outline", "sm")}>
+                    Receipt (PDF)
+                  </a>
+                  <a href={`/api/shipments/${s.id}/label`} className={buttonClass("outline", "sm")}>
+                    Label (PDF)
+                  </a>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
+      )}
 
-    const dateFormatted = new Date(shipment.createdAt).toLocaleDateString(
-      "en-US",
-      { month: "short", day: "numeric", year: "numeric" }
-    );
-
-    const etaFormatted = shipment.estimatedDelivery
-      ? new Date(shipment.estimatedDelivery).toLocaleDateString("en-US", {
-          month: "short", day: "numeric", year: "numeric",
-        })
-      : "N/A";
-
-    const deliveredFormatted = shipment.deliveredAt
-      ? new Date(shipment.deliveredAt).toLocaleDateString("en-US", {
-          month: "short", day: "numeric", year: "numeric",
-        })
-      : null;
-
-    const latestUpdate = shipment.TrackingUpdates[0];
-
-    return {
-      id: shipment.id,
-      tracking_number: shipment.trackingNumber,
-      origin,
-      destination,
-      date: dateFormatted,
-      eta: etaFormatted,
-      originPostalCode: shipment.originPostalCode,
-      destinationPostalCode: shipment.destinationPostalCode,
-      delivered: deliveredFormatted,
-      items: shipment.packages.length,
-      weight: `${totalWeight.toFixed(1)} kg`,
-      type: shipment.serviceType,
-      value: `$${totalValue.toFixed(2)}`,
-      status: mapStatus(latestUpdate?.status),
-      lastUpdate: latestUpdate?.message || "No updates available",
-      recipient: {
-        name: shipment.recipient?.name || "Unknown",
-        imageUrl: null,
-      },
-    };
-  });
-
-  console.log("FORMATTED SHIPMENTS COUNT:", formattedShipments.length);
-
-  return <ShipmentsPage shipments={formattedShipments} />;
+      <div className="mt-8 max-w-3xl">
+        <PaymentNotice email={COMPANY.email} />
+      </div>
+    </AccountShell>
+  );
 }

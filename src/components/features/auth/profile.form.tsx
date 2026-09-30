@@ -130,7 +130,7 @@ export default function ProfileForm({ userData }: ProfileUserData) {
         <Button
           variant={isEditMode ? "default" : "outline"}
           size="sm"
-          className={`${isEditMode && "bg-secondary hover:bg-secondary/80"}`}
+          className={`${isEditMode && "bg-primary hover:bg-primary/90"}`}
           onClick={() => setIsEditMode(!isEditMode)}
           disabled={isPending}
         >
@@ -366,7 +366,7 @@ export default function ProfileForm({ userData }: ProfileUserData) {
           {isEditMode && (
             <Button
               type="submit"
-              className="w-full bg-secondary hover:bg-secondary/80"
+              className="w-full bg-primary hover:bg-primary/90"
               disabled={isPending}
             >
               {isPending ? (

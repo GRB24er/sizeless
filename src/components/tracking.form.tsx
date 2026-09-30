@@ -1,66 +1,92 @@
 "use client";
 
-import React, { useState } from "react";
-import { Search, ArrowRight, Loader2 } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { toast } from "sonner";
+import React, { useId, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { Arrow, buttonClass } from "@/components/landing/primitives";
 
-const TrackingForm = ({ variant = "light", className }: { variant?: "light" | "dark"; className?: string }) => {
-  const [trackingNumber, setTrackingNumber] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+/** Accepts "lox-7k2m 9qxa" or just the 8-character code, returns "LOX-7K2M9QXA". */
+function normalize(raw: string) {
+  const v = raw.trim().toUpperCase().replace(/\s+/g, "");
+  return /^[A-Z0-9]{8}$/.test(v) ? `LOX-${v}` : v;
+}
+
+const TrackingForm = ({
+  className,
+  help = "It starts with LOX- and is in your booking confirmation email.",
+}: {
+  className?: string;
+  help?: string | null;
+}) => {
+  const id = useId();
   const router = useRouter();
-  const dark = variant === "dark";
+  const [value, setValue] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const num = trackingNumber.trim().toUpperCase();
+    const num = normalize(value);
     if (!num) {
-      toast.error("Please enter a tracking number");
+      setError("Enter the tracking number from your booking confirmation.");
       return;
     }
-    setIsLoading(true);
+    setError(null);
+    setPending(true);
     router.push(`/track/${encodeURIComponent(num)}`);
   };
 
+  const describedBy = error ? `${id}-error` : help ? `${id}-help` : undefined;
+
   return (
-    <form onSubmit={handleSubmit} className={cn("w-full", className)}>
-      <label htmlFor="tracking-number" className="sr-only">
+    <form onSubmit={handleSubmit} noValidate className={cn("w-full", className)}>
+      <label htmlFor={`${id}-input`} className="text-sm font-medium text-ink">
         Tracking number
       </label>
-      <div
-        className={cn(
-          "flex items-center gap-2 rounded-xl p-1.5 transition-shadow focus-within:ring-2",
-          dark
-            ? "bg-white/[0.07] ring-1 ring-white/15 backdrop-blur-sm focus-within:ring-gold/60"
-            : "bg-white ring-1 ring-ink/10 shadow-sm focus-within:ring-gold-deep/50"
-        )}
-      >
-        <Search className="ml-3 h-5 w-5 shrink-0 text-slate-400" />
+      <div className="mt-2 flex flex-col gap-2 sm:flex-row">
         <input
-          id="tracking-number"
+          id={`${id}-input`}
           type="text"
           autoComplete="off"
+          autoCapitalize="characters"
           spellCheck={false}
-          placeholder="e.g. LOX-7K2M9QXA"
-          value={trackingNumber}
-          onChange={(e) => setTrackingNumber(e.target.value)}
+          placeholder="LOX-7K2M9QXA"
+          value={value}
+          onChange={(e) => {
+            setValue(e.target.value);
+            if (error) setError(null);
+          }}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={describedBy}
           className={cn(
-            "h-12 min-w-0 flex-1 bg-transparent px-2 font-mono text-[15px] tracking-wide outline-none",
-            dark ? "text-white placeholder:text-slate-400" : "text-ink placeholder:text-slate-400"
+            "figures h-12 w-full min-w-0 rounded-md border bg-white sm:flex-1 px-4 text-[15px] uppercase text-ink transition-[border-color,box-shadow] duration-150 placeholder:text-ink-3 focus:outline-none focus:ring-[3px]",
+            error ? "border-[#B42318] focus:ring-[#B42318]/15" : "border-line-2 focus:border-ink focus:ring-signal/15"
           )}
         />
-        <button
-          type="submit"
-          disabled={isLoading}
-          className={cn(
-            "inline-flex h-12 shrink-0 items-center gap-2 rounded-lg px-5 text-sm font-semibold transition-colors disabled:opacity-70",
-            dark ? "bg-gold text-ink hover:bg-[#d8b566]" : "bg-navy text-white hover:bg-navy-soft"
+        <button type="submit" disabled={pending} className={buttonClass("primary", "md", "h-12 sm:w-auto")}>
+          {pending ? (
+            <>
+              <Loader2 className="size-4 animate-spin" aria-hidden /> Opening
+            </>
+          ) : (
+            <>
+              Track <Arrow />
+            </>
           )}
-        >
-          {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <>Track <ArrowRight className="h-4 w-4" /></>}
         </button>
       </div>
+      {error ? (
+        <p id={`${id}-error`} role="alert" className="mt-2 text-[13px] text-[#B42318]">
+          {error}
+        </p>
+      ) : (
+        help && (
+          <p id={`${id}-help`} className="mt-2 text-[13px] text-ink-3">
+            {help}
+          </p>
+        )
+      )}
     </form>
   );
 };

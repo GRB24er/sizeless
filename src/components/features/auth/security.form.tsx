@@ -215,7 +215,7 @@ export default function SecurityForm() {
 
             <Button
               type="submit"
-              className="w-full bg-secondary hover:bg-secondary/80"
+              className="w-full bg-primary hover:bg-primary/90"
               disabled={isPending}
             >
               {isPending ? (

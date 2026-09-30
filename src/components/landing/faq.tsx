@@ -7,18 +7,18 @@ export type FaqItem = { q: string; a: ReactNode };
 export function Faq({ items, tone = "light" }: { items: FaqItem[]; tone?: "light" | "dark" }) {
   const dark = tone === "dark";
   return (
-    <Accordion type="single" collapsible className={cn("border-t", dark ? "border-white/15" : "border-ink/15")}>
+    <Accordion type="single" collapsible className={cn("border-t", dark ? "border-white/15" : "border-line")}>
       {items.map((item, i) => (
-        <AccordionItem key={i} value={`q${i}`} className={cn(dark ? "border-white/15" : "border-ink/15")}>
+        <AccordionItem key={i} value={`q${i}`} className={cn(dark ? "border-white/15" : "border-line")}>
           <AccordionTrigger
             className={cn(
-              "py-5 font-display text-lg font-normal hover:no-underline sm:text-xl",
-              dark ? "text-white [&>svg]:text-gold" : "text-ink [&>svg]:text-gold-deep"
+              "items-center rounded-none py-5 text-[17px] font-medium hover:no-underline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-signal focus-visible:ring-0 [&>svg]:size-5 [&>svg]:translate-y-0",
+              dark ? "text-white [&>svg]:text-[#A9B6C6]" : "text-ink [&>svg]:text-ink-3"
             )}
           >
             {item.q}
           </AccordionTrigger>
-          <AccordionContent className={cn("max-w-3xl pb-6 text-[15px] leading-relaxed", dark ? "text-slate-300" : "text-slate-600")}>
+          <AccordionContent className={cn("max-w-[65ch] pb-6 text-[15px] leading-relaxed", dark ? "text-[#B7C3D1]" : "text-ink-2")}>
             {item.a}
           </AccordionContent>
         </AccordionItem>

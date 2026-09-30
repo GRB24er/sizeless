@@ -12,6 +12,7 @@ import {
   generateStorageAgreement,
   generateVaultInsuranceCertificate,
 } from "@/lib/documents/pdf-templates";
+import { isDocumentAvailable } from "@/lib/vault/client-documents";
 
 export async function GET(
   req: NextRequest,
@@ -43,6 +44,11 @@ export async function GET(
     // Access control: admin or deposit owner
     if (session.user.role !== "ADMIN" && deposit.clientId !== session.user.id) {
       return NextResponse.json({ error: "Access denied" }, { status: 403 });
+    }
+
+    // Clients only get documents for events that have happened (see lib/vault/client-documents).
+    if (session.user.role !== "ADMIN" && !isDocumentAvailable(docType, deposit)) {
+      return NextResponse.json({ error: "This document isn't available for this deposit yet" }, { status: 409 });
     }
 
     let pdfBuffer: Buffer;

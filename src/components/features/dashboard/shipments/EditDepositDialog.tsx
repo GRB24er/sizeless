@@ -46,7 +46,6 @@ const VAULT_LOCATIONS = [
   "Zurich Vault",
   "Singapore Freeport",
   "Dubai Gold Vault",
-  "New York Federal Reserve",
   "Hong Kong Vault",
 ];
 

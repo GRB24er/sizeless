@@ -19,7 +19,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { signIn } from "next-auth/react";
+import { signIn, getSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
@@ -67,7 +67,12 @@ export const LoginForm = () => {
       // Optionally, display a success message
       toast.success("Successfully signed in!");
       router.refresh();
-      router.replace("/");
+      // Return to the page that sent the user here if it's a path on this site;
+      // otherwise clients go to their account and admins to the dashboard.
+      const next = new URLSearchParams(window.location.search).get("next");
+      const safeNext = next && next.startsWith("/") && !next.startsWith("//") && !next.startsWith("/\\") ? next : null;
+      const session = safeNext ? null : await getSession();
+      router.replace(safeNext ?? (session?.user?.role === "ADMIN" ? "/dashboard" : "/account"));
     } catch (error: unknown) {
       console.error(error);
       toast.error("An unexpected error occurred.");
@@ -120,7 +125,7 @@ export const LoginForm = () => {
                     </FormLabel>
                     <Link
                       href="/forgot-password"
-                      className="text-xs text-secondary hover:underline"
+                      className="text-xs text-ink-2 underline decoration-line-2 underline-offset-4 hover:text-ink"
                     >
                       Forgot password?
                     </Link>
@@ -162,7 +167,7 @@ export const LoginForm = () => {
         <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
           <Button
             type="submit"
-            className="w-full bg-secondary hover:bg-secondary hover:opacity-80 text-white py-2 h-11 mt-2"
+            className="w-full bg-ink text-white hover:bg-navy-2 active:scale-[0.98] transition-[background-color,transform] duration-150 h-11 mt-2"
             disabled={form.formState.isSubmitting || !form.formState.isValid}
           >
             {form.formState.isSubmitting ? (
@@ -180,7 +185,7 @@ export const LoginForm = () => {
             Don&apos;t have an account?
             <button
               type="button"
-              className="ml-1 text-secondary hover:underline font-medium"
+              className="ml-1 font-medium text-ink underline decoration-line-2 underline-offset-4 hover:decoration-ink"
             >
               <Link href={"/register"}>Sign up</Link>
             </button>

@@ -1,5 +1,9 @@
 import TrackingResult from "@/components/features/tracking.result";
+import TrackingForm from "@/components/tracking.form";
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
+import { Container } from "@/components/landing/primitives";
+import { COMPANY } from "@/lib/company";
 import { prisma } from "@/constants/config/db";
 import { Metadata } from "next";
 import { currentUser, canAccessShipment } from "@/lib/auth-guards";
@@ -8,7 +12,7 @@ export async function generateMetadata({ params }: { params: Promise<{ trackingI
   const { trackingId } = await params;
   return {
     title: trackingId ? `Track ${trackingId} | Aegis Cargo` : "Tracking Results | Aegis Cargo",
-    description: "Real-time shipment tracking and delivery status updates — Aegis Cargo Global Logistics",
+    description: "Status, route and every logged handover for an Aegis Cargo shipment.",
   };
 }
 
@@ -34,76 +38,48 @@ async function getTrackingData(trackingNumber: string) {
   }
 }
 
-function TrackingError({ trackingNumber, type }: { trackingNumber?: string; type: "not-found" | "error" | "missing" }) {
-  const content = {
-    "not-found": {
-      icon: <svg className="w-16 h-16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>,
-      title: "Shipment Not Found",
-      subtitle: trackingNumber ? `Tracking Number: ${trackingNumber}` : undefined,
-      description: "We couldn't locate a shipment with this tracking number. Please verify and try again.",
-      suggestions: ["Double-check for typos in your tracking number", "Ensure the shipment has been processed (allow 1-2 hours after pickup)", "Try searching with an alternative reference number"],
-    },
-    error: {
-      icon: <svg className="w-16 h-16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>,
-      title: "Unable to Retrieve Data",
-      subtitle: "A temporary error occurred",
-      description: "We're experiencing technical difficulties. Our team has been notified.",
-      suggestions: ["Wait a few moments and refresh the page", "Clear your browser cache and try again", "Contact support if the issue persists"],
-    },
-    missing: {
-      icon: <svg className="w-16 h-16" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>,
-      title: "No Tracking Number Provided",
-      subtitle: "Please enter your tracking information",
-      description: "Enter your AWB or reference number to get started.",
-      suggestions: ["Find your tracking number in your shipping confirmation email", "Check your receipt or shipping label", "Contact the sender for tracking details"],
-    },
-  };
+const ERRORS = {
+  "not-found": {
+    title: "We can't find that shipment",
+    description: "Check the number against your booking confirmation email. Tracking numbers start with LOX- followed by eight letters and digits.",
+  },
+  error: {
+    title: "Tracking is unavailable right now",
+    description: "Something went wrong on our side while looking up this shipment. Please try again in a few minutes.",
+  },
+  missing: {
+    title: "Enter a tracking number",
+    description: "Your tracking number is in your booking confirmation email.",
+  },
+} as const;
 
-  const { icon, title, subtitle, description, suggestions } = content[type];
-
+function TrackingError({ trackingNumber, type }: { trackingNumber?: string; type: keyof typeof ERRORS }) {
+  const { title, description } = ERRORS[type];
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0A1628] via-slate-900 to-[#0A1628]">
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-red-600/5 rounded-full blur-[150px]" />
-        <div className="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] bg-orange-500/5 rounded-full blur-[120px]" />
-      </div>
-      <div className="relative z-10 max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
-        <div className="text-center">
-          <div className="inline-flex items-center justify-center p-4 rounded-2xl bg-slate-800/50 border border-slate-700/50 text-slate-400 mb-8">{icon}</div>
-          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-3">{title}</h1>
-          {subtitle && <p className="text-lg text-slate-400 mb-6 font-mono tracking-wide">{subtitle}</p>}
-          <p className="text-slate-400 max-w-lg mx-auto mb-10 leading-relaxed">{description}</p>
-          <div className="bg-slate-800/30 border border-slate-700/50 rounded-xl p-6 mb-10 text-left max-w-md mx-auto">
-            <h3 className="text-sm font-semibold text-slate-300 uppercase tracking-wider mb-4">Suggestions</h3>
-            <ul className="space-y-3">
-              {suggestions.map((s, i) => (
-                <li key={i} className="flex items-start gap-3 text-sm text-slate-400">
-                  <svg className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
-                  {s}
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/track" className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-gradient-to-r from-emerald-600 to-emerald-700 text-white font-semibold hover:from-emerald-500 hover:to-emerald-600 transition-all shadow-lg shadow-emerald-600/25">
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-              Try Another Number
-            </Link>
-            <Link href="/support" className="inline-flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl bg-slate-800 border border-slate-700 text-white font-semibold hover:bg-slate-700 transition-all">
-              Contact Support
-            </Link>
-          </div>
-          <div className="mt-12 pt-8 border-t border-slate-800/50">
-            <p className="text-sm text-slate-500 mb-2">Need immediate assistance?</p>
-            <div className="flex items-center justify-center gap-6 text-sm">
-              <a href="mailto:admin@aegiscargo.org" className="flex items-center gap-2 text-slate-400 hover:text-white transition-colors">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                admin@aegiscargo.org
-              </a>
-            </div>
+    <div className="bg-canvas pb-20 pt-[calc(var(--header-h)+2.5rem)] sm:pt-[calc(var(--header-h)+4rem)]">
+      <Container className="grid gap-10 lg:grid-cols-12">
+        <div className="lg:col-span-7">
+          {trackingNumber && <p className="figures text-[15px] text-ink-3">{trackingNumber}</p>}
+          <h1 className="type-display mt-2 text-balance text-[2.2rem] font-semibold leading-[1.05] text-ink sm:text-[2.75rem]">{title}</h1>
+          <p className="mt-4 max-w-[52ch] text-[17px] leading-relaxed text-ink-2">{description}</p>
+          <div className="mt-8 max-w-xl rounded-xl border border-line bg-surface p-5 sm:p-6">
+            <TrackingForm help={null} />
           </div>
         </div>
-      </div>
+        <aside className="lg:col-span-4 lg:col-start-9 lg:pt-10">
+          <h2 className="text-[15px] font-semibold text-ink">Still can&apos;t find it?</h2>
+          <p className="mt-2 text-[15px] leading-relaxed text-ink-2">
+            Write to{" "}
+            <a href={`mailto:${COMPANY.email}`} className="font-medium text-ink underline decoration-line-2 underline-offset-4">
+              {COMPANY.email}
+            </a>{" "}
+            with the number and we&apos;ll look it up. We never ask for payment to release a shipment.
+          </p>
+          <Link href="/contact" className="mt-4 inline-block text-[15px] font-medium text-ink underline decoration-line-2 underline-offset-4">
+            Contact us
+          </Link>
+        </aside>
+      </Container>
     </div>
   );
 }
@@ -138,31 +114,17 @@ export default async function TrackingResultsPage({ params }: { params: Promise<
 
   try {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-[#0A1628] via-slate-900 to-[#0A1628]">
-        <div className="fixed inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-emerald-600/8 rounded-full blur-[150px]" />
-          <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-amber-500/8 rounded-full blur-[130px]" />
-          <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: `radial-gradient(circle at 1px 1px, rgba(255,255,255,0.3) 1px, transparent 0)`, backgroundSize: "40px 40px" }} />
-        </div>
-        <div className="relative z-10">
-          <div className="border-b border-slate-800/50 bg-slate-900/50 backdrop-blur-sm">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <Link href="/track" className="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors">
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
-                    Back to Tracking
-                  </Link>
-                  <span className="text-slate-700">|</span>
-                  <span className="text-sm font-mono text-emerald-400">{sanitizedTrackingNumber}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <TrackingResult data={data} detailsHidden={detailsHidden} />
-          </div>
-        </div>
+      <div className="bg-canvas pb-20 pt-[calc(var(--header-h)+1.5rem)] sm:pt-[calc(var(--header-h)+2.5rem)]">
+        <Container>
+          <Link
+            href="/track"
+            className="group mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-ink-2 transition-colors hover:text-ink print:hidden"
+          >
+            <ArrowLeft aria-hidden strokeWidth={1.75} className="size-4 transition-transform duration-200 group-hover:-translate-x-0.5" />
+            Track another shipment
+          </Link>
+          <TrackingResult data={data} detailsHidden={detailsHidden} />
+        </Container>
       </div>
     );
   } catch (error) {

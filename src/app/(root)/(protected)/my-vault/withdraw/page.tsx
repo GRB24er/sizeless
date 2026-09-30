@@ -1,18 +1,19 @@
-// ═══════════════════════════════════════════════════════════════
-// src/app/(root)/(protected)/my-vault/withdraw/page.tsx
-// Client Vault Withdrawal — Server Component
-// ═══════════════════════════════════════════════════════════════
+// Client vault release: choose a deposit in storage, then how it leaves the vault.
 
+import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { auth } from "~/auth";
 import { prisma } from "@/constants/config/db";
 import WithdrawClient from "./WithdrawClient";
+import { AccountShell } from "@/components/account/account-shell";
+
+export const metadata: Metadata = { title: "Request a release | Aegis Cargo" };
 
 export default async function WithdrawPage() {
   const session = await auth();
-  if (!session?.user?.id) redirect("/login");
+  if (!session?.user?.id) redirect("/login?next=/my-vault/withdraw");
 
-  // Fetch user's deposits that are eligible for withdrawal
+  // Only deposits in storage can be released.
   const deposits = await prisma.vaultDeposit.findMany({
     where: {
       clientId: session.user.id,
@@ -33,11 +34,12 @@ export default async function WithdrawPage() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <WithdrawClient
-        deposits={deposits as any}
-        userId={session.user.id}
-      />
-    </div>
+    <AccountShell
+      active="vault"
+      title="Request a release"
+      intro="Collect your metal, sell it through a bullion dealer, or move it to another vault. The fee for each is in the published schedule."
+    >
+      <WithdrawClient deposits={deposits} userId={session.user.id} />
+    </AccountShell>
   );
 }

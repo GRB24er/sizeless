@@ -86,7 +86,6 @@ const VAULT_LOCATION_SUGGESTIONS = [
   "Zurich Vault",
   "Singapore Freeport",
   "Dubai Gold Vault",
-  "New York Federal Reserve",
   "Hong Kong Vault",
 ];
 

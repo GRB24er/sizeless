@@ -4,6 +4,7 @@ import { prisma } from "@/constants/config/db";
 import { auth } from "~/auth";
 import { revalidatePath } from "next/cache";
 import transporter from "@/lib/verify-mail";
+import { ASSET_TYPE_LABELS } from "@/lib/vault/types";
 
 const FROM_EMAIL = "Aegis Cargo Vault <admin@aegiscargo.org>";
 
@@ -34,30 +35,26 @@ async function sendVaultEmail(email: string, name: string, subject: string, body
 
 // ─── USER ACTIONS ───
 
-export async function getUserVaultDeposits() {
-  const session = await auth();
-  if (!session?.user?.id) return [];
-  return prisma.vaultDeposit.findMany({
-    where: { clientId: session.user.id },
-    include: { activities: { orderBy: { createdAt: "desc" }, take: 5 } },
-    orderBy: { createdAt: "desc" },
-  });
-}
-
 export async function requestVaultDeposit(formData: FormData) {
   const session = await auth();
   if (!session?.user?.id) return { error: "Unauthorized" };
 
   const assetType = formData.get("assetType") as string;
-  const description = formData.get("description") as string;
+  const description = ((formData.get("description") as string) || "").trim();
   const weightGrams = parseFloat(formData.get("weightGrams") as string);
-  const purity = formData.get("purity") as string;
+  const purity = ((formData.get("purity") as string) || "").trim() || null;
   const quantity = parseInt(formData.get("quantity") as string) || 1;
   const declaredValue = parseFloat(formData.get("declaredValue") as string);
-  const serialNumbers = formData.get("serialNumbers") as string;
+  const serialNumbers = ((formData.get("serialNumbers") as string) || "").trim();
 
   if (!assetType || !description || !weightGrams || !declaredValue) {
     return { error: "Please fill in all required fields." };
+  }
+  if (!(assetType in ASSET_TYPE_LABELS)) {
+    return { error: "Please choose what you're depositing from the list." };
+  }
+  if (!(weightGrams > 0) || !(declaredValue > 0) || quantity < 1 || quantity > 10000) {
+    return { error: "Weight, quantity and declared value must be positive numbers." };
   }
 
   if (formData.get("feesAccepted") !== "true") {
@@ -72,7 +69,7 @@ export async function requestVaultDeposit(formData: FormData) {
       quantity, declaredValue, serialNumbers: serialNumbers || null,
       client: { connect: { id: session.user.id } },
       activities: {
-        create: { action: "NOTE_ADDED" as any, description: `Deposit request submitted (published fee schedule accepted) for ${quantity}x ${assetType} (${weightGrams}g)`, performedBy: session.user.name },
+        create: { action: "NOTE_ADDED" as any, description: `Deposit request submitted, with the published fee schedule accepted: ${quantity} x ${ASSET_TYPE_LABELS[assetType]} (${weightGrams} g)`, performedBy: session.user.name },
       },
     },
   });
@@ -87,7 +84,7 @@ export async function requestVaultDeposit(formData: FormData) {
       </div>
       <div style="background:#f9fafb;border-radius:8px;padding:20px;margin:24px 0;">
         <table style="width:100%;border-collapse:collapse;">
-          <tr><td style="padding:8px 0;color:#6b7280;font-size:14px;">Asset</td><td style="padding:8px 0;color:#111827;font-size:14px;font-weight:500;text-align:right;">${quantity}x ${assetType}</td></tr>
+          <tr><td style="padding:8px 0;color:#6b7280;font-size:14px;">Asset</td><td style="padding:8px 0;color:#111827;font-size:14px;font-weight:500;text-align:right;">${quantity} x ${ASSET_TYPE_LABELS[assetType]}</td></tr>
           <tr><td style="padding:8px 0;color:#6b7280;font-size:14px;">Weight</td><td style="padding:8px 0;color:#111827;font-size:14px;font-weight:500;text-align:right;">${weightGrams}g</td></tr>
           <tr><td style="padding:8px 0;color:#6b7280;font-size:14px;">Declared Value</td><td style="padding:8px 0;color:#111827;font-size:14px;font-weight:500;text-align:right;">$${declaredValue.toLocaleString()}</td></tr>
           <tr><td style="padding:8px 0;color:#6b7280;font-size:14px;">Status</td><td style="padding:8px 0;color:#D4A853;font-size:14px;font-weight:600;text-align:right;">Pending Verification</td></tr>

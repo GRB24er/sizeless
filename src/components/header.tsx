@@ -1,205 +1,252 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { CSSProperties, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useSession } from "next-auth/react";
-import {
-  Menu, User, Package, LogOut, LayoutDashboard,
-  ChevronDown,
-} from "lucide-react";
+import { useSession, signOut } from "next-auth/react";
+import { Menu, User, Package, LogOut, LayoutDashboard, ChevronDown, LayoutGrid, LockKeyhole } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import {
-  Sheet, SheetContent, SheetTrigger, SheetClose, SheetHeader, SheetTitle,
-} from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetClose, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { signOut } from "next-auth/react";
 import { Logo } from "./logo";
 import { Notifications } from "./features/notification/notification";
 import { ActiveShipment } from "./features/dashboard/shipments/activeShipment";
-import { InstantNavLink } from "./instantLink";
+import { buttonClass } from "./landing/primitives";
 
-const mainNavItems = [
-  { href: "/", label: "Home" },
+const NAV = [
   { href: "/track", label: "Track" },
   { href: "/services", label: "Services" },
   { href: "/vault", label: "Vault" },
   { href: "/support", label: "Support" },
 ];
 
-const authNavItems = {
-  unauthenticated: [{ href: "/login", label: "Login" }],
-  authenticated: [
-    { href: "/profile", label: "Profile", icon: User },
-    { href: "/shipments/history", label: "My Shipments", icon: Package },
-  ],
-};
+// Signed-in clients get their own vault in place of the public vault page.
+const SIGNED_IN_NAV = NAV.map((item) => (item.href === "/vault" ? { href: "/my-vault", label: "My vault" } : item));
+
+const ACCOUNT_LINKS = [
+  { href: "/account", label: "My account", icon: LayoutGrid },
+  { href: "/my-vault", label: "My vault", icon: LockKeyhole },
+  { href: "/shipments/history", label: "My shipments", icon: Package },
+  { href: "/profile", label: "Profile", icon: User },
+];
 
 export const Header = () => {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const sentinel = useRef<HTMLSpanElement>(null);
   const pathname = usePathname();
   const { data: session, status } = useSession();
-  const isAuthenticated = status === "authenticated";
+  const signedIn = status === "authenticated";
+  const isAdmin = session?.user?.role === "ADMIN";
+  const name = session?.user?.name || session?.user?.email || "Account";
 
+  // The border appears once the top of the page has scrolled away.
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    const el = sentinel.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([entry]) => setScrolled(!entry.isIntersecting));
+    io.observe(el);
+    return () => io.disconnect();
   }, []);
 
-  const handleSignOut = async () => { await signOut({ callbackUrl: "/" }); };
+  const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
+  const nav = signedIn ? SIGNED_IN_NAV : NAV;
+  const handleSignOut = () => signOut({ callbackUrl: "/" });
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50">
-
-      {/* Main Navigation */}
-      <nav className={cn(
-        "transition-all duration-300",
-        isScrolled
-          ? "bg-navy/95 backdrop-blur-xl border-b border-white/10 shadow-lg shadow-black/20"
-          : "bg-navy/70 backdrop-blur-md border-b border-white/5"
-      )}>
-        <div className="container mx-auto px-4">
-          <div className="flex h-16 items-center justify-between">
+    <>
+      <span ref={sentinel} aria-hidden className="pointer-events-none absolute left-0 top-0 h-2 w-px" />
+      <header
+        className={cn(
+          "fixed inset-x-0 top-0 z-40 h-[var(--header-h)] border-b bg-canvas/85 backdrop-blur-md backdrop-saturate-150 transition-[border-color,box-shadow] duration-200",
+          scrolled ? "border-line shadow-[0_1px_12px_-6px_rgba(15,29,47,0.18)]" : "border-transparent"
+        )}
+      >
+        <div className="mx-auto flex h-full w-full max-w-7xl items-center justify-between gap-6 px-5 sm:px-8 lg:px-10">
+          <div className="flex items-center gap-8">
             <Logo />
-
-            {/* Desktop Navigation */}
-            <div className="hidden lg:flex items-center gap-1">
-              {mainNavItems.map((item) => {
-                const isActive = pathname === item.href;
-                return (
-                  <InstantNavLink key={item.href} href={item.href} className={cn(
-                    "relative px-4 py-2 text-sm font-medium transition-colors rounded-lg",
-                    isActive ? "text-white" : "text-slate-300 hover:text-white"
-                  )}>
-                    {item.label}
-                    {isActive && <span className="absolute bottom-0 left-4 right-4 h-px bg-gold" />}
-                  </InstantNavLink>
-                );
-              })}
-            </div>
-
-            {/* Desktop Auth */}
-            <div className="hidden lg:flex items-center gap-3">
-              {isAuthenticated ? (
-                <>
-                  <Notifications />
-                  <ActiveShipment />
-                  <InstantNavLink href="/shipments/create" className="px-4 py-2 rounded-lg bg-gold text-ink text-sm font-semibold hover:bg-[#d8b566] transition-colors">
-                    Book a shipment
-                  </InstantNavLink>
-                  <DropdownMenu modal={false}>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="gap-2 text-slate-300 hover:text-white hover:bg-slate-800/50">
-                        <div className="w-8 h-8 rounded-full bg-[#0F1D2F]/50 border border-[#162D4A]/50 flex items-center justify-center">
-                          <User className="w-4 h-4 text-[#8C9EAF]" />
-                        </div>
-                        <span className="max-w-24 truncate text-sm">{session?.user?.name || "Account"}</span>
-                        <ChevronDown className="w-4 h-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-56 bg-[#0F1D2F] border-[#0F1D2F]/50">
-                      <DropdownMenuLabel className="text-slate-300">My Account</DropdownMenuLabel>
-                      <DropdownMenuSeparator className="bg-[#0F1D2F]/30" />
-                      {session?.user?.role === "ADMIN" && (
-                        <DropdownMenuItem asChild>
-                          <InstantNavLink href="/dashboard" className="flex items-center gap-2 text-slate-300 hover:text-white"><LayoutDashboard className="w-4 h-4" />Dashboard</InstantNavLink>
-                        </DropdownMenuItem>
-                      )}
-                      {authNavItems.authenticated.map((item) => {
-                        const Icon = item.icon;
-                        return (
-                          <DropdownMenuItem key={item.href} asChild>
-                            <InstantNavLink href={item.href} className="flex items-center gap-2 text-slate-300 hover:text-white"><Icon className="w-4 h-4" />{item.label}</InstantNavLink>
-                          </DropdownMenuItem>
-                        );
-                      })}
-                      <DropdownMenuSeparator className="bg-[#0F1D2F]/30" />
-                      <DropdownMenuItem onClick={handleSignOut} className="flex items-center gap-2 text-red-400 hover:text-red-300 cursor-pointer">
-                        <LogOut className="w-4 h-4" />Logout
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </>
-              ) : (
-                <div className="flex items-center gap-2">
-                  <InstantNavLink href="/login" className="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white transition-colors">
-                    Sign in
-                  </InstantNavLink>
-                  <InstantNavLink href="/register" className="px-4 py-2 rounded-lg bg-gold text-ink text-sm font-semibold hover:bg-[#d8b566] transition-colors">
-                    Open an account
-                  </InstantNavLink>
-                </div>
-              )}
-            </div>
-
-            {/* Mobile Menu */}
-            <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="lg:hidden text-slate-300 hover:text-white hover:bg-slate-800/50"><Menu className="w-5 h-5" /></Button>
-              </SheetTrigger>
-              <SheetContent side="right" className="w-full max-w-sm bg-[#0F1D2F] border-[#0F1D2F]/30 p-0">
-                <div className="flex flex-col h-full">
-                  <div className="flex items-center justify-between p-4 border-b border-[#0F1D2F]/30">
-                    <SheetHeader><SheetTitle><Logo /></SheetTitle></SheetHeader>
-                  </div>
-                  <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-                    {mainNavItems.map((item) => {
-                      const isActive = pathname === item.href;
-                      return (
-                        <SheetClose key={item.href} asChild>
-                          <InstantNavLink href={item.href} className={cn(
-                            "flex items-center px-4 py-3 rounded-lg text-sm font-medium transition-colors",
-                            isActive ? "bg-[#1E3A5F]/10 text-[#8C9EAF] border border-[#1E3A5F]/20" : "text-slate-300 hover:bg-slate-800/50 hover:text-white"
-                          )}>
-                            {item.label}
-                          </InstantNavLink>
-                        </SheetClose>
-                      );
-                    })}
-                    <div className="my-4 h-px bg-[#0F1D2F]/30" />
-                    {isAuthenticated ? (
-                      <>
-                        <div className="px-4 py-2 mb-4">
-                          <p className="text-xs text-slate-500">Signed in as</p>
-                          <p className="text-sm font-medium text-white truncate">{session?.user?.email || session?.user?.name}</p>
-                        </div>
-                        <div className="space-y-2 px-4 mb-4">
-                          <ActiveShipment />
-                          <SheetClose asChild>
-                            <InstantNavLink href="/shipments/create" className="flex items-center justify-center w-full px-4 py-3 rounded-lg bg-gold text-ink text-sm font-semibold">Book a shipment</InstantNavLink>
-                          </SheetClose>
-                        </div>
-                        {session?.user?.role === "ADMIN" && (
-                          <SheetClose asChild><InstantNavLink href="/dashboard" className="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800/50"><LayoutDashboard className="w-4 h-4" />Dashboard</InstantNavLink></SheetClose>
+            <nav aria-label="Main" className="hidden lg:block">
+              <ul className="flex items-center">
+                {nav.map((item) => {
+                  const active = isActive(item.href);
+                  return (
+                    <li key={item.href}>
+                      <Link
+                        href={item.href}
+                        aria-current={active ? "page" : undefined}
+                        className={cn(
+                          "relative inline-flex h-[var(--header-h)] items-center px-3 text-[15px] font-medium transition-colors duration-150 focus-visible:outline-2 focus-visible:-outline-offset-8 focus-visible:outline-signal",
+                          active ? "text-ink" : "text-ink-2 hover:text-ink"
                         )}
-                        {authNavItems.authenticated.map((item) => {
-                          const Icon = item.icon;
-                          return (<SheetClose key={item.href} asChild><InstantNavLink href={item.href} className="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800/50"><Icon className="w-4 h-4" />{item.label}</InstantNavLink></SheetClose>);
-                        })}
-                        <button onClick={handleSignOut} className="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors"><LogOut className="w-4 h-4" />Logout</button>
-                      </>
-                    ) : (
-                      <div className="space-y-2">
-                        <SheetClose asChild>
-                          <InstantNavLink href="/register" className="flex items-center justify-center w-full px-4 py-3 rounded-lg bg-gold text-ink text-sm font-semibold">Open an account</InstantNavLink>
-                        </SheetClose>
-                        <SheetClose asChild>
-                          <InstantNavLink href="/login" className="flex items-center justify-center w-full px-4 py-3 rounded-lg border border-white/15 text-white text-sm font-medium">Sign in</InstantNavLink>
-                        </SheetClose>
-                      </div>
-                    )}
-                  </nav>
-                </div>
-              </SheetContent>
-            </Sheet>
+                      >
+                        {item.label}
+                        {active && <span aria-hidden className="absolute inset-x-3 bottom-0 h-0.5 bg-signal" />}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </nav>
           </div>
+
+          <div className="hidden items-center gap-2 lg:flex">
+            {signedIn ? (
+              <>
+                <Notifications />
+                <ActiveShipment />
+                <Link href="/shipments/create" className={buttonClass("dark", "sm", "ml-1")}>
+                  Book a shipment
+                </Link>
+                <DropdownMenu modal={false}>
+                  <DropdownMenuTrigger className="group ml-1 inline-flex h-9 items-center gap-2 rounded-md pl-1 pr-2 text-sm font-medium text-ink transition-colors hover:bg-tint focus-visible:outline-2 focus-visible:outline-signal">
+                    <span className="grid size-7 place-items-center rounded-full bg-navy text-[12px] font-semibold uppercase text-white">
+                      {name.charAt(0)}
+                    </span>
+                    <span className="max-w-28 truncate">{name}</span>
+                    <ChevronDown aria-hidden strokeWidth={1.75} className="size-4 text-ink-3 transition-transform duration-200 group-data-[state=open]:rotate-180" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" sideOffset={8} className="w-56 rounded-lg border-line bg-surface p-1 shadow-[0_16px_40px_-16px_rgba(15,29,47,0.35)]">
+                    <DropdownMenuLabel className="px-2 py-1.5 text-[13px] font-normal text-ink-3">
+                      Signed in as
+                      <span className="block truncate font-medium text-ink">{session?.user?.email || name}</span>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator className="bg-line" />
+                    {isAdmin && (
+                      <DropdownMenuItem asChild>
+                        <Link href="/dashboard" className="gap-2 text-ink">
+                          <LayoutDashboard strokeWidth={1.75} /> Dashboard
+                        </Link>
+                      </DropdownMenuItem>
+                    )}
+                    {ACCOUNT_LINKS.map(({ href, label, icon: Icon }) => (
+                      <DropdownMenuItem key={href} asChild>
+                        <Link href={href} className="gap-2 text-ink">
+                          <Icon strokeWidth={1.75} /> {label}
+                        </Link>
+                      </DropdownMenuItem>
+                    ))}
+                    <DropdownMenuSeparator className="bg-line" />
+                    <DropdownMenuItem onClick={handleSignOut} className="gap-2 text-[#B42318] focus:text-[#B42318]">
+                      <LogOut strokeWidth={1.75} className="text-[#B42318]" /> Sign out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="inline-flex h-9 items-center rounded-md px-3 text-[15px] font-medium text-ink-2 transition-colors hover:text-ink focus-visible:outline-2 focus-visible:outline-signal"
+                >
+                  Sign in
+                </Link>
+                <Link href="/register" className={buttonClass("dark", "sm")}>
+                  Open an account
+                </Link>
+              </>
+            )}
+          </div>
+
+          <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+            <SheetTrigger
+              aria-label="Open menu"
+              className="-mr-2 inline-flex size-11 items-center justify-center rounded-md text-ink transition-colors hover:bg-tint focus-visible:outline-2 focus-visible:outline-signal lg:hidden"
+            >
+              <Menu strokeWidth={1.75} className="size-6" />
+            </SheetTrigger>
+            <SheetContent side="right" aria-describedby={undefined} className="w-full gap-0 border-line bg-canvas p-0 sm:max-w-sm">
+              <SheetHeader className="h-[var(--header-h)] justify-center border-b border-line px-5">
+                <SheetTitle asChild>
+                  <div>
+                    <SheetClose asChild>
+                      <Logo />
+                    </SheetClose>
+                  </div>
+                </SheetTitle>
+              </SheetHeader>
+
+              <nav aria-label="Main" className="flex-1 overflow-y-auto px-5 pb-8 pt-2">
+                <ul>
+                  {[{ href: "/", label: "Home" }, ...nav, { href: "/contact", label: "Contact" }].map((item, i) => {
+                    const active = item.href === "/" ? pathname === "/" : isActive(item.href);
+                    return (
+                      <li key={item.href} className="animate-rise border-b border-line" style={{ "--delay": `${i * 40}ms` } as CSSProperties}>
+                        <SheetClose asChild>
+                          <Link
+                            href={item.href}
+                            aria-current={active ? "page" : undefined}
+                            className={cn("flex items-center justify-between py-4 text-xl font-medium", active ? "text-ink" : "text-ink-2")}
+                          >
+                            {item.label}
+                            {active && <span aria-hidden className="size-2 rounded-full bg-signal" />}
+                          </Link>
+                        </SheetClose>
+                      </li>
+                    );
+                  })}
+                </ul>
+
+                {signedIn ? (
+                  <div className="mt-8 space-y-4">
+                    <p className="text-[13px] text-ink-3">
+                      Signed in as <span className="block truncate text-[15px] font-medium text-ink">{session?.user?.email || name}</span>
+                    </p>
+                    <SheetClose asChild>
+                      <Link href="/shipments/create" className={buttonClass("dark", "md", "w-full")}>
+                        Book a shipment
+                      </Link>
+                    </SheetClose>
+                    <div className="flex">
+                      <ActiveShipment />
+                    </div>
+                    <ul className="space-y-1">
+                      {isAdmin && (
+                        <li>
+                          <SheetClose asChild>
+                            <Link href="/dashboard" className="flex items-center gap-3 rounded-md py-2.5 text-[15px] text-ink">
+                              <LayoutDashboard strokeWidth={1.75} className="size-4 text-ink-3" /> Dashboard
+                            </Link>
+                          </SheetClose>
+                        </li>
+                      )}
+                      {ACCOUNT_LINKS.map(({ href, label, icon: Icon }) => (
+                        <li key={href}>
+                          <SheetClose asChild>
+                            <Link href={href} className="flex items-center gap-3 rounded-md py-2.5 text-[15px] text-ink">
+                              <Icon strokeWidth={1.75} className="size-4 text-ink-3" /> {label}
+                            </Link>
+                          </SheetClose>
+                        </li>
+                      ))}
+                      <li>
+                        <button onClick={handleSignOut} className="flex w-full items-center gap-3 rounded-md py-2.5 text-[15px] text-[#B42318]">
+                          <LogOut strokeWidth={1.75} className="size-4" /> Sign out
+                        </button>
+                      </li>
+                    </ul>
+                  </div>
+                ) : (
+                  <div className="mt-8 grid gap-3">
+                    <SheetClose asChild>
+                      <Link href="/register" className={buttonClass("dark", "md", "w-full")}>
+                        Open an account
+                      </Link>
+                    </SheetClose>
+                    <SheetClose asChild>
+                      <Link href="/login" className={buttonClass("outline", "md", "w-full")}>
+                        Sign in
+                      </Link>
+                    </SheetClose>
+                  </div>
+                )}
+              </nav>
+            </SheetContent>
+          </Sheet>
         </div>
-      </nav>
-    </header>
+      </header>
+    </>
   );
 };

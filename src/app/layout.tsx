@@ -1,19 +1,24 @@
 import type { Metadata } from "next";
-import { Inter, Fraunces } from "next/font/google";
+import { Inter, Mona_Sans, IBM_Plex_Mono } from "next/font/google";
 import { SessionProvider } from "next-auth/react";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
-const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
-const fraunces = Fraunces({ variable: "--font-fraunces", subsets: ["latin"], weight: ["400", "500", "600"] });
+const mona = Mona_Sans({ variable: "--font-mona", subsets: ["latin"], axes: ["wdth"] });
+const plexMono = IBM_Plex_Mono({ variable: "--font-plex-mono", subsets: ["latin"], weight: ["400", "500"] });
+// The admin dashboard keeps Inter; only loaded on pages that use it.
+const inter = Inter({ variable: "--font-inter", subsets: ["latin"], preload: false });
+
+const description =
+  "Secure shipping and precious-metals vault custody. Every charge is itemized from a published rate card and fixed when you book.";
 
 export const metadata: Metadata = {
-  title: "Aegis Cargo — Global Shipping & Vault Services",
-  description: "Enterprise-grade logistics, worldwide shipping, real-time tracking, and secure gold vault storage. Itemized pricing agreed before you book.",
+  title: "Aegis Cargo | Secure Shipping & Vault Services",
+  description,
   icons: { icon: "/favicon.ico" },
   openGraph: {
-    title: "Aegis Cargo — Global Shipping & Vault Services",
-    description: "Enterprise-grade logistics, worldwide shipping, real-time tracking, and secure gold vault storage.",
+    title: "Aegis Cargo | Secure Shipping & Vault Services",
+    description,
     url: "https://www.aegiscargo.org",
     siteName: "Aegis Cargo",
     type: "website",
@@ -23,7 +28,8 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body className={`${inter.className} ${fraunces.variable} antialiased`}>
+      <body className={`${mona.variable} ${plexMono.variable} ${inter.variable} font-sans antialiased`}>
+        <noscript dangerouslySetInnerHTML={{ __html: "<style>[data-reveal]{opacity:1!important;transform:none!important}</style>" }} />
         <SessionProvider refetchInterval={60 * 60} refetchOnWindowFocus={false}>
           <main>{children}</main>
           <Toaster />

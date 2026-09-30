@@ -214,7 +214,6 @@ export function VaultTransferDialog({
             <option value="Zurich Vault">Zurich Vault</option>
             <option value="Singapore Freeport">Singapore Freeport</option>
             <option value="Dubai Gold Vault">Dubai Gold Vault</option>
-            <option value="New York Federal Reserve">New York Federal Reserve</option>
             <option value="Hong Kong Vault">Hong Kong Vault</option>
           </select>
         </div>

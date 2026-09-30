@@ -1,0 +1,362 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - main [ref=e3]:
+      - navigation [ref=e5]:
+        - generic [ref=e7]:
+          - link [ref=e9] [cursor=pointer]:
+            - /url: /
+            - img "Aegis Cargo" [ref=e10]
+          - generic [ref=e11]:
+            - link "Home" [ref=e12] [cursor=pointer]:
+              - /url: /
+            - link "Track" [ref=e14] [cursor=pointer]:
+              - /url: /track
+            - link "Services" [ref=e15] [cursor=pointer]:
+              - /url: /services
+            - link "Vault" [ref=e16] [cursor=pointer]:
+              - /url: /vault
+            - link "Support" [ref=e17] [cursor=pointer]:
+              - /url: /support
+          - generic [ref=e19]:
+            - link "Sign in" [ref=e20] [cursor=pointer]:
+              - /url: /login
+            - link "Open an account" [ref=e21] [cursor=pointer]:
+              - /url: /register
+      - generic [ref=e22]:
+        - generic [ref=e26]:
+          - generic [ref=e27]:
+            - paragraph [ref=e28]: Secure shipping · Precious-metals custody
+            - heading [level=1] [ref=e30]:
+              - text: Secure shipping and custody,
+              - emphasis [ref=e31]: priced before you commit.
+            - paragraph [ref=e32]: Insured transport for gold, documents and high-value goods, with vault storage alongside. Every charge is itemized before you book, and every handover is logged.
+            - generic [ref=e33]:
+              - paragraph [ref=e34]: Track a shipment
+              - generic [ref=e35]:
+                - generic [ref=e36]: Tracking number
+                - generic [ref=e37]:
+                  - textbox "Tracking number" [ref=e41]:
+                    - /placeholder: e.g. LOX-7K2M9QXA
+                  - button "Track" [ref=e42]
+            - generic [ref=e45]:
+              - link "Get an itemized price" [ref=e46] [cursor=pointer]:
+                - /url: /shipments/create
+              - link "Vault services" [ref=e49] [cursor=pointer]:
+                - /url: /vault
+          - generic [ref=e53]:
+            - generic [ref=e54]:
+              - generic [ref=e55]:
+                - paragraph [ref=e56]: Example quote
+                - paragraph [ref=e57]: Secure Freight
+                - paragraph [ref=e58]: 2 kg in 2 packages · $150,000 declared · insured · 5–8 business days
+              - generic [ref=e59]:
+                - generic [ref=e60]:
+                  - paragraph [ref=e61]: Freight & Handling
+                  - generic [ref=e62]:
+                    - generic [ref=e63]:
+                      - term [ref=e64]: Base freight
+                      - definition [ref=e65]: $750
+                    - generic [ref=e66]:
+                      - term [ref=e67]: Weight surcharge (2 kg)
+                      - definition [ref=e68]: $110
+                    - generic [ref=e69]:
+                      - term [ref=e70]: Armed security escort
+                      - definition [ref=e71]: $250
+                    - generic [ref=e72]:
+                      - term [ref=e73]: Vault handling
+                      - definition [ref=e74]: $175
+                    - generic [ref=e75]:
+                      - term [ref=e76]: Tamper-evident seals (×2)
+                      - definition [ref=e77]: $90
+                - generic [ref=e78]:
+                  - paragraph [ref=e79]: Customs & Compliance
+                  - generic [ref=e80]:
+                    - generic [ref=e81]:
+                      - term [ref=e82]: Export permit
+                      - definition [ref=e83]: $125
+                    - generic [ref=e84]:
+                      - term [ref=e85]: Customs brokerage
+                      - definition [ref=e86]: $275
+                    - generic [ref=e87]:
+                      - term [ref=e88]: Import duty (5% of declared value)
+                      - definition [ref=e89]: $7,500
+                - generic [ref=e90]:
+                  - paragraph [ref=e91]: Insurance
+                  - generic [ref=e93]:
+                    - term [ref=e94]: Full-value cover (1.25% of declared value)
+                    - definition [ref=e95]: $1,875
+              - generic [ref=e96]:
+                - generic [ref=e97]:
+                  - paragraph [ref=e98]: Total · fixed at booking
+                  - paragraph [ref=e99]: $11,150
+                - paragraph [ref=e100]: Calculated from our published rate card
+            - img "Price fixed at booking" [ref=e101]:
+              - generic [ref=e104]: PRICE FIXED AT BOOKING · NO CHARGES ADDED ·
+        - generic [ref=e108]:
+          - generic [ref=e109]:
+            - paragraph [ref=e110]: Our commitments
+            - heading [level=2] [ref=e112]:
+              - text: Four promises,
+              - emphasis [ref=e113]: built into the software
+              - text: — not just the brochure.
+          - generic [ref=e114]:
+            - generic [ref=e115]:
+              - paragraph [ref=e116]: I
+              - heading "Fixed at booking" [level=3] [ref=e117]
+              - paragraph [ref=e118]: Your total comes from our published rate card and is locked when you book. We never add hold, release or clearance fees.
+            - generic [ref=e119]:
+              - paragraph [ref=e120]: II
+              - heading "Every handover logged" [level=3] [ref=e121]
+              - paragraph [ref=e122]: Pickups, departures and arrivals are recorded with time and location, and each update is emailed to you.
+            - generic [ref=e123]:
+              - paragraph [ref=e124]: III
+              - heading "Your details stay private" [level=3] [ref=e125]
+              - paragraph [ref=e126]: A tracking number shows status and route only. Addresses, contacts and declared values are shown to you alone.
+            - generic [ref=e127]:
+              - paragraph [ref=e128]: IV
+              - heading "Vault fees on the table" [level=3] [ref=e129]
+              - paragraph [ref=e130]: Storage, intake, assay, insurance and release fees are listed on the deposit form before you submit.
+        - generic [ref=e132]:
+          - generic [ref=e133]:
+            - generic [ref=e134]:
+              - paragraph [ref=e135]: Secure transport
+              - heading "Four levels of security, one transparent rate card." [level=2] [ref=e137]
+              - paragraph [ref=e138]: These are the same rates the booking page uses to price your shipment. Choose the level your consignment needs.
+            - link "Full rate card" [ref=e139] [cursor=pointer]:
+              - /url: /services
+          - generic [ref=e143]:
+            - article [ref=e144]:
+              - paragraph [ref=e146]: Maximum security
+              - heading "Armored Express Courier" [level=3] [ref=e152]
+              - paragraph [ref=e153]: 3–5 business days
+              - paragraph [ref=e154]: Armed escort, armored vehicle, dedicated vault-to-vault transfer. Chain-of-custody logged at every handover.
+              - generic [ref=e155]:
+                - generic [ref=e156]:
+                  - term [ref=e157]: Base freight
+                  - definition [ref=e158]: $1,250
+                - generic [ref=e159]:
+                  - term [ref=e160]: Per kilogram
+                  - definition [ref=e161]: $85
+                - generic [ref=e162]:
+                  - term [ref=e163]: Insurance (optional)
+                  - definition [ref=e164]: 1.5%
+              - link "Price a shipment" [ref=e165] [cursor=pointer]:
+                - /url: /shipments/create
+            - article [ref=e168]:
+              - paragraph [ref=e170]: High security
+              - heading "Secure Freight" [level=3] [ref=e176]
+              - paragraph [ref=e177]: 5–8 business days
+              - paragraph [ref=e178]: Sealed tamper-evident containers, bonded warehouse transfers, armed checkpoint inspections. Tracking updated at every handover.
+              - generic [ref=e179]:
+                - generic [ref=e180]:
+                  - term [ref=e181]: Base freight
+                  - definition [ref=e182]: $750
+                - generic [ref=e183]:
+                  - term [ref=e184]: Per kilogram
+                  - definition [ref=e185]: $55
+                - generic [ref=e186]:
+                  - term [ref=e187]: Insurance (optional)
+                  - definition [ref=e188]: 1.25%
+              - link "Price a shipment" [ref=e189] [cursor=pointer]:
+                - /url: /shipments/create
+            - article [ref=e192]:
+              - paragraph [ref=e194]: Standard security
+              - heading "Standard Secure Delivery" [level=3] [ref=e200]
+              - paragraph [ref=e201]: 8–14 business days
+              - paragraph [ref=e202]: Standard freight with sealed packaging, customs brokerage included, and optional insurance. Suitable for lower-value consignments and refined metals.
+              - generic [ref=e203]:
+                - generic [ref=e204]:
+                  - term [ref=e205]: Base freight
+                  - definition [ref=e206]: $350
+                - generic [ref=e207]:
+                  - term [ref=e208]: Per kilogram
+                  - definition [ref=e209]: $32
+                - generic [ref=e210]:
+                  - term [ref=e211]: Insurance (optional)
+                  - definition [ref=e212]: 1%
+              - link "Price a shipment" [ref=e213] [cursor=pointer]:
+                - /url: /shipments/create
+            - article [ref=e216]:
+              - paragraph [ref=e218]: Basic security
+              - heading "Economy Secure" [level=3] [ref=e224]
+              - paragraph [ref=e225]: 14–21 business days
+              - paragraph [ref=e226]: Cost-effective consolidated secure freight. Shared armored transport with verified co-shippers. Best for non-urgent bulk transfers.
+              - generic [ref=e227]:
+                - generic [ref=e228]:
+                  - term [ref=e229]: Base freight
+                  - definition [ref=e230]: $185
+                - generic [ref=e231]:
+                  - term [ref=e232]: Per kilogram
+                  - definition [ref=e233]: $18
+                - generic [ref=e234]:
+                  - term [ref=e235]: Insurance (optional)
+                  - definition [ref=e236]: 0.85%
+              - link "Price a shipment" [ref=e237] [cursor=pointer]:
+                - /url: /shipments/create
+          - paragraph [ref=e240]: Every quote also itemizes vault handling ($175), tamper-evident seals ($45 per package), export permit ($125), customs brokerage ($275) and estimated import duty (5% of declared value).
+        - generic [ref=e242]:
+          - generic [ref=e243]:
+            - paragraph [ref=e244]: How it works
+            - heading "From quote to delivery, with nothing added along the way." [level=2] [ref=e246]
+          - list [ref=e247]:
+            - listitem [ref=e248]:
+              - paragraph [ref=e250]: "01"
+              - heading "Quote" [level=3] [ref=e251]
+              - paragraph [ref=e252]: Enter your packages and route. The price is built line by line from the rate card as you type.
+            - listitem [ref=e253]:
+              - paragraph [ref=e255]: "02"
+              - heading "Accept & book" [level=3] [ref=e256]
+              - paragraph [ref=e257]: Review the itemized total and accept it. That total is fixed, stored with your shipment and emailed to you.
+            - listitem [ref=e258]:
+              - paragraph [ref=e260]: "03"
+              - heading "Handover log" [level=3] [ref=e261]
+              - paragraph [ref=e262]: Each pickup, departure and arrival is logged with time and location on your tracking page.
+            - listitem [ref=e263]:
+              - paragraph [ref=e264]: "04"
+              - heading "Delivered" [level=3] [ref=e265]
+              - paragraph [ref=e266]: Delivery is recorded and your receipt shows exactly what you agreed to pay — nothing more.
+        - generic [ref=e268]:
+          - img "Gold bars and coins" [ref=e272]
+          - generic [ref=e274]:
+            - generic [ref=e275]:
+              - paragraph [ref=e276]: Vault custody
+              - heading [level=2] [ref=e278]:
+                - text: Precious-metals storage,
+                - emphasis [ref=e279]: with the fees on the table.
+              - paragraph [ref=e280]: Open an account, pass identity checks, and submit a deposit request with the full fee schedule in front of you. Each deposit is weighed, assayed and recorded at intake.
+            - generic [ref=e281]:
+              - generic [ref=e282]:
+                - generic [ref=e283]:
+                  - paragraph [ref=e284]: Allocated Storage
+                  - paragraph [ref=e285]: Specific bars assigned to you, serials recorded
+                - paragraph [ref=e286]:
+                  - text: $3.50
+                  - generic [ref=e287]: per kg / month
+              - generic [ref=e288]:
+                - generic [ref=e289]:
+                  - paragraph [ref=e290]: Segregated Storage
+                  - paragraph [ref=e291]: Held apart from other clients' metal
+                - paragraph [ref=e292]:
+                  - text: $2.75
+                  - generic [ref=e293]: per kg / month
+              - generic [ref=e294]:
+                - generic [ref=e295]:
+                  - paragraph [ref=e296]: Unallocated Storage
+                  - paragraph [ref=e297]: A claim on pooled metal, lowest cost
+                - paragraph [ref=e298]:
+                  - text: $1.25
+                  - generic [ref=e299]: per kg / month
+            - paragraph [ref=e300]: Minimum $25 per month per deposit.
+            - list [ref=e301]:
+              - listitem [ref=e302]: Identity and source-of-funds checks
+              - listitem [ref=e305]: Weight, purity and serials recorded
+              - listitem [ref=e308]: Optional insurance, named insurer
+              - listitem [ref=e311]: Holdings visible in your account
+            - link "Explore vault services" [ref=e314] [cursor=pointer]:
+              - /url: /vault
+        - generic [ref=e318]:
+          - generic [ref=e319]:
+            - generic [ref=e320]:
+              - paragraph [ref=e321]: Questions
+              - heading "Straight answers about price and privacy." [level=2] [ref=e323]
+            - paragraph [ref=e324]:
+              - text: Something else?
+              - link "Contact us" [ref=e325] [cursor=pointer]:
+                - /url: /contact
+              - text: .
+          - generic [ref=e327]:
+            - heading [level=3] [ref=e329]:
+              - button "Can the price change after I book?" [ref=e330]
+            - heading [level=3] [ref=e332]:
+              - button "What's included in the quote?" [ref=e333]
+            - heading [level=3] [ref=e335]:
+              - button "How is import duty handled?" [ref=e336]
+            - heading [level=3] [ref=e338]:
+              - button "Who can see my shipment details?" [ref=e339]
+            - heading [level=3] [ref=e341]:
+              - button "What if someone asks me to pay to release a shipment?" [ref=e342]
+            - heading [level=3] [ref=e344]:
+              - button "How do vault fees work?" [ref=e345]
+        - generic [ref=e350]:
+          - heading [level=2] [ref=e351]:
+            - text: Know the full price
+            - emphasis [ref=e352]: before you commit.
+          - paragraph [ref=e353]: Build an itemized quote in your account. Nothing is booked until you accept the total.
+          - generic [ref=e354]:
+            - link "Get an itemized price" [ref=e355] [cursor=pointer]:
+              - /url: /shipments/create
+            - link "Talk to us" [ref=e358] [cursor=pointer]:
+              - /url: /contact
+      - generic [ref=e361]:
+        - generic [ref=e362]:
+          - generic [ref=e363]:
+            - link [ref=e364] [cursor=pointer]:
+              - /url: /
+              - img "Aegis Cargo" [ref=e365]
+            - paragraph [ref=e366]:
+              - text: Secure shipping and custody,
+              - emphasis [ref=e367]: priced before you commit.
+            - generic [ref=e368]:
+              - paragraph [ref=e369]:
+                - generic [ref=e373]:
+                  - generic [ref=e374]: Unit 6a Pompey Centre
+                  - generic [ref=e375]: Fratton Way
+                  - generic [ref=e376]: Southsea, PO4 8ER
+              - paragraph [ref=e377]:
+                - link "+447361617512" [ref=e380] [cursor=pointer]:
+                  - /url: tel:+447361617512
+              - paragraph [ref=e381]:
+                - link "admin@aegiscargo.org" [ref=e385] [cursor=pointer]:
+                  - /url: mailto:admin@aegiscargo.org
+          - generic [ref=e386]:
+            - generic [ref=e387]:
+              - heading "Shipping" [level=3] [ref=e388]
+              - list [ref=e389]:
+                - listitem [ref=e390]:
+                  - link "Armored Express Courier" [ref=e391] [cursor=pointer]:
+                    - /url: /services
+                - listitem [ref=e392]:
+                  - link "Secure Freight" [ref=e393] [cursor=pointer]:
+                    - /url: /services
+                - listitem [ref=e394]:
+                  - link "Standard Secure Delivery" [ref=e395] [cursor=pointer]:
+                    - /url: /services
+                - listitem [ref=e396]:
+                  - link "Economy Secure" [ref=e397] [cursor=pointer]:
+                    - /url: /services
+                - listitem [ref=e398]:
+                  - link "Track a shipment" [ref=e399] [cursor=pointer]:
+                    - /url: /track
+            - generic [ref=e400]:
+              - heading "Vault" [level=3] [ref=e401]
+              - list [ref=e402]:
+                - listitem [ref=e403]:
+                  - link "Vault services" [ref=e404] [cursor=pointer]:
+                    - /url: /vault
+                - listitem [ref=e405]:
+                  - link "Fee schedule" [ref=e406] [cursor=pointer]:
+                    - /url: /vault#fees
+                - listitem [ref=e407]:
+                  - link "Open an account" [ref=e408] [cursor=pointer]:
+                    - /url: /register
+            - generic [ref=e409]:
+              - heading "Company" [level=3] [ref=e410]
+              - list [ref=e411]:
+                - listitem [ref=e412]:
+                  - link "Support" [ref=e413] [cursor=pointer]:
+                    - /url: /support
+                - listitem [ref=e414]:
+                  - link "Contact" [ref=e415] [cursor=pointer]:
+                    - /url: /contact
+                - listitem [ref=e416]:
+                  - link "Terms of Service" [ref=e417] [cursor=pointer]:
+                    - /url: /terms
+                - listitem [ref=e418]:
+                  - link "Privacy Policy" [ref=e419] [cursor=pointer]:
+                    - /url: /privacy
+        - generic [ref=e420]:
+          - paragraph [ref=e421]: © 2026 Aegis Cargo. All rights reserved.
+          - paragraph [ref=e422]: We never ask for release or clearance fees after booking.
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e428] [cursor=pointer]
+  - alert [ref=e432]

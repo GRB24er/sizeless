@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { LegalDocument } from "@/components/landing/legal-document";
 
 export const metadata: Metadata = {
   title: "Privacy Policy | Aegis Cargo",
@@ -71,51 +72,10 @@ const sections = [
 
 export default function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0A1628] via-[#0F1D2F] to-[#0A1628]">
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 right-1/4 w-[600px] h-[600px] bg-[#1E3A5F]/8 rounded-full blur-[150px]" />
-        <div
-          className="absolute inset-0 opacity-[0.02]"
-          style={{
-            backgroundImage: `radial-gradient(circle at 1px 1px, rgba(140,158,175,0.4) 1px, transparent 0)`,
-            backgroundSize: "48px 48px",
-          }}
-        />
-      </div>
-
-      <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8 pt-32 pb-20">
-        {/* Header */}
-        <div className="text-center mb-16">
-          <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1E3A5F]/20 border border-[#1E3A5F]/30 mb-6">
-            <span className="text-sm font-medium text-[#B3C7DB]">Legal</span>
-          </span>
-          <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4">
-            Privacy Policy
-          </h1>
-          <p className="text-slate-400 max-w-2xl mx-auto">
-            Your privacy is important to us. This policy explains how Aegis
-            Cargo handles your personal data. Last updated: March 2026.
-          </p>
-        </div>
-
-        {/* Content */}
-        <div className="max-w-3xl mx-auto">
-          <div className="bg-slate-900/60 backdrop-blur-sm rounded-2xl border border-slate-700/50 p-8 sm:p-12">
-            <div className="space-y-10">
-              {sections.map((section) => (
-                <div key={section.title}>
-                  <h2 className="text-xl font-semibold text-white mb-3">
-                    {section.title}
-                  </h2>
-                  <p className="text-slate-400 leading-relaxed text-sm">
-                    {section.content}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    <LegalDocument
+      title="Privacy Policy"
+      intro="Your privacy is important to us. This policy explains how Aegis Cargo handles your personal data. Last updated: March 2026."
+      sections={sections}
+    />
   );
 }

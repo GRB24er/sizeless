@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { Check, Lock } from "lucide-react";
 import TrackingForm from "@/components/tracking.form";
 import { PageHero } from "@/components/landing/page-hero";
 import { Container, SectionHeading } from "@/components/landing/primitives";
-import { Faq, FaqItem } from "@/components/landing/faq";
-import { COMPANY } from "@/lib/company";
+import { Reveal } from "@/components/landing/reveal";
+import { HomeFaq } from "@/components/landing/home";
+import { TRACKING_FAQ } from "@/components/landing/faqs";
 
 export const metadata: Metadata = {
   title: "Track a Shipment | Aegis Cargo",
@@ -15,127 +15,96 @@ export const metadata: Metadata = {
 const PUBLIC_VIEW = ["Current status and estimated delivery", "Every logged handover, with time and location", "Origin and destination city and country", "Service level and package count"];
 const SENDER_VIEW = ["Street addresses for both ends", "Sender and recipient contact details", "Declared values", "Air waybill download"];
 
-// Illustrative record — shows the layout of a tracking page, not a real shipment.
+// Illustrative record: shows the layout of a tracking page, not a real shipment.
 const EXAMPLE_EVENTS = [
   { status: "Arrived at facility", place: "Destination vault, Zurich", time: "Thu 14:20" },
   { status: "Departed facility", place: "Origin hub, London", time: "Wed 09:05" },
   { status: "Picked up", place: "Sender premises, London", time: "Tue 16:40" },
-  { status: "Booked · price fixed", place: "Online booking", time: "Tue 10:12" },
+  { status: "Booked, price fixed", place: "Online booking", time: "Tue 10:12" },
 ];
 
-const TRACKING_FAQ: FaqItem[] = [
-  {
-    q: "Where do I find my tracking number?",
-    a: (
-      <>
-        It&apos;s in your booking confirmation email and in{" "}
-        <Link href="/shipments/history" className="font-medium text-navy underline underline-offset-4">My Shipments</Link>. Tracking numbers start with LOX-.
-      </>
-    ),
-  },
-  {
-    q: "Why can't I see addresses or the declared value?",
-    a: "To protect the sender and recipient, those details are only shown to the account that booked the shipment. Sign in with that account to see them.",
-  },
-  {
-    q: "How often is tracking updated?",
-    a: "A new entry is logged each time the shipment is picked up, departs or arrives at a facility. The sender and recipient receive an email with each update.",
-  },
-  {
-    q: "My shipment shows “On hold”. Do I need to pay anything?",
-    a: (
-      <>
-        No. Holds happen for operational reasons, such as a documentation or address check. We never ask for a payment to release a shipment — the price was fixed at booking. If anyone asks you to pay, don&apos;t, and write to{" "}
-        <a href={`mailto:${COMPANY.email}`} className="font-medium text-navy underline underline-offset-4">{COMPANY.email}</a>.
-      </>
-    ),
-  },
-  {
-    q: "Can I download the air waybill?",
-    a: "Yes. When you're signed in with the account that booked the shipment, open its tracking page and use the Documents tab.",
-  },
-];
+function ExampleRecord() {
+  return (
+    <figure className="rounded-xl border border-line bg-surface p-6 shadow-[0_24px_60px_-36px_rgba(15,29,47,0.45)] sm:p-7">
+      <div className="flex items-start justify-between gap-4 border-b border-line pb-4">
+        <div>
+          <p className="text-[13px] text-ink-3">Example tracking record</p>
+          <p className="figures mt-1 text-[15px] text-ink">LOX-XXXXXXXX</p>
+        </div>
+        <span className="rounded-md bg-navy px-2.5 py-1 text-[13px] font-medium text-white">In transit</span>
+      </div>
+      <ol className="relative mt-6 space-y-5 pl-7">
+        <span aria-hidden className="absolute bottom-2 left-[5px] top-2 w-px bg-line-2" />
+        {EXAMPLE_EVENTS.map((e, i) => (
+          <li key={e.status} className="relative">
+            <span
+              aria-hidden
+              className={`absolute -left-7 top-[5px] block size-[11px] rounded-[3px] border-2 ${i === 0 ? "border-signal bg-signal" : "border-line-2 bg-surface"}`}
+            />
+            <div className="flex items-baseline justify-between gap-4">
+              <p className={`text-[15px] ${i === 0 ? "font-semibold text-ink" : "text-ink-2"}`}>{e.status}</p>
+              <p className="figures shrink-0 text-[13px] text-ink-3">{e.time}</p>
+            </div>
+            <p className="text-sm text-ink-3">{e.place}</p>
+          </li>
+        ))}
+      </ol>
+      <figcaption className="mt-6 border-t border-line pt-4 text-[13px] text-ink-3">
+        An illustration of the layout. Your own shipment shows its real entries.
+      </figcaption>
+    </figure>
+  );
+}
 
 export default function TrackingPage() {
   return (
     <>
       <PageHero
-        eyebrow="Tracking"
-        title={<>Track a shipment</>}
+        title="Track a shipment"
         intro="Enter your tracking number to see the status, the route and every logged handover."
-        image="/images/box.jpeg"
+        aside={<ExampleRecord />}
       >
-        <div className="mt-10 max-w-xl">
-          <TrackingForm variant="dark" />
-          <p className="mt-3 text-sm text-slate-400">Your tracking number is in your booking confirmation email.</p>
+        <div className="mt-8 max-w-xl rounded-xl border border-line bg-surface p-5 sm:p-6">
+          <TrackingForm />
         </div>
       </PageHero>
 
-      <section className="bg-ivory py-20 sm:py-24">
-        <Container className="grid items-start gap-14 lg:grid-cols-2">
-          <div>
+      <section className="border-t border-line bg-surface py-20 sm:py-28">
+        <Container>
+          <Reveal>
             <SectionHeading
-              eyebrow="What you'll see"
-              title={<>Open about progress, <em className="font-normal text-gold-deep">private about people.</em></>}
+              title="Open about progress, private about people"
               intro="Anyone with the tracking number can follow the shipment. Personal details stay with the account that booked it."
             />
-            <div className="mt-10 grid gap-8 sm:grid-cols-2">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">With a tracking number</p>
-                <ul className="mt-4 space-y-3 text-[15px] text-slate-700">
-                  {PUBLIC_VIEW.map((t) => (
-                    <li key={t} className="flex items-start gap-2.5"><Check className="mt-0.5 h-4 w-4 shrink-0 text-gold-deep" />{t}</li>
-                  ))}
-                </ul>
-              </div>
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">Signed in as the sender, also</p>
-                <ul className="mt-4 space-y-3 text-[15px] text-slate-700">
-                  {SENDER_VIEW.map((t) => (
-                    <li key={t} className="flex items-start gap-2.5"><Lock className="mt-0.5 h-4 w-4 shrink-0 text-navy-soft" />{t}</li>
-                  ))}
-                </ul>
-              </div>
+          </Reveal>
+          <Reveal delay={80} className="mt-12 grid gap-10 sm:grid-cols-2 lg:max-w-4xl">
+            <div>
+              <h3 className="border-b border-ink/80 pb-2.5 text-[15px] font-semibold text-ink">With a tracking number</h3>
+              <ul className="mt-4 space-y-3 text-[15px] text-ink-2">
+                {PUBLIC_VIEW.map((t) => (
+                  <li key={t} className="flex items-start gap-2.5">
+                    <Check aria-hidden strokeWidth={1.75} className="mt-0.5 size-4 shrink-0 text-signal-ink" />
+                    {t}
+                  </li>
+                ))}
+              </ul>
             </div>
-          </div>
-
-          <figure className="rounded-2xl border border-ink/10 bg-white p-6 shadow-xl shadow-ink/5 sm:p-8">
-            <div className="flex items-center justify-between border-b border-ink/10 pb-4">
-              <div>
-                <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-gold-deep">Example tracking record</p>
-                <p className="mt-1 font-mono text-sm text-slate-500">LOX-XXXXXXXX</p>
-              </div>
-              <span className="rounded-full bg-navy px-3 py-1 text-xs font-medium text-white">In transit</span>
+            <div>
+              <h3 className="border-b border-ink/80 pb-2.5 text-[15px] font-semibold text-ink">Signed in as the sender, also</h3>
+              <ul className="mt-4 space-y-3 text-[15px] text-ink-2">
+                {SENDER_VIEW.map((t) => (
+                  <li key={t} className="flex items-start gap-2.5">
+                    <Lock aria-hidden strokeWidth={1.75} className="mt-0.5 size-4 shrink-0 text-ink-3" />
+                    {t}
+                  </li>
+                ))}
+              </ul>
             </div>
-            <ol className="relative mt-6 space-y-6 border-l border-ink/15 pl-6">
-              {EXAMPLE_EVENTS.map((e, i) => (
-                <li key={e.status} className="relative">
-                  <span className={`absolute -left-[31px] top-1 h-3 w-3 rounded-full border-2 ${i === 0 ? "border-gold-deep bg-gold" : "border-ink/20 bg-white"}`} />
-                  <div className="flex items-baseline justify-between gap-4">
-                    <p className={`text-[15px] ${i === 0 ? "font-semibold text-ink" : "text-slate-700"}`}>{e.status}</p>
-                    <p className="shrink-0 text-xs tabular-nums text-slate-400">{e.time}</p>
-                  </div>
-                  <p className="text-sm text-slate-500">{e.place}</p>
-                </li>
-              ))}
-            </ol>
-            <figcaption className="mt-6 border-t border-ink/10 pt-4 text-xs text-slate-400">
-              Illustration of the tracking page layout. Your own shipment shows its real entries.
-            </figcaption>
-          </figure>
+          </Reveal>
         </Container>
       </section>
 
-      <section className="bg-white py-20 sm:py-24">
-        <Container className="grid gap-12 lg:grid-cols-12">
-          <div className="lg:col-span-4">
-            <SectionHeading eyebrow="Help" title="Tracking questions" />
-          </div>
-          <div className="lg:col-span-8">
-            <Faq items={TRACKING_FAQ} />
-          </div>
-        </Container>
-      </section>
+      <HomeFaq title="Tracking questions" items={TRACKING_FAQ} />
     </>
   );
 }

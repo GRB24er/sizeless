@@ -121,9 +121,18 @@ export default function CreateShipmentPage() {
   useEffect(() => {
     if (status === "loading") return;
     if (status === "unauthenticated") {
-      router.push("/login");
+      // Come back here after signing in, with the chosen service still selected.
+      router.push(`/login?next=${encodeURIComponent(window.location.pathname + window.location.search)}`);
     }
   }, [status, router]);
+
+  // A service picked in the site's price estimator or rates table (?service=...).
+  useEffect(() => {
+    const requested = new URLSearchParams(window.location.search).get("service");
+    if (requested && SHIPPING_OPTIONS.some((o) => o.id === requested)) {
+      form.setValue("serviceType", requested);
+    }
+  }, [form]);
 
   if (status === "loading") {
     return (

@@ -121,13 +121,13 @@ function FileUpload({
 
   return (
     <div>
-      <label className="block text-sm font-medium text-slate-300 mb-2">
-        {label} {required && <span className="text-red-400">*</span>}
+      <label className="block text-sm font-medium text-ink mb-2">
+        {label} {required && <span className="text-[#B42318]">*</span>}
       </label>
       {value ? (
-        <div className="flex items-center gap-3 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20">
-          <CheckCircle className="w-5 h-5 text-emerald-400 shrink-0" />
-          <span className="text-sm text-emerald-300 truncate flex-1">
+        <div className="flex items-center gap-3 p-3 rounded-xl bg-[#1F7A4D]/10 border border-[#1F7A4D]/25">
+          <CheckCircle className="w-5 h-5 text-[#1F7A4D] shrink-0" />
+          <span className="text-sm text-[#1F7A4D] truncate flex-1">
             {fileName || "Document uploaded"}
           </span>
           <button
@@ -136,7 +136,7 @@ function FileUpload({
               onChange("");
               setFileName("");
             }}
-            className="text-slate-400 hover:text-red-400 transition-colors"
+            className="text-ink-2 hover:text-[#B42318] transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -144,14 +144,14 @@ function FileUpload({
       ) : (
         <div
           onClick={() => inputRef.current?.click()}
-          className="flex items-center justify-center gap-3 p-6 rounded-xl border-2 border-dashed border-slate-700/50 hover:border-[#D4A853]/30 bg-slate-800/30 cursor-pointer transition-all"
+          className="flex items-center justify-center gap-3 p-6 rounded-xl border-2 border-dashed border-line-2 hover:border-ink/30 bg-canvas cursor-pointer transition-all"
         >
           {isUploading ? (
-            <Loader2 className="w-5 h-5 text-[#D4A853] animate-spin" />
+            <Loader2 className="w-5 h-5 text-signal-ink animate-spin" />
           ) : (
-            <Upload className="w-5 h-5 text-slate-400" />
+            <Upload className="w-5 h-5 text-ink-2" />
           )}
-          <span className="text-sm text-slate-400">
+          <span className="text-sm text-ink-2">
             {isUploading ? "Uploading..." : "Click to upload (PDF, JPG, PNG — max 10MB)"}
           </span>
         </div>
@@ -247,19 +247,19 @@ export default function KYCForm({
     required?: boolean;
   }) => (
     <div>
-      <label className="block text-sm font-medium text-slate-300 mb-2">
-        {label} {required && <span className="text-red-400">*</span>}
+      <label className="block text-sm font-medium text-ink mb-2">
+        {label} {required && <span className="text-[#B42318]">*</span>}
       </label>
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full px-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700/50 text-white text-sm focus:border-[#D4A853]/50 focus:outline-none focus:ring-1 focus:ring-[#D4A853]/20 transition-all appearance-none"
+        className="w-full px-4 py-3 rounded-md bg-white border border-line-2 text-ink text-sm focus:border-ink focus:outline-none focus:ring-1 focus:ring-signal/15 transition-all appearance-none"
       >
-        <option value="" className="bg-slate-800">
+        <option value="" className="bg-white">
           Select...
         </option>
         {options.map((o) => (
-          <option key={o.value} value={o.value} className="bg-slate-800">
+          <option key={o.value} value={o.value} className="bg-white">
             {o.label}
           </option>
         ))}
@@ -283,15 +283,15 @@ export default function KYCForm({
     required?: boolean;
   }) => (
     <div>
-      <label className="block text-sm font-medium text-slate-300 mb-2">
-        {label} {required && <span className="text-red-400">*</span>}
+      <label className="block text-sm font-medium text-ink mb-2">
+        {label} {required && <span className="text-[#B42318]">*</span>}
       </label>
       <input
         type={type || "text"}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full px-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700/50 text-white text-sm placeholder:text-slate-500 focus:border-[#D4A853]/50 focus:outline-none focus:ring-1 focus:ring-[#D4A853]/20 transition-all"
+        className="w-full px-4 py-3 rounded-md bg-white border border-line-2 text-ink text-sm placeholder:text-ink-3 focus:border-ink focus:outline-none focus:ring-1 focus:ring-signal/15 transition-all"
       />
     </div>
   );
@@ -308,10 +308,10 @@ export default function KYCForm({
               <div
                 className={`flex items-center gap-2 px-3 py-2 rounded-full text-xs font-medium transition-all ${
                   isActive
-                    ? "bg-[#D4A853]/20 text-[#D4A853] border border-[#D4A853]/30"
+                    ? "bg-signal-soft text-signal-ink border border-signal/30"
                     : isComplete
-                    ? "bg-emerald-500/10 text-emerald-400"
-                    : "text-slate-500"
+                    ? "bg-[#1F7A4D]/10 text-[#1F7A4D]"
+                    : "text-ink-3"
                 }`}
               >
                 {isComplete ? (
@@ -326,7 +326,7 @@ export default function KYCForm({
               {i < STEPS.length - 1 && (
                 <ChevronRight
                   className={`w-4 h-4 mx-1 ${
-                    isComplete ? "text-emerald-500/40" : "text-slate-700"
+                    isComplete ? "text-[#1F7A4D]/50" : "text-line-2"
                   }`}
                 />
               )}
@@ -336,19 +336,19 @@ export default function KYCForm({
       </div>
 
       {/* Step Content */}
-      <div className="bg-slate-800/30 rounded-2xl border border-slate-700/50 p-8">
+      <div className="bg-surface rounded-xl border border-line p-8">
         {/* Step 1: Identity */}
         {step === 1 && (
           <div className="space-y-6">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-xl bg-[#D4A853]/15 flex items-center justify-center">
-                <User className="w-5 h-5 text-[#D4A853]" />
+              <div className="w-10 h-10 rounded-xl bg-signal-soft flex items-center justify-center">
+                <User className="w-5 h-5 text-signal-ink" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-white">
+                <h3 className="text-lg font-semibold text-ink">
                   Identity Verification
                 </h3>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-ink-2">
                   Government-issued photo ID required
                 </p>
               </div>
@@ -388,14 +388,14 @@ export default function KYCForm({
         {step === 2 && (
           <div className="space-y-6">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-xl bg-[#D4A853]/15 flex items-center justify-center">
-                <MapPin className="w-5 h-5 text-[#D4A853]" />
+              <div className="w-10 h-10 rounded-xl bg-signal-soft flex items-center justify-center">
+                <MapPin className="w-5 h-5 text-signal-ink" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-white">
+                <h3 className="text-lg font-semibold text-ink">
                   Proof of Address
                 </h3>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-ink-2">
                   Document must be dated within the last 3 months
                 </p>
               </div>
@@ -421,14 +421,14 @@ export default function KYCForm({
         {step === 3 && (
           <div className="space-y-6">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-xl bg-[#D4A853]/15 flex items-center justify-center">
-                <Pickaxe className="w-5 h-5 text-[#D4A853]" />
+              <div className="w-10 h-10 rounded-xl bg-signal-soft flex items-center justify-center">
+                <Pickaxe className="w-5 h-5 text-signal-ink" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-white">
+                <h3 className="text-lg font-semibold text-ink">
                   Source of Gold / Funds
                 </h3>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-ink-2">
                   Required for AML compliance — how did you acquire the gold?
                 </p>
               </div>
@@ -448,7 +448,7 @@ export default function KYCForm({
               required
             />
             <div>
-              <label className="block text-sm font-medium text-slate-300 mb-2">
+              <label className="block text-sm font-medium text-ink mb-2">
                 Additional Notes (optional)
               </label>
               <textarea
@@ -456,7 +456,7 @@ export default function KYCForm({
                 onChange={(e) => update("sourceNotes", e.target.value)}
                 placeholder="e.g. Purchased from ABC Refinery in Accra, Ghana. Invoice #GH-2024-1234."
                 rows={3}
-                className="w-full px-4 py-3 rounded-xl bg-slate-800/50 border border-slate-700/50 text-white text-sm placeholder:text-slate-500 focus:border-[#D4A853]/50 focus:outline-none focus:ring-1 focus:ring-[#D4A853]/20 transition-all resize-none"
+                className="w-full px-4 py-3 rounded-md bg-white border border-line-2 text-ink text-sm placeholder:text-ink-3 focus:border-ink focus:outline-none focus:ring-1 focus:ring-signal/15 transition-all resize-none"
               />
             </div>
           </div>
@@ -466,23 +466,23 @@ export default function KYCForm({
         {step === 4 && (
           <div className="space-y-6">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-xl bg-[#D4A853]/15 flex items-center justify-center">
-                <Building2 className="w-5 h-5 text-[#D4A853]" />
+              <div className="w-10 h-10 rounded-xl bg-signal-soft flex items-center justify-center">
+                <Building2 className="w-5 h-5 text-signal-ink" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-white">
+                <h3 className="text-lg font-semibold text-ink">
                   Corporate Information
                 </h3>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-ink-2">
                   Only required if depositing on behalf of a company
                 </p>
               </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-blue-500/10 border border-blue-500/20 mb-4">
+            <div className="p-4 rounded-xl bg-tint border border-line mb-4">
               <div className="flex gap-2">
-                <AlertCircle className="w-4 h-4 text-blue-400 mt-0.5 shrink-0" />
-                <p className="text-sm text-blue-300">
+                <AlertCircle className="w-4 h-4 text-ink-3 mt-0.5 shrink-0" />
+                <p className="text-sm text-ink-2">
                   Skip this step if you are depositing as an individual. These
                   fields are only for corporate clients.
                 </p>
@@ -513,14 +513,14 @@ export default function KYCForm({
         {step === 5 && (
           <div className="space-y-6">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/15 flex items-center justify-center">
-                <Eye className="w-5 h-5 text-emerald-400" />
+              <div className="w-10 h-10 rounded-xl bg-[#1F7A4D]/10 flex items-center justify-center">
+                <Eye className="w-5 h-5 text-[#1F7A4D]" />
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-white">
+                <h3 className="text-lg font-semibold text-ink">
                   Review & Submit
                 </h3>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-ink-2">
                   Please verify all information before submitting
                 </p>
               </div>
@@ -528,91 +528,91 @@ export default function KYCForm({
 
             <div className="space-y-4">
               {/* Identity */}
-              <div className="p-4 rounded-xl bg-slate-800/50 border border-slate-700/30">
-                <p className="text-xs text-[#D4A853] font-semibold uppercase tracking-wide mb-3">
+              <div className="p-4 rounded-xl bg-canvas border border-line">
+                <p className="text-xs text-signal-ink font-semibold uppercase tracking-wide mb-3">
                   Identity
                 </p>
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div>
-                    <span className="text-slate-400">ID Type:</span>{" "}
-                    <span className="text-white font-medium">
+                    <span className="text-ink-2">ID Type:</span>{" "}
+                    <span className="text-ink font-medium">
                       {ID_TYPES.find((t) => t.value === formData.idType)
                         ?.label || "—"}
                     </span>
                   </div>
                   <div>
-                    <span className="text-slate-400">ID Number:</span>{" "}
-                    <span className="text-white font-medium font-mono">
+                    <span className="text-ink-2">ID Number:</span>{" "}
+                    <span className="text-ink font-medium font-mono">
                       {formData.idNumber || "—"}
                     </span>
                   </div>
                   <div>
-                    <span className="text-slate-400">Expiry:</span>{" "}
-                    <span className="text-white font-medium">
+                    <span className="text-ink-2">Expiry:</span>{" "}
+                    <span className="text-ink font-medium">
                       {formData.idExpiryDate || "—"}
                     </span>
                   </div>
                   <div>
-                    <span className="text-slate-400">Document:</span>{" "}
+                    <span className="text-ink-2">Document:</span>{" "}
                     {formData.idDocumentUrl ? (
-                      <span className="text-emerald-400">✓ Uploaded</span>
+                      <span className="text-[#1F7A4D]">✓ Uploaded</span>
                     ) : (
-                      <span className="text-red-400">✗ Missing</span>
+                      <span className="text-[#B42318]">✗ Missing</span>
                     )}
                   </div>
                 </div>
               </div>
 
               {/* Address */}
-              <div className="p-4 rounded-xl bg-slate-800/50 border border-slate-700/30">
-                <p className="text-xs text-[#D4A853] font-semibold uppercase tracking-wide mb-3">
+              <div className="p-4 rounded-xl bg-canvas border border-line">
+                <p className="text-xs text-signal-ink font-semibold uppercase tracking-wide mb-3">
                   Proof of Address
                 </p>
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div>
-                    <span className="text-slate-400">Doc Type:</span>{" "}
-                    <span className="text-white font-medium">
+                    <span className="text-ink-2">Doc Type:</span>{" "}
+                    <span className="text-ink font-medium">
                       {ADDRESS_DOC_TYPES.find(
                         (t) => t.value === formData.addressDocType
                       )?.label || "—"}
                     </span>
                   </div>
                   <div>
-                    <span className="text-slate-400">Document:</span>{" "}
+                    <span className="text-ink-2">Document:</span>{" "}
                     {formData.addressDocUrl ? (
-                      <span className="text-emerald-400">✓ Uploaded</span>
+                      <span className="text-[#1F7A4D]">✓ Uploaded</span>
                     ) : (
-                      <span className="text-red-400">✗ Missing</span>
+                      <span className="text-[#B42318]">✗ Missing</span>
                     )}
                   </div>
                 </div>
               </div>
 
               {/* Source of Gold */}
-              <div className="p-4 rounded-xl bg-slate-800/50 border border-slate-700/30">
-                <p className="text-xs text-[#D4A853] font-semibold uppercase tracking-wide mb-3">
+              <div className="p-4 rounded-xl bg-canvas border border-line">
+                <p className="text-xs text-signal-ink font-semibold uppercase tracking-wide mb-3">
                   Source of Gold
                 </p>
                 <div className="grid grid-cols-2 gap-3 text-sm">
                   <div>
-                    <span className="text-slate-400">Source:</span>{" "}
-                    <span className="text-white font-medium">
+                    <span className="text-ink-2">Source:</span>{" "}
+                    <span className="text-ink font-medium">
                       {SOURCE_OF_GOLD.find(
                         (t) => t.value === formData.sourceOfGold
                       )?.label || "—"}
                     </span>
                   </div>
                   <div>
-                    <span className="text-slate-400">Document:</span>{" "}
+                    <span className="text-ink-2">Document:</span>{" "}
                     {formData.sourceDocUrl ? (
-                      <span className="text-emerald-400">✓ Uploaded</span>
+                      <span className="text-[#1F7A4D]">✓ Uploaded</span>
                     ) : (
-                      <span className="text-red-400">✗ Missing</span>
+                      <span className="text-[#B42318]">✗ Missing</span>
                     )}
                   </div>
                 </div>
                 {formData.sourceNotes && (
-                  <p className="text-xs text-slate-400 mt-2">
+                  <p className="text-xs text-ink-2 mt-2">
                     Notes: {formData.sourceNotes}
                   </p>
                 )}
@@ -620,20 +620,20 @@ export default function KYCForm({
 
               {/* Corporate (if filled) */}
               {formData.corporateName && (
-                <div className="p-4 rounded-xl bg-slate-800/50 border border-slate-700/30">
-                  <p className="text-xs text-[#D4A853] font-semibold uppercase tracking-wide mb-3">
+                <div className="p-4 rounded-xl bg-canvas border border-line">
+                  <p className="text-xs text-signal-ink font-semibold uppercase tracking-wide mb-3">
                     Corporate
                   </p>
                   <div className="grid grid-cols-2 gap-3 text-sm">
                     <div>
-                      <span className="text-slate-400">Company:</span>{" "}
-                      <span className="text-white font-medium">
+                      <span className="text-ink-2">Company:</span>{" "}
+                      <span className="text-ink font-medium">
                         {formData.corporateName}
                       </span>
                     </div>
                     <div>
-                      <span className="text-slate-400">Reg. No:</span>{" "}
-                      <span className="text-white font-medium font-mono">
+                      <span className="text-ink-2">Reg. No:</span>{" "}
+                      <span className="text-ink font-medium font-mono">
                         {formData.corporateRegNo || "—"}
                       </span>
                     </div>
@@ -643,10 +643,10 @@ export default function KYCForm({
             </div>
 
             {/* Compliance Notice */}
-            <div className="p-4 rounded-xl bg-[#D4A853]/10 border border-[#D4A853]/20">
+            <div className="p-4 rounded-xl bg-signal-soft border border-signal/25">
               <div className="flex gap-2">
-                <Shield className="w-4 h-4 text-[#D4A853] mt-0.5 shrink-0" />
-                <p className="text-xs text-[#D4A853]/80">
+                <Shield className="w-4 h-4 text-signal-ink mt-0.5 shrink-0" />
+                <p className="text-xs text-ink-2">
                   By submitting this application, you confirm that all
                   information and documents provided are accurate and genuine.
                   False or fraudulent submissions will result in permanent
@@ -659,12 +659,12 @@ export default function KYCForm({
         )}
 
         {/* Navigation */}
-        <div className="flex items-center justify-between mt-8 pt-6 border-t border-slate-700/30">
+        <div className="flex items-center justify-between mt-8 pt-6 border-t border-line">
           <button
             type="button"
             onClick={() => setStep((s) => Math.max(1, s - 1))}
             disabled={step === 1}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-medium text-slate-400 hover:text-white disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            className="flex items-center gap-2 px-5 py-2.5 rounded-md text-sm font-medium text-ink-2 hover:text-ink disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
           >
             <ChevronLeft className="w-4 h-4" /> Back
           </button>
@@ -674,7 +674,7 @@ export default function KYCForm({
               type="button"
               onClick={() => setStep((s) => Math.min(5, s + 1))}
               disabled={!isStepValid(step)}
-              className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#D4A853] text-[#0A1628] text-sm font-semibold hover:bg-[#F5DEB3] disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+              className="flex items-center gap-2 px-6 py-2.5 rounded-md bg-ink text-white text-sm font-semibold hover:bg-navy-2 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
             >
               Continue <ChevronRight className="w-4 h-4" />
             </button>
@@ -683,7 +683,7 @@ export default function KYCForm({
               type="button"
               onClick={handleSubmit}
               disabled={isPending}
-              className="flex items-center gap-2 px-8 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-emerald-600 text-white text-sm font-semibold hover:from-emerald-400 hover:to-emerald-500 disabled:opacity-50 transition-all shadow-lg shadow-emerald-500/25"
+              className="flex items-center gap-2 px-8 py-3 rounded-md bg-signal text-white text-sm font-semibold hover:bg-signal-hover disabled:opacity-50 transition-colors"
             >
               {isPending ? (
                 <Loader2 className="w-4 h-4 animate-spin" />

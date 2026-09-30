@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 import { STORAGE_TYPE_CONFIG, MIN_MONTHLY_STORAGE_FEE, VAULT_PUBLISHED_FEES } from "@/lib/vault/types";
 import { PageHero } from "@/components/landing/page-hero";
-import { Container, SectionHeading, usd } from "@/components/landing/primitives";
-import { Faq, FaqItem } from "@/components/landing/faq";
-import { COMPANY } from "@/lib/company";
+import { Container, SectionHeading, ButtonLink, Amount, usd, usdCents } from "@/components/landing/primitives";
+import { Reveal } from "@/components/landing/reveal";
+import { VaultEstimate } from "@/components/landing/task-panel";
+import { HomeFaq, ClosingCta } from "@/components/landing/home";
+import { VAULT_FAQ } from "@/components/landing/faqs";
 
 export const metadata: Metadata = {
   title: "Vault Custody | Aegis Cargo",
@@ -16,147 +16,121 @@ const STEPS = [
   { title: "Open an account", text: "Register online in a few minutes." },
   { title: "Identity checks", text: "Submit ID, proof of address and the source of your metal for review." },
   { title: "Deposit request", text: "Describe your metal and accept the published fee schedule." },
-  { title: "Intake & assay", text: "We weigh, test and record serial numbers when the metal arrives." },
+  { title: "Intake and assay", text: "We weigh, test and record serial numbers when the metal arrives." },
   { title: "In storage", text: "A custody reference is issued and your account shows the deposit as in storage." },
   { title: "Release", text: "Request collection, sale or transfer from your account at any time." },
 ];
 
 const FEE_GROUPS = Array.from(new Set(VAULT_PUBLISHED_FEES.map((f) => f.group)));
 
-const VAULT_FAQ: FaqItem[] = [
-  {
-    q: "Who can open a vault account?",
-    a: "Anyone who passes our identity and source-of-funds checks. You'll need a government ID, a proof-of-address document and evidence of where the metal came from, such as a purchase invoice.",
-  },
-  {
-    q: "What's the difference between allocated, segregated and unallocated storage?",
-    a: (
-      <ul className="space-y-2">
-        {Object.values(STORAGE_TYPE_CONFIG).map((s) => (
-          <li key={s.label}><span className="font-medium text-ink">{s.label}:</span> {s.description}</li>
-        ))}
-      </ul>
-    ),
-  },
-  {
-    q: "Is my deposit insured?",
-    a: "Insurance is optional and priced from the schedule below. When cover is in place, your insurance certificate names the insurer and the policy number so you can verify it with them directly.",
-  },
-  {
-    q: "How do I get my metal back?",
-    a: "Request a release from your account: physical collection, sale through a bullion dealer, or transfer to another vault. The fee for each is in the schedule you accepted when you deposited.",
-  },
-  {
-    q: "Will you ever ask me to pay to release my holdings?",
-    a: (
-      <>
-        Only the release fees shown in the published schedule. We never ask for any other payment to release metal — if someone does, don&apos;t pay, and write to{" "}
-        <a href={`mailto:${COMPANY.email}`} className="font-medium text-navy underline underline-offset-4">{COMPANY.email}</a>.
-      </>
-    ),
-  },
-];
-
 export default function VaultPage() {
   return (
     <>
       <PageHero
-        eyebrow="Vault custody"
-        title={<>Precious-metals custody, <em className="font-normal text-gold">with the fees on the table.</em></>}
-        intro="Store gold, silver, platinum and palladium with documented intake, a published fee schedule, and online access to your holdings."
+        title="Precious-metals custody, with every fee in writing."
+        intro="Store gold, silver, platinum and palladium with documented intake, a published fee schedule and online access to your holdings."
         image="/images/gold.jpeg"
+        imageAlt="One-kilogram fine gold bars and gold bullion coins"
       >
-        <div className="mt-10 flex flex-wrap gap-4">
-          <Link href="/register" className="inline-flex items-center gap-2 rounded-lg bg-gold px-6 py-3 text-sm font-semibold text-ink transition-colors hover:bg-[#d8b566]">
-            Open an account <ArrowRight className="h-4 w-4" />
-          </Link>
-          <a href="#fees" className="inline-flex items-center gap-2 rounded-lg border border-white/25 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/10">
+        <div className="mt-8 flex flex-wrap gap-3">
+          <ButtonLink href="/register" arrow>
+            Open an account
+          </ButtonLink>
+          <ButtonLink href="#fees" variant="outline">
             See the fee schedule
-          </a>
+          </ButtonLink>
         </div>
       </PageHero>
 
-      {/* Storage types */}
-      <section className="bg-ivory py-20 sm:py-24">
-        <Container>
-          <SectionHeading
-            eyebrow="Storage"
-            title="Choose how your metal is held."
-            intro={`Storage is charged monthly per kilogram, with a minimum of ${usd(MIN_MONTHLY_STORAGE_FEE)} per deposit.`}
-          />
-          <div className="mt-14 grid gap-5 md:grid-cols-3">
-            {Object.entries(STORAGE_TYPE_CONFIG).map(([key, s]) => (
-              <article key={key} className="flex flex-col rounded-2xl border border-ink/10 bg-white p-7">
-                <h3 className="font-display text-2xl text-ink">{s.label}</h3>
-                <p className="mt-4 flex-1 text-[15px] leading-relaxed text-slate-600">{s.description}</p>
-                <p className="mt-8 border-t border-ink/10 pt-5">
-                  <span className="font-display text-4xl tabular-nums text-ink">{usd(s.monthlyRatePerKg)}</span>
-                  <span className="ml-2 text-sm text-slate-500">per kg / month</span>
-                </p>
-              </article>
-            ))}
+      {/* Storage types and estimate */}
+      <section className="border-t border-line bg-surface py-20 sm:py-28">
+        <Container className="grid items-start gap-12 lg:grid-cols-12 lg:gap-10">
+          <div className="lg:col-span-6">
+            <Reveal>
+              <SectionHeading
+                title="Choose how your metal is held"
+                intro={`Storage is charged monthly per kilogram, with a minimum of ${usd(MIN_MONTHLY_STORAGE_FEE)} per deposit.`}
+              />
+            </Reveal>
+            <Reveal delay={80} as="dl" className="mt-10 border-t border-line">
+              {Object.entries(STORAGE_TYPE_CONFIG).map(([key, s]) => (
+                <div key={key} className="grid gap-x-8 gap-y-2 border-b border-line py-6 sm:grid-cols-[minmax(0,1fr)_auto]">
+                  <dt>
+                    <span className="text-[17px] font-semibold text-ink">{s.label}</span>
+                    <span className="mt-1.5 block max-w-[52ch] text-[15px] leading-relaxed text-ink-2">{s.description}</span>
+                  </dt>
+                  <dd className="sm:text-right">
+                    <span className="figures text-xl text-ink">{usdCents(s.monthlyRatePerKg)}</span>
+                    <span className="block text-[13px] text-ink-3">per kg a month</span>
+                  </dd>
+                </div>
+              ))}
+            </Reveal>
           </div>
+
+          <Reveal delay={120} className="lg:sticky lg:top-24 lg:col-span-5 lg:col-start-8">
+            <div className="rounded-xl border border-line bg-surface p-5 shadow-[0_24px_60px_-36px_rgba(15,29,47,0.45)] sm:p-7">
+              <h2 className="type-display text-xl font-semibold text-ink">Estimate monthly storage</h2>
+              <p className="mt-1 text-sm text-ink-3">Uses the same rates as the deposit form.</p>
+              <div className="mt-6">
+                <VaultEstimate />
+              </div>
+            </div>
+          </Reveal>
         </Container>
       </section>
 
       {/* Process */}
-      <section className="bg-navy py-20 sm:py-24">
+      <section className="bg-navy py-20 sm:py-28">
         <Container>
-          <SectionHeading tone="dark" eyebrow="How it works" title="From account to release, every step recorded." />
-          <ol className="mt-16 grid gap-px overflow-hidden rounded-2xl bg-white/10 sm:grid-cols-2 lg:grid-cols-3">
-            {STEPS.map((s, i) => (
-              <li key={s.title} className="bg-navy p-7">
-                <p className="font-display text-3xl text-gold">{String(i + 1).padStart(2, "0")}</p>
-                <h3 className="mt-4 text-lg font-semibold text-white">{s.title}</h3>
-                <p className="mt-2 text-[15px] leading-relaxed text-slate-300">{s.text}</p>
+          <Reveal>
+            <SectionHeading tone="dark" title="From account to release, every step recorded" />
+          </Reveal>
+          <Reveal delay={80} as="ol" className="mt-12 grid gap-x-10 sm:grid-cols-2 lg:grid-cols-3">
+            {STEPS.map((s) => (
+              <li key={s.title} className="flex gap-4 border-t border-white/15 py-7">
+                <span aria-hidden className="mt-[7px] block size-[11px] shrink-0 rounded-[3px] border-2 border-signal" />
+                <div>
+                  <h3 className="text-[17px] font-semibold text-white">{s.title}</h3>
+                  <p className="mt-1.5 max-w-[38ch] text-[15px] leading-relaxed text-[#B7C3D1]">{s.text}</p>
+                </div>
               </li>
             ))}
-          </ol>
+          </Reveal>
         </Container>
       </section>
 
       {/* Fee schedule */}
-      <section id="fees" className="scroll-mt-24 bg-white py-20 sm:py-24">
-        <Container className="grid gap-12 lg:grid-cols-12">
-          <div className="lg:col-span-4">
+      <section id="fees" className="scroll-mt-20 bg-canvas py-20 sm:py-28">
+        <Container>
+          <Reveal>
             <SectionHeading
-              eyebrow="Fee schedule"
-              title="The complete list."
+              title="The complete fee schedule"
               intro="These are the only fees we charge for vault custody. You see and accept this schedule on the deposit form, and every invoice is generated from it."
             />
-          </div>
-          <div className="space-y-8 lg:col-span-8">
+          </Reveal>
+          <Reveal delay={80} className="mt-12 gap-x-12 md:columns-2">
             {FEE_GROUPS.map((group) => (
-              <div key={group}>
-                <h3 className="border-b border-ink/15 pb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-gold-deep">{group}</h3>
-                <dl className="divide-y divide-ink/10">
+              <div key={group} className="mb-10 break-inside-avoid">
+                <h3 className="border-b border-ink/80 pb-2.5 text-[15px] font-semibold text-ink">{group}</h3>
+                <dl className="divide-y divide-line">
                   {VAULT_PUBLISHED_FEES.filter((f) => f.group === group).map((f) => (
                     <div key={f.label} className="flex items-baseline justify-between gap-6 py-3.5 text-[15px]">
-                      <dt className="text-slate-700">{f.label}</dt>
-                      <dd className="text-right tabular-nums text-ink">{f.price}</dd>
+                      <dt className="text-ink-2">{f.label}</dt>
+                      <dd className="shrink-0 text-right">
+                        <Amount text={f.price} />
+                      </dd>
                     </div>
                   ))}
                 </dl>
               </div>
             ))}
-          </div>
+          </Reveal>
         </Container>
       </section>
 
-      {/* FAQ */}
-      <section className="bg-ivory py-20 sm:py-24">
-        <Container className="grid gap-12 lg:grid-cols-12">
-          <div className="lg:col-span-4">
-            <SectionHeading eyebrow="Questions" title="About vault custody" />
-            <Link href="/register" className="mt-8 inline-flex items-center gap-2 rounded-lg bg-navy px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-navy-soft">
-              Open an account <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-          <div className="lg:col-span-8">
-            <Faq items={VAULT_FAQ} />
-          </div>
-        </Container>
-      </section>
+      <HomeFaq title="About vault custody" items={VAULT_FAQ} />
+      <ClosingCta />
     </>
   );
 }

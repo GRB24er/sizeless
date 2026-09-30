@@ -90,7 +90,7 @@ export const RegistrationForm = () => {
                   <FormItem>
                     <FormLabel>First Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="John" {...field} />
+                      <Input {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -105,7 +105,7 @@ export const RegistrationForm = () => {
                   <FormItem>
                     <FormLabel>Last Name</FormLabel>
                     <FormControl>
-                      <Input placeholder="Doe" {...field} />
+                      <Input {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -148,7 +148,7 @@ export const RegistrationForm = () => {
                   <FormControl>
                     <Input
                       type="tel"
-                      placeholder="+1 (555) 000-0000"
+                      placeholder="+44 7700 900123"
                       {...field}
                     />
                   </FormControl>
@@ -203,11 +203,11 @@ export const RegistrationForm = () => {
             <Checkbox id="terms" required />
             <Label htmlFor="terms" className="text-sm font-normal">
               I agree to the{" "}
-              <Link href="/terms" className="text-secondary hover:underline">
+              <Link href="/terms" className="text-ink underline decoration-line-2 underline-offset-4 hover:decoration-ink">
                 Terms of Service
               </Link>{" "}
               and{" "}
-              <Link href="/privacy" className="text-secondary hover:underline">
+              <Link href="/privacy" className="text-ink underline decoration-line-2 underline-offset-4 hover:decoration-ink">
                 Privacy Policy
               </Link>
             </Label>
@@ -218,7 +218,7 @@ export const RegistrationForm = () => {
         <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
           <Button
             type="submit"
-            className="w-full bg-secondary hover:bg-secondary hover:opacity-80 text-white py-2 h-11 mt-2"
+            className="w-full bg-ink text-white hover:bg-navy-2 active:scale-[0.98] transition-[background-color,transform] duration-150 h-11 mt-2"
             disabled={isPending}
           >
             {isPending ? (
@@ -238,7 +238,7 @@ export const RegistrationForm = () => {
             Already have an account?
             <button
               type="button"
-              className="ml-1 text-secondary hover:underline font-medium"
+              className="ml-1 font-medium text-ink underline decoration-line-2 underline-offset-4 hover:decoration-ink"
             >
               <Link href={"/login"}>Login</Link>
             </button>
