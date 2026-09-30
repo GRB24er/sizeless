@@ -1,12 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import {
   Menu, User, Package, LogOut, LayoutDashboard,
-  ChevronDown, Vault,
+  ChevronDown,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -61,8 +60,8 @@ export const Header = () => {
       <nav className={cn(
         "transition-all duration-300",
         isScrolled
-          ? "bg-[#0F1D2F]/95 backdrop-blur-xl border-b border-[#0F1D2F]/30 shadow-lg shadow-[#0F1D2F]/50"
-          : "bg-[#0F1D2F]/80 backdrop-blur-md"
+          ? "bg-navy/95 backdrop-blur-xl border-b border-white/10 shadow-lg shadow-black/20"
+          : "bg-navy/70 backdrop-blur-md border-b border-white/5"
       )}>
         <div className="container mx-auto px-4">
           <div className="flex h-16 items-center justify-between">
@@ -72,14 +71,13 @@ export const Header = () => {
             <div className="hidden lg:flex items-center gap-1">
               {mainNavItems.map((item) => {
                 const isActive = pathname === item.href;
-                const isVault = item.label === "Vault";
                 return (
                   <InstantNavLink key={item.href} href={item.href} className={cn(
                     "relative px-4 py-2 text-sm font-medium transition-colors rounded-lg",
-                    isActive ? "text-white" : isVault ? "text-[#8C9EAF] hover:text-[#C8D3DD] hover:bg-[#8C9EAF]/10" : "text-slate-400 hover:text-white hover:bg-slate-800/50"
+                    isActive ? "text-white" : "text-slate-300 hover:text-white"
                   )}>
                     {item.label}
-                    {isActive && <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-[#1E3A5F]" />}
+                    {isActive && <span className="absolute bottom-0 left-4 right-4 h-px bg-gold" />}
                   </InstantNavLink>
                 );
               })}
@@ -91,8 +89,8 @@ export const Header = () => {
                 <>
                   <Notifications />
                   <ActiveShipment />
-                  <InstantNavLink href="/shipments/create" className="px-4 py-2 rounded-lg bg-gradient-to-r from-[#1E3A5F] to-[#162D4A] text-white text-sm font-medium hover:from-[#1E3A5F] hover:to-[#1E3A5F] transition-all shadow-lg shadow-[#1E3A5F]/25">
-                    Create Shipment
+                  <InstantNavLink href="/shipments/create" className="px-4 py-2 rounded-lg bg-gold text-ink text-sm font-semibold hover:bg-[#d8b566] transition-colors">
+                    Book a shipment
                   </InstantNavLink>
                   <DropdownMenu modal={false}>
                     <DropdownMenuTrigger asChild>
@@ -128,9 +126,14 @@ export const Header = () => {
                   </DropdownMenu>
                 </>
               ) : (
-                <InstantNavLink href="/login" className="px-4 py-2 rounded-lg bg-gradient-to-r from-[#1E3A5F] to-[#162D4A] text-white text-sm font-medium hover:from-[#1E3A5F] hover:to-[#1E3A5F] transition-all shadow-lg shadow-[#1E3A5F]/25">
-                  Login
-                </InstantNavLink>
+                <div className="flex items-center gap-2">
+                  <InstantNavLink href="/login" className="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white transition-colors">
+                    Sign in
+                  </InstantNavLink>
+                  <InstantNavLink href="/register" className="px-4 py-2 rounded-lg bg-gold text-ink text-sm font-semibold hover:bg-[#d8b566] transition-colors">
+                    Open an account
+                  </InstantNavLink>
+                </div>
               )}
             </div>
 
@@ -168,7 +171,7 @@ export const Header = () => {
                         <div className="space-y-2 px-4 mb-4">
                           <ActiveShipment />
                           <SheetClose asChild>
-                            <InstantNavLink href="/shipments/create" className="flex items-center justify-center w-full px-4 py-3 rounded-lg bg-gradient-to-r from-[#1E3A5F] to-[#162D4A] text-white text-sm font-medium">Create Shipment</InstantNavLink>
+                            <InstantNavLink href="/shipments/create" className="flex items-center justify-center w-full px-4 py-3 rounded-lg bg-gold text-ink text-sm font-semibold">Book a shipment</InstantNavLink>
                           </SheetClose>
                         </div>
                         {session?.user?.role === "ADMIN" && (
@@ -181,9 +184,14 @@ export const Header = () => {
                         <button onClick={handleSignOut} className="flex items-center gap-3 w-full px-4 py-3 rounded-lg text-red-400 hover:bg-red-500/10 transition-colors"><LogOut className="w-4 h-4" />Logout</button>
                       </>
                     ) : (
-                      <SheetClose asChild>
-                        <InstantNavLink href="/login" className="flex items-center justify-center w-full px-4 py-3 rounded-lg bg-gradient-to-r from-[#1E3A5F] to-[#162D4A] text-white text-sm font-medium">Login</InstantNavLink>
-                      </SheetClose>
+                      <div className="space-y-2">
+                        <SheetClose asChild>
+                          <InstantNavLink href="/register" className="flex items-center justify-center w-full px-4 py-3 rounded-lg bg-gold text-ink text-sm font-semibold">Open an account</InstantNavLink>
+                        </SheetClose>
+                        <SheetClose asChild>
+                          <InstantNavLink href="/login" className="flex items-center justify-center w-full px-4 py-3 rounded-lg border border-white/15 text-white text-sm font-medium">Sign in</InstantNavLink>
+                        </SheetClose>
+                      </div>
                     )}
                   </nav>
                 </div>
