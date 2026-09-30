@@ -41,3 +41,20 @@ export function getLogoFormat(): "PNG" | "JPEG" {
     return "PNG";
   }
 }
+
+let cachedWatermark: string | null | undefined;
+
+/** Transparent, single-tone version of the logo used as the page watermark. */
+export function getWatermarkBase64(): string | null {
+  if (cachedWatermark !== undefined) return cachedWatermark;
+  try {
+    const wmPath = path.join(process.cwd(), "public", "images", "logo-watermark.png");
+    cachedWatermark = fs.existsSync(wmPath)
+      ? `data:image/png;base64,${fs.readFileSync(wmPath).toString("base64")}`
+      : null;
+  } catch (err) {
+    console.error("Failed to load watermark:", err);
+    cachedWatermark = null;
+  }
+  return cachedWatermark;
+}

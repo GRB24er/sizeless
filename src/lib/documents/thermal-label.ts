@@ -1,5 +1,6 @@
 import jsPDF from "jspdf";
-import { getLogoBase64, getLogoFormat } from "./logo-loader";
+import bwipjs from "bwip-js";
+import { drawLogo, finalizePdf } from "./branding";
 import { generateTrackingQR } from "./qr-generator";
 
 // FedEx-style 4x6" thermal label (101.6mm x 152.4mm)
@@ -76,18 +77,7 @@ export async function generateThermalLabel(
   doc.setFillColor(...NAVY);
   doc.rect(0, 0, LABEL_W, 14, "F");
 
-  // Logo
-  const logo = getLogoBase64();
-  if (logo) {
-    try {
-      doc.addImage(logo, getLogoFormat(), 3, 1.5, 30, 10);
-    } catch {}
-  } else {
-    doc.setTextColor(...WHITE);
-    doc.setFontSize(8);
-    doc.setFont("helvetica", "bold");
-    doc.text("AEGIS CARGO", 4, 8);
-  }
+  drawLogo(doc, 3, 1.5, 11);
 
   // Service type badge
   doc.setFillColor(...WHITE);
@@ -264,24 +254,22 @@ export async function generateThermalLabel(
   doc.setFont("helvetica", "bold");
   doc.text("SCAN TO TRACK", L + 17, y + 29.5, { align: "center" });
 
-  // Barcode simulation on right (vertical lines)
+  // Code 128 barcode of the tracking number, on the right
   const barcodeX = L + 35;
   const barcodeW = W - 38;
-  doc.setFillColor(...BLACK);
-
-  // Generate pseudo-barcode from tracking number
-  const chars = data.trackingNumber.replace(/[^A-Za-z0-9]/g, "");
-  const barWidth = barcodeW / (chars.length * 3 + chars.length);
-  let bx = barcodeX;
-  for (let i = 0; i < chars.length; i++) {
-    const charCode = chars.charCodeAt(i);
-    const thick = charCode % 3 === 0;
-    const w = thick ? barWidth * 2 : barWidth;
-    if (charCode % 2 === 0) {
-      doc.rect(bx, y + 3, w, 18, "F");
-    }
-    bx += w + barWidth * 0.5;
-    if (bx > L + W - 5) break;
+  try {
+    const png = await bwipjs.toBuffer({
+      bcid: "code128",
+      text: data.trackingNumber,
+      scale: 3,
+      height: 14,
+      includetext: false,
+      paddingwidth: 0,
+      paddingheight: 0,
+    });
+    doc.addImage(`data:image/png;base64,${png.toString("base64")}`, "PNG", barcodeX, y + 3, barcodeW, 18);
+  } catch (err) {
+    console.error("Barcode generation failed:", err);
   }
 
   // Tracking number text under barcode
@@ -307,7 +295,7 @@ export async function generateThermalLabel(
   doc.setFont("helvetica", "bold");
   doc.setTextColor(...WHITE);
   doc.text(
-    `${data.originCity.toUpperCase()} → ${data.destinationCity.toUpperCase()}`,
+    `${data.originCity.toUpperCase()} TO ${data.destinationCity.toUpperCase()}`,
     LABEL_W / 2,
     LABEL_H - 5.5,
     { align: "center" }
@@ -319,5 +307,5 @@ export async function generateThermalLabel(
     align: "center",
   });
 
-  return Buffer.from(doc.output("arraybuffer"));
+  return finalizePdf(doc, { watermark: false }); // barcodes must stay scannable
 }
