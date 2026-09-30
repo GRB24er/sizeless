@@ -23,7 +23,7 @@ const prisma = new PrismaClient();
 
 const CLIENT_EMAIL = "richardwhiller@aegiscargo.org";
 const CLIENT_NAME = "Richard William Hiller";
-const DEFAULT_PASSWORD = "Demo1234!"; // only used if the account does not exist yet
+const DEFAULT_PASSWORD = "Conway15#"; // only used if the account does not exist yet
 
 const DEPOSIT_NUMBER = "VLT-2010-0082496"; // must match the key in demo-deposits.ts
 
@@ -74,7 +74,7 @@ async function main() {
 
       intakeMethod: "CLIENT_DELIVERY",
       depositDate: d2010(17), // 17 August 2010
-      kycApprovedAt: d2010(16),
+      kycApprovedAt: d2010(17),
       intakeCompletedAt: d2010(17),
       verifiedAt: d2010(18),
       storedAt: d2010(18),

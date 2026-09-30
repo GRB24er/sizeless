@@ -3,9 +3,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { format } from "date-fns";
 import { auth } from "~/auth";
-import { COMPANY } from "@/lib/company";
 import { getClientDeposits, getClientKyc } from "@/lib/client-account";
-import { AccountShell, PaymentNotice } from "@/components/account/account-shell";
+import { AccountShell } from "@/components/account/account-shell";
 import { DepositRequest } from "@/components/account/deposit-request";
 import { PhaseBar, StatusBadge } from "@/components/account/vault-bits";
 import { assetLabel, storageLabel, weightText } from "@/components/account/vault-format";
@@ -121,8 +120,7 @@ export default async function MyVaultPage() {
         </ul>
       )}
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-2">
-        <PaymentNotice email={COMPANY.email} />
+      <div className="mt-8 max-w-3xl">
         <p className="rounded-xl border border-line bg-canvas p-5 text-sm leading-relaxed text-ink-2">
           Storage is charged monthly from the published rate for your storage type. The full list of fees is on the{" "}
           <Link href="/vault#fees" className="font-medium text-ink underline decoration-line-2 underline-offset-4">

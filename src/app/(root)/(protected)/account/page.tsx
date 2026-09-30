@@ -4,10 +4,9 @@ import { redirect } from "next/navigation";
 import { format } from "date-fns";
 import { auth } from "~/auth";
 import { prisma } from "@/constants/config/db";
-import { COMPANY } from "@/lib/company";
 import { getClientDeposits, getClientKyc, getClientShipments } from "@/lib/client-account";
 import { shipmentStatusLabel, shipmentStatusTone } from "@/lib/shipment-status";
-import { AccountShell, Panel, PaymentNotice } from "@/components/account/account-shell";
+import { AccountShell, Panel } from "@/components/account/account-shell";
 import { PhaseBar, StatusBadge } from "@/components/account/vault-bits";
 import { TONE_BADGE, assetLabel, weightText } from "@/components/account/vault-format";
 import { ButtonLink, TextLink } from "@/components/landing/primitives";
@@ -194,8 +193,6 @@ export default async function AccountPage() {
               Profile and security
             </TextLink>
           </Panel>
-
-          <PaymentNotice email={COMPANY.email} />
         </aside>
       </div>
     </AccountShell>

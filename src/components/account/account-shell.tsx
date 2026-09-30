@@ -90,13 +90,12 @@ export function Field({ label, children, mono = false }: { label: string; childr
   );
 }
 
-/** The payment-safety notice shown on every account page. */
+/** Short, neutral pricing note. Shown once in the account area, not repeated on every page. */
 export function PaymentNotice({ email }: { email: string }) {
   return (
     <p className="rounded-xl border border-line bg-canvas p-5 text-sm leading-relaxed text-ink-2">
-      <span className="font-semibold text-ink">We only charge the fees in our published schedules.</span> We never ask for a payment to
-      release a shipment or your metal, or for taxes, bonds or clearance fees outside those schedules. If anyone asks, don&apos;t pay and
-      write to{" "}
+      <span className="font-semibold text-ink">Every charge on your account is set out up front.</span> Storage, demurrage and the release
+      options are all on the fee schedule you accept when you deposit. Questions about a charge? Email{" "}
       <a href={`mailto:${email}`} className="font-medium text-ink underline decoration-line-2 underline-offset-4">
         {email}
       </a>

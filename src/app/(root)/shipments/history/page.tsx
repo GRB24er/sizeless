@@ -3,12 +3,11 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { format } from "date-fns";
 import { auth } from "~/auth";
-import { COMPANY } from "@/lib/company";
 import { getClientShipments } from "@/lib/client-account";
 import { SHIPPING_OPTIONS } from "@/app/(root)/shipments/create/type";
 import { SHIPMENT_STAGES, shipmentStage, shipmentStatusLabel, shipmentStatusTone } from "@/lib/shipment-status";
 import { cn } from "@/lib/utils";
-import { AccountShell, PaymentNotice } from "@/components/account/account-shell";
+import { AccountShell } from "@/components/account/account-shell";
 import { TONE_BADGE } from "@/components/account/vault-format";
 import { ButtonLink, buttonClass } from "@/components/landing/primitives";
 
@@ -134,9 +133,6 @@ export default async function MyShipmentsPage() {
         </ul>
       )}
 
-      <div className="mt-8 max-w-3xl">
-        <PaymentNotice email={COMPANY.email} />
-      </div>
     </AccountShell>
   );
 }
