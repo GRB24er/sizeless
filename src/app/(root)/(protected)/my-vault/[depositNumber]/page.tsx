@@ -269,17 +269,6 @@ export default async function DepositPage({ params }: { params: Promise<{ deposi
               </Field>
               <Field label="In storage since">{day(d.storedAt ?? d.storageStartDate) ?? "Not yet"}</Field>
             </dl>
-            <p className="mt-4 border-t border-line pt-4 text-sm leading-relaxed text-ink-3">
-              Storage is billed monthly. If you request a withdrawal, collection is free for {VAULT_FEE_SCHEDULE.demurrageFreeDays} days
-              after we approve it. Metal held past that is charged demurrage of{" "}
-              <span className="figures text-ink-2">{cash(VAULT_FEE_SCHEDULE.demurrageRatePerKgPerDay)}</span> per kg a day (minimum{" "}
-              <span className="figures text-ink-2">{cash(VAULT_FEE_SCHEDULE.demurrageMinPerDay)}</span> a day) until you collect. It
-              is on the{" "}
-              <Link href="/vault#fees" className="font-medium text-ink underline decoration-line-2 underline-offset-4">
-                published fee schedule
-              </Link>
-              .
-            </p>
           </Panel>
 
           <Panel title="Insurance">

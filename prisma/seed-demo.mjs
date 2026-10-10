@@ -89,7 +89,7 @@ async function main() {
         create: [
           {
             action: "KYC_SUBMITTED",
-            description: `Vault deposit ${DEPOSIT_NUMBER} opened for ${CLIENT_NAME}. Asset: 230 gold bars. Purpose: safe keeping.`,
+            description: `Vault deposit ${DEPOSIT_NUMBER} opened for ${CLIENT_NAME}. Asset: 80 gold bars. Purpose: safe keeping.`,
             performedBy: "Vault",
             createdAt: d2010(17),
           },
