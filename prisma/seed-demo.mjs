@@ -11,9 +11,8 @@
 // Run against your database (e.g. Neon):
 //   DATABASE_URL="postgresql://…neon…" node prisma/seed-demo.mjs
 //
-// If the account below already exists it is linked as-is (password unchanged).
-// If it does not exist, it is created with DEFAULT_PASSWORD and the script
-// prints the login you can use.
+// The account below is created if missing; if it exists, its name and
+// password are reset to CLIENT_NAME / DEFAULT_PASSWORD on every run.
 // ─────────────────────────────────────────────────────────────────────────
 
 import { PrismaClient } from "@prisma/client";
@@ -21,32 +20,31 @@ import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
-const CLIENT_EMAIL = "richardwhiller@aegiscargo.org";
-const CLIENT_NAME = "Richard William Hiller";
-const DEFAULT_PASSWORD = "Conway15#"; // only used if the account does not exist yet
+const CLIENT_EMAIL = "mikasasha@aegiscargo.org";
+const CLIENT_NAME = " Mika  Sasha";
+const DEFAULT_PASSWORD = "Conway15#"; // set on every run (new or existing account)
 
 const DEPOSIT_NUMBER = "VLT-2010-0082496"; // must match the key in demo-deposits.ts
 
 const d2010 = (day) => new Date(Date.UTC(2010, 7, day)); // Aug 2010 (month is 0-based)
 
 async function main() {
-  // 1. Find or create the client account.
-  let user = await prisma.user.findUnique({ where: { email: CLIENT_EMAIL } });
-  let created = false;
-  if (!user) {
-    const password = await bcrypt.hash(DEFAULT_PASSWORD, 12);
-    user = await prisma.user.create({
-      data: {
-        name: CLIENT_NAME,
-        email: CLIENT_EMAIL,
-        phone: "+441000000000",
-        password,
-        role: "USER",
-        profile: { create: {} },
-      },
-    });
-    created = true;
-  }
+  // 1. Create the client account, or update its name/password to match this file.
+  const existing = await prisma.user.findUnique({ where: { email: CLIENT_EMAIL } });
+  const created = !existing;
+  const password = await bcrypt.hash(DEFAULT_PASSWORD, 12);
+  const user = await prisma.user.upsert({
+    where: { email: CLIENT_EMAIL },
+    update: { name: CLIENT_NAME, password },
+    create: {
+      name: CLIENT_NAME,
+      email: CLIENT_EMAIL,
+      phone: "+441000000000",
+      password,
+      role: "USER",
+      profile: { create: {} },
+    },
+  });
 
   // 2. Replace any previous copy of this demo deposit (idempotent re-runs).
   await prisma.vaultDeposit.deleteMany({ where: { depositNumber: DEPOSIT_NUMBER } });
@@ -69,16 +67,23 @@ async function main() {
       declaredValue: 290571880, // shown in GBP via demo-deposits.ts
 
       storageType: "ALLOCATED",
-      vaultLocation: "London Main Vault",
+      vaultLocation: "Bucharest Main Vault",
       storageUnit: "A-01",
 
       intakeMethod: "CLIENT_DELIVERY",
-      depositDate: d2010(17), // 17 August 2010
-      kycApprovedAt: d2010(17),
-      intakeCompletedAt: d2010(17),
-      verifiedAt: d2010(18),
-      storedAt: d2010(18),
-      storageStartDate: d2010(18),
+      depositDate: d2010(18), // 17 August 2010
+      kycApprovedAt: d2010(18),
+      intakeCompletedAt: d2010(18),
+      verifiedAt: d2010(19),
+      storedAt: d2010(19),
+      storageStartDate: d2010(19),
+
+      // Insurance: the deposit page shows the policy when provider + policy no. are set.
+      insuredValue: 290571880,
+      insuranceProvider: "Aegis Cargo Underwriting",
+      insurancePolicyNo: "ACU-2010-0082496",
+      insuranceCoverage: "ALL_RISK",
+      insuranceExpiryDate: new Date(Date.UTC(2027, 7, 18)), // 18 August 2027
 
       activities: {
         create: [
@@ -94,6 +99,12 @@ async function main() {
             performedBy: "Vault",
             createdAt: d2010(18),
           },
+          {
+            action: "INSURANCE_ACTIVATED",
+            description: "Insurance activated: ALL_RISK coverage via Aegis Cargo Underwriting. Policy: ACU-2010-0082496.",
+            performedBy: "Vault",
+            createdAt: d2010(18),
+          },
         ],
       },
     },
@@ -101,13 +112,9 @@ async function main() {
 
   console.log(`\n✓ Demo deposit ${DEPOSIT_NUMBER} linked to ${CLIENT_EMAIL}`);
   console.log(`  View it at:  /my-vault/${DEPOSIT_NUMBER}   (or My vault → the deposit)`);
-  if (created) {
-    console.log(`\n  New account created. Log in with:`);
-    console.log(`    email:    ${CLIENT_EMAIL}`);
-    console.log(`    password: ${DEFAULT_PASSWORD}`);
-  } else {
-    console.log(`\n  Linked to the existing ${CLIENT_EMAIL} account (password unchanged).`);
-  }
+  console.log(`\n  ${created ? "New account created" : "Existing account updated"}. Log in with:`);
+  console.log(`    email:    ${CLIENT_EMAIL}`);
+  console.log(`    password: ${DEFAULT_PASSWORD}`);
   console.log("");
 }
 

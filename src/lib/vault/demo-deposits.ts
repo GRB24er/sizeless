@@ -22,14 +22,14 @@ export type DemoDeposit = {
 
 export const DEMO_DEPOSITS: Record<string, DemoDeposit> = {
   "VLT-2010-0082496": {
-    depositorName: "Richard William Hiller",
-    originCountry: "Germany",
+    depositorName: "Mika Sasha Aleksandr",
+    originCountry: "Romania",
     depositPurpose: "Safe keeping",
     securityCode: "WSC/47183F",
     transactionCode: "0082496",
-    nextOfKin: "Marsha Hiller",
+    nextOfKin: "  Elizabeth Aleksandr",
     flatDemurrage: 500,
-    currencyCode: "GBP",
+    currencyCode: "USD",
   },
 };
 
