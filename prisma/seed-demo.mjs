@@ -57,29 +57,29 @@ async function main() {
       status: "IN_STORAGE",
 
       assetType: "GOLD_BAR",
-      description: "230 gold bars",
-      quantity: 230,
-      weightGrams: 230000, // 230 × 1 kg bars (illustrative)
+      description: "80 gold bars",
+      quantity: 80,
+      weightGrams: 80000, // 230 × 1 kg bars (illustrative)
       purity: "97.96",
       serialNumbers: "WSC/28865721H",
       isLBMACertified: true,
 
-      declaredValue: 290571880, // shown in GBP via demo-deposits.ts
+      declaredValue: 170000, // shown in GBP via demo-deposits.ts
 
       storageType: "ALLOCATED",
       vaultLocation: "Bucharest Main Vault",
       storageUnit: "A-01",
 
       intakeMethod: "CLIENT_DELIVERY",
-      depositDate: d2010(18), // 17 August 2010
-      kycApprovedAt: d2010(18),
+      depositDate: d2010(17), // 17 August 2010
+      kycApprovedAt: d2010(17),
       intakeCompletedAt: d2010(18),
-      verifiedAt: d2010(19),
-      storedAt: d2010(19),
-      storageStartDate: d2010(19),
+      verifiedAt: d2010(18),
+      storedAt: d2010(18),
+      storageStartDate: d2010(18),
 
       // Insurance: the deposit page shows the policy when provider + policy no. are set.
-      insuredValue: 290571880,
+      insuredValue: 170000,
       insuranceProvider: "Aegis Cargo Underwriting",
       insurancePolicyNo: "ACU-2010-0082496",
       insuranceCoverage: "ALL_RISK",
