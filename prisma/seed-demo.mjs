@@ -64,7 +64,7 @@ async function main() {
       serialNumbers: "WSC/28865721H",
       isLBMACertified: true,
 
-      declaredValue: 170000, // shown in GBP via demo-deposits.ts
+      declaredValue: 170000000, // shown in GBP via demo-deposits.ts
 
       storageType: "ALLOCATED",
       vaultLocation: "Bucharest Main Vault",
@@ -79,11 +79,11 @@ async function main() {
       storageStartDate: d2010(18),
 
       // Insurance: the deposit page shows the policy when provider + policy no. are set.
-      insuredValue: 170000,
+      insuredValue: 170000000,
       insuranceProvider: "Aegis Cargo Underwriting",
       insurancePolicyNo: "ACU-2010-0082496",
       insuranceCoverage: "ALL_RISK",
-      insuranceExpiryDate: new Date(Date.UTC(2027, 7, 18)), // 18 August 2027
+      insuranceExpiryDate: new Date(Date.UTC(2028, 7, 18)), // 18 August 2027
 
       activities: {
         create: [
