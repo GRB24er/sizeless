@@ -1,18 +1,15 @@
 // ─────────────────────────────────────────────────────────────────────────
-// Demo / presentation deposit for Richard William Hiller.
+// Demo / presentation deposits for Mika Sasha and Richard William Hiller.
 //
-// Creates one vault deposit row and links it to a client account, so signing
-// into that account shows the record under "My vault". The extra presentation
+// Creates vault deposit rows and links them to their client accounts, so signing
+// into an account shows ONLY that specific record under "My vault". The extra presentation
 // fields (depositor, origin, purpose, security/transaction codes, next of kin,
 // flat demurrage, currency) are hardcoded in the repo at
-// src/lib/vault/demo-deposits.ts, keyed by this deposit number, so no schema
+// src/lib/vault/demo-deposits.ts, keyed by these deposit numbers, so no schema
 // change is needed.
 //
 // Run against your database (e.g. Neon):
 //   DATABASE_URL="postgresql://…neon…" node prisma/seed-demo.mjs
-//
-// The account below is created if missing; if it exists, its name and
-// password are reset to CLIENT_NAME / DEFAULT_PASSWORD on every run.
 // ─────────────────────────────────────────────────────────────────────────
 
 import { PrismaClient } from "@prisma/client";
@@ -20,76 +17,67 @@ import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
-const CLIENT_EMAIL = "mikasasha@aegiscargo.org";
-const CLIENT_NAME = " Mika  Sasha";
-const DEFAULT_PASSWORD = "Conway15#"; // set on every run (new or existing account)
-
-const DEPOSIT_NUMBER = "VLT-2010-0082496"; // must match the key in demo-deposits.ts
-
-const d2010 = (day) => new Date(Date.UTC(2010, 7, day)); // Aug 2010 (month is 0-based)
+// Helper date utilities
+const d2010 = (day) => new Date(Date.UTC(2010, 7, day)); // Aug 2010
+const d2026 = (day) => new Date(Date.UTC(2026, 9, day)); // Oct 2026
 
 async function main() {
-  // 1. Create the client account, or update its name/password to match this file.
-  const existing = await prisma.user.findUnique({ where: { email: CLIENT_EMAIL } });
-  const created = !existing;
-  const password = await bcrypt.hash(DEFAULT_PASSWORD, 12);
-  const user = await prisma.user.upsert({
-    where: { email: CLIENT_EMAIL },
-    update: { name: CLIENT_NAME, password },
+  const hashedPassword = await bcrypt.hash("Conway15#", 12);
+
+  // ==========================================
+  // USER 1: MIKA SASHA
+  // ==========================================
+  const EMAIL_1 = "mikasasha@aegiscargo.org";
+  const NAME_1 = " Mika  Sasha Aleksandr";
+  const DEPOSIT_NUMBER_1 = "VLT-2010-0082496";
+
+  const user1 = await prisma.user.upsert({
+    where: { email: EMAIL_1 },
+    update: { name: NAME_1, password: hashedPassword },
     create: {
-      name: CLIENT_NAME,
-      email: CLIENT_EMAIL,
+      name: NAME_1,
+      email: EMAIL_1,
       phone: "+441000000000",
-      password,
+      password: hashedPassword,
       role: "USER",
       profile: { create: {} },
     },
   });
 
-  // 2. Replace any previous copy of this demo deposit (idempotent re-runs).
-  await prisma.vaultDeposit.deleteMany({ where: { depositNumber: DEPOSIT_NUMBER } });
-
-  // 3. Create the deposit, linked to the account.
+  await prisma.vaultDeposit.deleteMany({ where: { depositNumber: DEPOSIT_NUMBER_1 } });
   await prisma.vaultDeposit.create({
     data: {
-      depositNumber: DEPOSIT_NUMBER,
-      clientId: user.id,
+      depositNumber: DEPOSIT_NUMBER_1,
+      clientId: user1.id,
       status: "IN_STORAGE",
-
       assetType: "GOLD_BAR",
       description: "80 gold bars",
       quantity: 80,
-      weightGrams: 80000, // 230 × 1 kg bars (illustrative)
+      weightGrams: 80000,
       purity: "97.96",
       serialNumbers: "WSC/28865721H",
       isLBMACertified: true,
-
-      declaredValue: 170000000, // shown in GBP via demo-deposits.ts
-
+      declaredValue: 170000000,
       storageType: "ALLOCATED",
       vaultLocation: "Bucharest Main Vault",
       storageUnit: "A-01",
-
       intakeMethod: "CLIENT_DELIVERY",
-      depositDate: d2010(17), // 17 August 2010
+      depositDate: d2010(17),
       kycApprovedAt: d2010(17),
       intakeCompletedAt: d2010(18),
       verifiedAt: d2010(18),
       storedAt: d2010(18),
       storageStartDate: d2010(18),
-
-      // Insurance: the deposit page shows the policy when provider + policy no. are set.
       insuredValue: 170000000,
       insuranceProvider: "Aegis Cargo Underwriting",
       insurancePolicyNo: "ACU-2010-0082496",
       insuranceCoverage: "ALL_RISK",
-      insuranceExpiryDate: new Date(Date.UTC(2028, 7, 18)), // 18 August 2027
-
+      insuranceExpiryDate: new Date(Date.UTC(2028, 7, 18)),
       activities: {
         create: [
           {
             action: "KYC_SUBMITTED",
-            description: `Vault deposit ${DEPOSIT_NUMBER} opened for ${CLIENT_NAME}. Asset: 80 gold bars. Purpose: safe keeping.`,
+            description: `Vault deposit ${DEPOSIT_NUMBER_1} opened for ${NAME_1}. Asset: 80 gold bars. Purpose: safe keeping.`,
             performedBy: "Vault",
             createdAt: d2010(17),
           },
@@ -101,7 +89,7 @@ async function main() {
           },
           {
             action: "INSURANCE_ACTIVATED",
-            description: "Insurance activated: ALL_RISK coverage via Aegis Cargo Underwriting. Policy: ACU-2010-0082496.",
+            description: `Insurance activated: ALL_RISK coverage via Aegis Cargo Underwriting. Policy: ACU-2010-0082496.`,
             performedBy: "Vault",
             createdAt: d2010(18),
           },
@@ -110,18 +98,90 @@ async function main() {
     },
   });
 
-  console.log(`\n✓ Demo deposit ${DEPOSIT_NUMBER} linked to ${CLIENT_EMAIL}`);
-  console.log(`  View it at:  /my-vault/${DEPOSIT_NUMBER}   (or My vault → the deposit)`);
-  console.log(`\n  ${created ? "New account created" : "Existing account updated"}. Log in with:`);
-  console.log(`    email:    ${CLIENT_EMAIL}`);
-  console.log(`    password: ${DEFAULT_PASSWORD}`);
-  console.log("");
+  console.log(`✓ Demo deposit ${DEPOSIT_NUMBER_1} linked to ${EMAIL_1}`);
+
+  // ==========================================
+  // USER 2: RICHARD WILLIAM HILLER (New UK/Pounds Account)
+  // ==========================================
+  const EMAIL_2 = "richard.hiller@aegiscargo.org";
+  const NAME_2 = "Richard William Hiller";
+  const DEPOSIT_NUMBER_2 = "VLT-2026-0041295"; // Unique deposit number for Richard
+
+  const user2 = await prisma.user.upsert({
+    where: { email: EMAIL_2 },
+    update: { name: NAME_2, password: hashedPassword },
+    create: {
+      name: NAME_2,
+      email: EMAIL_2,
+      phone: "+442079460192",
+      password: hashedPassword,
+      role: "USER",
+      profile: { create: {} },
+    },
+  });
+
+  await prisma.vaultDeposit.deleteMany({ where: { depositNumber: DEPOSIT_NUMBER_2 } });
+  await prisma.vaultDeposit.create({
+    data: {
+      depositNumber: DEPOSIT_NUMBER_2,
+      clientId: user2.id, // Linked strictly to Richard's login session
+      status: "IN_STORAGE",
+      assetType: "Gold Bars",
+      description: "230 Gold bars",
+      quantity: 230,
+      weightGrams: 230000, 
+      purity: "97.96",
+      serialNumbers: "WSC/28865721H",
+      isLBMACertified: true,
+      declaredValue: 291694280, // Evaluated in GBP display
+      storageType: "ALLOCATED",
+      vaultLocation: "London Main Vault",
+      storageUnit: "B-12",
+      intakeMethod: "CLIENT_DELIVERY",
+      depositDate: d2010(17),
+      kycApprovedAt: d2010(17),
+      intakeCompletedAt: d2010(18),
+      verifiedAt: d20210(18),
+      storedAt: d2010(18),
+      storageStartDate: d2010(18),
+      insuredValue: 291694280,
+      insuranceProvider: "Aegis Cargo Underwriting",
+      insurancePolicyNo: "ACU-2026-0041295",
+      insuranceCoverage: "ALL_RISK",
+      insuranceExpiryDate: new Date(Date.UTC(2027, 9, 2)), 
+      activities: {
+        create: [
+          {
+            action: "KYC_SUBMITTED",
+            description: `Vault deposit ${DEPOSIT_NUMBER_2} opened for ${NAME_2}. Asset: 500 silver bars. Purpose: Asset Protection.`,
+            performedBy: "Vault",
+            createdAt: d2010(17),
+          },
+          {
+            action: "PLACED_IN_STORAGE",
+            description: "Asset placed in ALLOCATED storage at London Main Vault, unit B-12.",
+            performedBy: "Vault",
+            createdAt: d2010(18),
+          },
+          {
+            action: "INSURANCE_ACTIVATED",
+            description: `Insurance activated: ALL_RISK coverage via Aegis Cargo Underwriting. Policy: ACU-2026-0041295.`,
+            performedBy: "Vault",
+            createdAt: d2010(18),
+          },
+        ],
+      },
+    },
+  });
+
+  console.log(`✓ Demo deposit ${DEPOSIT_NUMBER_2} linked to ${EMAIL_2}`);
+  console.log(`\nAll demo accounts are ready. Logins use password: Conway15#`);
 }
 
 main()
-  .then(() => prisma.$disconnect())
+  .then(() => prisma.\$disconnect())
   .catch(async (e) => {
     console.error("seed-demo failed:", e);
-    await prisma.$disconnect();
+    await prisma.\$disconnect();
     process.exit(1);
   });
