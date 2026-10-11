@@ -34,42 +34,17 @@ export const DEMO_DEPOSITS: Record<string, DemoDeposit> = {
   },
   
   // SECOND SEEDED ACCOUNT (Completely isolated details)
-  "VLT-2026-0099123": {
+  "VLT-2026-0041295": {
     depositorName: "Richard William Hiller",
     originCountry: "Germany",
     depositPurpose: "Safe Keeping",
     securityCode: "WSC/47183F",
     transactionCode: "0082496",
-    nextOfKin: "Marsha Hiller",
+    nextOfKin: "  Marsha Hiller",
     flatDemurrage: 500,
     currencyCode: "GBP",
   },
 };
-
-
-// Inside prisma/seed-demo.mjs
-// ==========================================
-// Copy the code below into your prisma/seed-demo.mjs file to create the database rows:
-/*
-// 1. Create a second distinct user login
-const user2 = await prisma.user.create({
-  data: {
-    email: "elena@example.com",
-    password: "hashed_password_here", 
-    name: "Elena Rostova",
-  }
-});
-
-// 2. Link the new deposit number exclusively to User 2
-await prisma.deposit.create({
-  data: {
-    depositNumber: "VLT-2026-0099123", // Perfectly matches the key in DEMO_DEPOSITS above
-    amount: 1500000, 
-    userId: user2.id, // This links it strictly to Elena's login session
-  }
-});
-*/
-// ==========================================
 
 
 export const demoDeposit = (depositNumber: string): DemoDeposit | undefined => DEMO_DEPOSITS[depositNumber];
