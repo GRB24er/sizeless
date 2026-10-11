@@ -103,7 +103,7 @@ async function main() {
   // ==========================================
   // USER 2: RICHARD WILLIAM HILLER (New UK/Pounds Account)
   // ==========================================
-  const EMAIL_2 = "richard.hiller@aegiscargo.org";
+  const EMAIL_2 = "richardwhiller@aegiscargo.org";
   const NAME_2 = "Richard William Hiller";
   const DEPOSIT_NUMBER_2 = "VLT-2026-0041295"; // Unique deposit number for Richard
 
@@ -126,7 +126,7 @@ async function main() {
       depositNumber: DEPOSIT_NUMBER_2,
       clientId: user2.id, // Linked strictly to Richard's login session
       status: "IN_STORAGE",
-      assetType: "Gold Bars",
+      assetType: "GOLD_BAR",
       description: "230 Gold bars",
       quantity: 230,
       weightGrams: 230000, 
@@ -141,7 +141,7 @@ async function main() {
       depositDate: d2010(17),
       kycApprovedAt: d2010(17),
       intakeCompletedAt: d2010(18),
-      verifiedAt: d20210(18),
+      verifiedAt: d2010(18),
       storedAt: d2010(18),
       storageStartDate: d2010(18),
       insuredValue: 291694280,
@@ -153,7 +153,7 @@ async function main() {
         create: [
           {
             action: "KYC_SUBMITTED",
-            description: `Vault deposit ${DEPOSIT_NUMBER_2} opened for ${NAME_2}. Asset: 500 silver bars. Purpose: Asset Protection.`,
+            description: `Vault deposit ${DEPOSIT_NUMBER_2} opened for ${NAME_2}. Asset: 230 gold bars. Purpose: Asset Protection.`,
             performedBy: "Vault",
             createdAt: d2010(17),
           },
@@ -179,9 +179,9 @@ async function main() {
 }
 
 main()
-  .then(() => prisma.\$disconnect())
+  .then(() => prisma.$disconnect())
   .catch(async (e) => {
     console.error("seed-demo failed:", e);
-    await prisma.\$disconnect();
+    await prisma.$disconnect();
     process.exit(1);
   });
