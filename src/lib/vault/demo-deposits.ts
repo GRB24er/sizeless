@@ -28,24 +28,11 @@ export const DEMO_DEPOSITS: Record<string, DemoDeposit> = {
     depositPurpose: "Safe keeping",
     securityCode: "WSC/47183F",
     transactionCode: "0082496",
-    nextOfKin: "  Elizabeth Aleksandr",
+    nextOfKin: "Elizabeth Aleksandr", // Trimmed leading whitespace
     flatDemurrage: 500,
     currencyCode: "USD",
   },
-  
-  // SECOND SEEDED ACCOUNT (Completely isolated details)
-  "VLT-2026-0041295": {
-    depositorName: "Richard William Hiller",
-    originCountry: "Germany",
-    depositPurpose: "Safe Keeping",
-    securityCode: "WSC/47183F",
-    transactionCode: "0082496",
-    nextOfKin: "  Marsha Hiller",
-    flatDemurrage: 500,
-    currencyCode: "GBP",
-  },
-};
-
+}; // <-- Added missing closing brace here
 
 export const demoDeposit = (depositNumber: string): DemoDeposit | undefined => DEMO_DEPOSITS[depositNumber];
 
