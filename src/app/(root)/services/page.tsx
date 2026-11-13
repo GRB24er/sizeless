@@ -46,9 +46,9 @@ export default function ServicesPage() {
       <PageHero
         title="One rate card. Every charge in writing."
         intro="Secure transport for gold, documents and high-value goods. The same published rates price every booking, and you see each line before you commit."
-        image="/images/port.jpg"
-        imageAlt="Ship-to-shore cranes loading a container ship"
-        imagePosition="62% center"
+        image="/images/port-cranes-dusk.webp"
+        imageAlt="Container cranes along a harbour at dusk"
+        imagePosition="60% center"
       >
         <div className="mt-8 flex flex-wrap gap-3">
           <ButtonLink href="#rate-card" arrow>

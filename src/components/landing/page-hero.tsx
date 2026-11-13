@@ -1,7 +1,7 @@
-import Image from "next/image";
 import { CSSProperties, ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { Container } from "./primitives";
+import { ParallaxImage } from "./parallax-image";
 
 const delay = (ms: number) => ({ "--delay": `${ms}ms` }) as CSSProperties;
 
@@ -49,14 +49,14 @@ export function PageHero({
         {image && (
           <div className="lg:col-span-5">
             <div className="animate-unveil relative aspect-[4/3] overflow-hidden rounded-xl bg-tint" style={delay(60)}>
-              <Image
+              <ParallaxImage
                 src={image}
                 alt={imageAlt}
-                fill
                 priority
+                travel={6}
                 sizes="(min-width: 1024px) 480px, 100vw"
-                className="animate-settle object-cover"
-                style={{ objectPosition: imagePosition }}
+                imageClassName="animate-settle"
+                imageStyle={{ objectPosition: imagePosition }}
               />
             </div>
           </div>

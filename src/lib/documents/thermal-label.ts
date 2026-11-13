@@ -1,16 +1,8 @@
 import jsPDF from "jspdf";
-import bwipjs from "bwip-js";
-import { drawLogo, finalizePdf } from "./branding";
 import { generateTrackingQR } from "./qr-generator";
-
-// FedEx-style 4x6" thermal label (101.6mm x 152.4mm)
-const LABEL_W = 101.6;
-const LABEL_H = 152.4;
-
-const BLACK = [0, 0, 0] as const;
-const WHITE = [255, 255, 255] as const;
-const GRAY = [120, 120, 120] as const;
-const NAVY = [15, 29, 47] as const;
+import { getMarkBase64 } from "./logo-loader";
+import { code128, documentFonts, fmtDate, type RGB } from "./layout";
+import { SHIPPING_OPTIONS } from "@/app/(root)/shipments/create/type";
 
 type LabelData = {
   trackingNumber: string;
@@ -27,285 +19,143 @@ type LabelData = {
   destinationState: string;
   destinationPostalCode: string;
   destinationCountry: string;
-  packages: {
-    weight: number;
-    pieces: number;
-    description: string;
-  }[];
-  recipient: {
-    name: string;
-    company?: string | null;
-    phone: string;
-  };
-  Sender: {
-    name: string;
-    phone?: string;
-  } | null;
+  packages: { weight: number; pieces: number; description: string }[];
+  recipient: { name: string; company?: string | null; phone: string };
+  Sender: { name: string; phone?: string } | null;
 };
 
-function fmtDate(d: string | Date): string {
-  try {
-    return new Date(d).toLocaleDateString("en-GB", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    });
-  } catch {
-    return "—";
-  }
+// Thermal printers render only black: no greys, no fills except solid black.
+const BLACK: RGB = [0, 0, 0];
+const WHITE: RGB = [255, 255, 255];
+
+function serviceName(id: string) {
+  return SHIPPING_OPTIONS.find((o) => o.id === id)?.label ?? id.replace(/[_-]+/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-export async function generateThermalLabel(
-  data: LabelData
-): Promise<Buffer> {
-  const doc = new jsPDF({
-    orientation: "portrait",
-    unit: "mm",
-    format: [LABEL_W, LABEL_H],
-  });
+/**
+ * Parcel label: who it is going to in the largest type, then the scannable
+ * tracking barcode, the consignment facts and a tracking QR. Lays out to any
+ * label size; used for the 4 × 6 in thermal label and the 100 × 150 mm label.
+ */
+export async function renderLabel(data: LabelData, size: { width: number; height: number }): Promise<Buffer> {
+  const { width: W, height: H } = size;
+  const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: [W, H], compress: true });
+  const font = documentFonts(doc);
+  const M = 4;
+  const R = W - M;
+  const [qr, barcode] = await Promise.all([generateTrackingQR(data.trackingNumber), code128(data.trackingNumber, 14)]);
+  const weight = data.packages.reduce((s, p) => s + p.weight, 0);
+  const pieces = data.packages.reduce((s, p) => s + p.pieces, 0);
+  const text = (t: string | string[], x: number, y: number, align: "left" | "right" = "left") => doc.text(t, x, y, { align });
+  const rule = (y: number, w = 0.3) => {
+    doc.setDrawColor(...BLACK);
+    doc.setLineWidth(w);
+    doc.line(M, y, R, y);
+  };
 
-  const qr = await generateTrackingQR(data.trackingNumber);
-  const totalWeight = data.packages.reduce((s, p) => s + p.weight, 0);
-  const totalPieces = data.packages.reduce((s, p) => s + p.pieces, 0);
-  const L = 3; // left margin
-  const R = LABEL_W - 3; // right edge
-  const W = R - L;
-
-  // ═══════════════════════════════════════════
-  // TOP BAR — Logo + Service Type
-  // ═══════════════════════════════════════════
-  doc.setFillColor(...NAVY);
-  doc.rect(0, 0, LABEL_W, 14, "F");
-
-  drawLogo(doc, 3, 1.5, 11);
-
-  // Service type badge
-  doc.setFillColor(...WHITE);
-  doc.roundedRect(R - 35, 2, 34, 10, 1, 1, "F");
-  doc.setTextColor(...NAVY);
-  doc.setFontSize(7);
-  doc.setFont("helvetica", "bold");
-  doc.text(data.serviceType.toUpperCase(), R - 18, 8.5, { align: "center" });
-
-  let y = 17;
-
-  // ═══════════════════════════════════════════
-  // TRACKING NUMBER — Large + prominent
-  // ═══════════════════════════════════════════
-  doc.setDrawColor(...BLACK);
-  doc.setLineWidth(0.4);
-  doc.rect(L, y, W, 12, "S");
-
-  doc.setFontSize(4);
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(...GRAY);
-  doc.text("TRACKING NUMBER", L + 2, y + 3);
-
-  doc.setFontSize(11);
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(...BLACK);
-  doc.text(data.trackingNumber, L + 2, y + 9.5);
-
-  y += 14;
-
-  // ═══════════════════════════════════════════
-  // FROM — Sender
-  // ═══════════════════════════════════════════
-  doc.setFillColor(245, 245, 245);
-  doc.rect(L, y, W, 20, "F");
-  doc.setDrawColor(...BLACK);
-  doc.setLineWidth(0.3);
-  doc.rect(L, y, W, 20, "S");
-
-  doc.setFontSize(4);
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(...GRAY);
-  doc.text("FROM / SHIPPER", L + 2, y + 3.5);
-
-  doc.setFontSize(7);
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(...BLACK);
-  doc.text(data.Sender?.name || "Aegis Cargo", L + 2, y + 8);
-
-  doc.setFontSize(5.5);
-  doc.setFont("helvetica", "normal");
-  doc.text(data.originAddress, L + 2, y + 12);
-  doc.text(
-    `${data.originCity}, ${data.originState} ${data.originPostalCode}`,
-    L + 2,
-    y + 15.5
-  );
-  doc.setFont("helvetica", "bold");
-  doc.text(data.originCountry.toUpperCase(), L + 2, y + 19);
-
-  if (data.Sender?.phone) {
-    doc.setFont("helvetica", "normal");
-    doc.setFontSize(4.5);
-    doc.setTextColor(...GRAY);
-    doc.text(`T: ${data.Sender.phone}`, R - 2, y + 19, { align: "right" });
+  // Brand and service.
+  const mark = getMarkBase64();
+  let bx = M;
+  if (mark) {
+    doc.addImage(mark, "PNG", M, 4.2, 7.2, 6, "aegis-mark", "FAST");
+    bx = M + 9.2;
   }
+  font("semibold", 10, BLACK);
+  text("Aegis Cargo", bx, 9);
+  const service = serviceName(data.serviceType).toUpperCase();
+  font("semibold", 7, WHITE);
+  const sw = doc.getTextWidth(service) + 5;
+  doc.setFillColor(...BLACK);
+  doc.rect(R - sw, 3.6, sw, 6.4, "F");
+  text(service, R - 2.5, 8, "right");
+  rule(13, 0.5);
 
-  y += 22;
+  // From.
+  let y = 17.4;
+  font("medium", 6, BLACK);
+  text("From", M, y);
+  text(`Shipped ${fmtDate(data.createdAt)}`, R, y, "right");
+  font("semibold", 8, BLACK);
+  text(data.Sender?.name || "Aegis Cargo", M, y + 4.4);
+  font("sans", 7, BLACK);
+  const from = [data.originAddress, `${data.originCity}${data.originState ? `, ${data.originState}` : ""} ${data.originPostalCode}`.trim(), data.originCountry]
+    .filter(Boolean)
+    .map((l) => doc.splitTextToSize(l, R - M)[0] as string);
+  from.forEach((l, i) => text(l, M, y + 8 + i * 3.3));
+  y += 8 + from.length * 3.3 + 1.2;
+  rule(y);
 
-  // ═══════════════════════════════════════════
-  // TO — Recipient (LARGE, prominent like FedEx)
-  // ═══════════════════════════════════════════
-  doc.setFillColor(...WHITE);
-  doc.setDrawColor(...BLACK);
-  doc.setLineWidth(0.8);
-  doc.rect(L, y, W, 28, "S");
-
-  doc.setFontSize(4);
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(...GRAY);
-  doc.text("SHIP TO / CONSIGNEE", L + 2, y + 3.5);
-
-  // Recipient name — BIG
-  doc.setFontSize(10);
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(...BLACK);
-  doc.text(data.recipient.name.toUpperCase(), L + 2, y + 9.5);
-
-  if (data.recipient.company) {
-    doc.setFontSize(6);
-    doc.setFont("helvetica", "normal");
-    doc.text(data.recipient.company, L + 2, y + 13);
-  }
-
-  doc.setFontSize(6);
-  doc.setFont("helvetica", "normal");
-  doc.text(data.destinationAddress, L + 2, y + 16.5);
-  doc.text(
-    `${data.destinationCity}, ${data.destinationState} ${data.destinationPostalCode}`,
-    L + 2,
-    y + 20
-  );
-
-  // Country + postal code — HUGE (routing info)
-  doc.setFontSize(14);
-  doc.setFont("helvetica", "bold");
-  doc.text(data.destinationCountry.toUpperCase(), L + 2, y + 27);
-
-  // Postal code on right
-  doc.setFontSize(14);
-  doc.text(data.destinationPostalCode || "", R - 2, y + 27, {
-    align: "right",
-  });
-
-  // Phone
-  doc.setFontSize(4.5);
-  doc.setFont("helvetica", "normal");
-  doc.setTextColor(...GRAY);
-  doc.text(`T: ${data.recipient.phone}`, R - 2, y + 3.5, { align: "right" });
-
-  y += 30;
-
-  // ═══════════════════════════════════════════
-  // SHIPMENT INFO BAR
-  // ═══════════════════════════════════════════
-  doc.setFillColor(...NAVY);
-  doc.rect(L, y, W, 5, "F");
-  doc.setFontSize(4);
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(...WHITE);
-  doc.text("SHIPMENT DETAILS", L + 2, y + 3.5);
-
+  // Deliver to: the largest type on the label.
+  y += 4.6;
+  font("medium", 6, BLACK);
+  text("Deliver to", M, y);
+  if (data.recipient.phone) text(data.recipient.phone, R, y, "right");
+  font("semibold", 13, BLACK);
+  const name = doc.splitTextToSize(data.recipient.name.toUpperCase(), R - M) as string[];
+  name.slice(0, 2).forEach((l, i) => text(l, M, y + 6 + i * 5.4));
+  y += 6 + (Math.min(name.length, 2) - 1) * 5.4;
+  font("sans", 8.5, BLACK);
+  const to = [
+    data.recipient.company,
+    data.destinationAddress,
+    `${data.destinationCity}${data.destinationState ? `, ${data.destinationState}` : ""}`,
+  ]
+    .filter(Boolean)
+    .flatMap((l) => (doc.splitTextToSize(l as string, R - M) as string[]).slice(0, 2));
+  to.forEach((l, i) => text(l, M, y + 4.6 + i * 3.9));
+  y += 4.6 + to.length * 3.9;
+  font("semibold", 10, BLACK);
+  text(data.destinationCountry.toUpperCase(), M, y + 1.4);
+  font("monoMedium", 14, BLACK);
+  text(data.destinationPostalCode || "", R, y + 1.6, "right");
   y += 5;
+  rule(y, 0.8);
 
-  // Info grid
-  doc.setDrawColor(...BLACK);
-  doc.setLineWidth(0.3);
-  const qW = W / 4;
+  // Tracking barcode.
+  y += 4.4;
+  font("medium", 6, BLACK);
+  text("Tracking number", M, y);
+  text(`Due ${fmtDate(data.estimatedDelivery)}`, R, y, "right");
+  if (barcode) doc.addImage(barcode, "PNG", M, y + 2, R - M, 15);
+  font("monoMedium", 11, BLACK);
+  text(data.trackingNumber, W / 2 - doc.getTextWidth(data.trackingNumber) / 2, y + 22.4);
+  y += 25.5;
+  rule(y);
 
-  // Row of details
+  // Consignment facts in four equal cells.
   const cells = [
-    { label: "WEIGHT", value: `${totalWeight} kg` },
-    { label: "PIECES", value: `${totalPieces}` },
-    { label: "DATE", value: fmtDate(data.createdAt) },
-    { label: "ETA", value: fmtDate(data.estimatedDelivery) },
+    ["Weight", `${weight.toLocaleString("en-GB", { maximumFractionDigits: 2 })} kg`],
+    ["Pieces", String(pieces)],
+    ["Packages", String(data.packages.length)],
   ];
-
-  cells.forEach((cell, i) => {
-    const cx = L + i * qW;
-    doc.rect(cx, y, qW, 10, "S");
-    doc.setFontSize(3.5);
-    doc.setFont("helvetica", "bold");
-    doc.setTextColor(...GRAY);
-    doc.text(cell.label, cx + 1.5, y + 3);
-    doc.setFontSize(6);
-    doc.setFont("helvetica", "bold");
-    doc.setTextColor(...BLACK);
-    doc.text(cell.value, cx + 1.5, y + 8);
+  const cw = (R - M) / cells.length;
+  cells.forEach(([label, value], i) => {
+    const x = M + i * cw;
+    if (i > 0) {
+      doc.setLineWidth(0.3);
+      doc.line(x, y, x, y + 10);
+    }
+    font("medium", 5.6, BLACK);
+    text(label, x + (i ? 2 : 0), y + 3.6);
+    font("monoMedium", 8.5, BLACK);
+    text(value, x + (i ? 2 : 0), y + 8.2);
   });
+  y += 10;
+  rule(y);
 
-  y += 12;
+  // Tracking QR.
+  const qrSize = Math.min(24, H - y - 6);
+  doc.addImage(qr, "PNG", M, y + 2.5, qrSize, qrSize);
+  font("semibold", 8, BLACK);
+  text("Scan to track", M + qrSize + 4, y + 8);
+  font("sans", 7, BLACK);
+  text("aegiscargo.org/track", M + qrSize + 4, y + 12);
+  text(data.trackingNumber, M + qrSize + 4, y + 16);
 
-  // ═══════════════════════════════════════════
-  // QR CODE + BARCODE AREA
-  // ═══════════════════════════════════════════
-  doc.setDrawColor(...BLACK);
-  doc.setLineWidth(0.4);
-  doc.rect(L, y, W, 30, "S");
+  return Buffer.from(doc.output("arraybuffer"));
+}
 
-  // QR on left
-  doc.addImage(qr, "PNG", L + 4, y + 2, 26, 26);
-  doc.setFontSize(3.5);
-  doc.setTextColor(...GRAY);
-  doc.setFont("helvetica", "bold");
-  doc.text("SCAN TO TRACK", L + 17, y + 29.5, { align: "center" });
-
-  // Code 128 barcode of the tracking number, on the right
-  const barcodeX = L + 35;
-  const barcodeW = W - 38;
-  try {
-    const png = await bwipjs.toBuffer({
-      bcid: "code128",
-      text: data.trackingNumber,
-      scale: 3,
-      height: 14,
-      includetext: false,
-      paddingwidth: 0,
-      paddingheight: 0,
-    });
-    doc.addImage(`data:image/png;base64,${png.toString("base64")}`, "PNG", barcodeX, y + 3, barcodeW, 18);
-  } catch (err) {
-    console.error("Barcode generation failed:", err);
-  }
-
-  // Tracking number text under barcode
-  doc.setFontSize(7);
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(...BLACK);
-  doc.text(
-    data.trackingNumber,
-    barcodeX + barcodeW / 2,
-    y + 25,
-    { align: "center" }
-  );
-
-  y += 32;
-
-  // ═══════════════════════════════════════════
-  // FOOTER — Route + branding
-  // ═══════════════════════════════════════════
-  doc.setFillColor(...NAVY);
-  doc.rect(0, LABEL_H - 10, LABEL_W, 10, "F");
-
-  doc.setFontSize(5);
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(...WHITE);
-  doc.text(
-    `${data.originCity.toUpperCase()} TO ${data.destinationCity.toUpperCase()}`,
-    LABEL_W / 2,
-    LABEL_H - 5.5,
-    { align: "center" }
-  );
-
-  doc.setFontSize(3.5);
-  doc.setFont("helvetica", "normal");
-  doc.text("aegiscargo.org", LABEL_W / 2, LABEL_H - 2.5, {
-    align: "center",
-  });
-
-  return finalizePdf(doc, { watermark: false }); // barcodes must stay scannable
+/** 4 × 6 in thermal label (101.6 × 152.4 mm). */
+export async function generateThermalLabel(data: LabelData): Promise<Buffer> {
+  return renderLabel(data, { width: 101.6, height: 152.4 });
 }

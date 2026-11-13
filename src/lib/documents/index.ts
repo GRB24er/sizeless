@@ -1,4 +1,4 @@
-export { generateTrackingQR, generateVaultQR, generateDocumentQR } from "./qr-generator";
+export { generateTrackingQR, generateVaultQR } from "./qr-generator";
 export { getLogoBase64, getLogoFormat } from "./logo-loader";
 export {
   generateAirwayBill,

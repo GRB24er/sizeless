@@ -67,6 +67,17 @@ export function weightText(grams: number) {
   return `${g} g (${kg}${oz} oz t)`;
 }
 
+/** Short weight for summary tiles: "80 kg" or "250 g". */
+export function compactWeight(grams: number) {
+  const fmt = new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 });
+  return grams >= 1000 ? `${fmt.format(grams / 1000)} kg` : `${fmt.format(grams)} g`;
+}
+
+/** Troy ounces, e.g. "2,572.06 oz t". */
+export function troyOunces(grams: number) {
+  return `${new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 }).format(grams / TROY_OZ_GRAMS)} oz t`;
+}
+
 export function purityText(purity: string | null, fineness?: number | null) {
   if (!purity && !fineness) return null;
   if (purity?.toLowerCase() === "dore") return "Doré (unrefined)";

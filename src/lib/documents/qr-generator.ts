@@ -21,13 +21,3 @@ export async function generateVaultQR(depositNumber: string): Promise<string> {
     errorCorrectionLevel: "M",
   });
 }
-
-export async function generateDocumentQR(documentId: string, type: string): Promise<string> {
-  const url = `${BASE_URL}/verify/${type}/${encodeURIComponent(documentId)}`;
-  return QRCode.toDataURL(url, {
-    width: 120,
-    margin: 1,
-    color: { dark: "#0A1628", light: "#FFFFFF" },
-    errorCorrectionLevel: "H",
-  });
-}

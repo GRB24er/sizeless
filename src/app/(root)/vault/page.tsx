@@ -29,8 +29,8 @@ export default function VaultPage() {
       <PageHero
         title="Precious-metals custody, with every fee in writing."
         intro="Store gold, silver, platinum and palladium with documented intake, a published fee schedule and online access to your holdings."
-        image="/images/gold.jpeg"
-        imageAlt="One-kilogram fine gold bars and gold bullion coins"
+        image="/images/gold-platinum-bars.webp"
+        imageAlt="A cast gold bar beside sealed platinum bars"
       >
         <div className="mt-8 flex flex-wrap gap-3">
           <ButtonLink href="/register" arrow>
