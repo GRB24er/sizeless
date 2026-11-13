@@ -1,5 +1,28 @@
 import { cn } from "@/lib/utils";
+import { SHIPMENT_STAGES, shipmentStage } from "@/lib/shipment-status";
 import { PHASES, TONE_BADGE, phaseOf, statusLabel, statusTone } from "./vault-format";
+
+/** A shipment's four stages as a segmented bar, matching the deposit PhaseBar. */
+export function ShipmentProgress({ status, labels = false }: { status: string | null | undefined; labels?: boolean }) {
+  const current = shipmentStage(status);
+  return (
+    <ol aria-label="Shipment progress" className={cn("grid grid-cols-4", labels ? "gap-2" : "gap-1")}>
+      {SHIPMENT_STAGES.map((stage, i) => {
+        const reached = current !== undefined && i <= current;
+        const now = i === current;
+        return (
+          <li key={stage} className="min-w-0">
+            <span aria-hidden className={cn("block rounded-full", labels ? "h-1" : "h-[3px]", reached ? "bg-signal" : "bg-line")} />
+            <span className={cn(labels ? "mt-2 block truncate text-[13px]" : "sr-only", now ? "font-medium text-ink" : reached ? "text-ink-2" : "text-ink-3")}>
+              {stage}
+              <span className="sr-only">{now ? " (current stage)" : reached ? " (done)" : ""}</span>
+            </span>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
 
 export function StatusBadge({ status, className }: { status: string; className?: string }) {
   return (

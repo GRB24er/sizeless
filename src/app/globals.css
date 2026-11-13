@@ -206,6 +206,22 @@
 .animate-unveil { animation: unveil 1100ms var(--ease-out-strong) both; animation-delay: var(--delay, 0ms); }
 .animate-settle { animation: settle 1600ms var(--ease-out-strong) both; animation-delay: var(--delay, 0ms); }
 
+/* Scroll-revealed photos get the same opening as the hero: the frame (a
+   <Reveal> with .reveal-frame) opens while the picture (.reveal-zoom) settles. */
+.reveal-frame {
+  clip-path: inset(0 round 12px);
+  transition: opacity 700ms var(--ease-out-strong), transform 700ms var(--ease-out-strong),
+    clip-path 1100ms var(--ease-out-strong);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+[data-reveal="hidden"].reveal-frame { clip-path: inset(6% 6% 6% 6% round 12px); }
+.reveal-zoom { transition: transform 1600ms var(--ease-out-strong); transition-delay: var(--reveal-delay, 0ms); }
+[data-reveal="hidden"] .reveal-zoom { transform: scale(1.08); }
+
+/* Scroll cue on the home film: a short light travelling down a hairline. */
+@keyframes scroll-cue { from { transform: translateY(-100%); } to { transform: translateY(270%); } }
+.animate-scroll-cue { animation: scroll-cue 1.8s var(--ease-out-strong) infinite; }
+
 /* Timeline rule that draws itself when its section is revealed. */
 .draw-x { transform-origin: left center; transition: transform 1100ms var(--ease-out-strong) 150ms; }
 [data-reveal="hidden"] .draw-x { transform: scaleX(0); }
@@ -215,6 +231,9 @@
 @media (prefers-reduced-motion: reduce) {
   [data-reveal] { transition: opacity 300ms ease; transform: none !important; }
   [data-reveal="hidden"] .draw-x, [data-reveal="hidden"] .draw-y { transform: none; }
+  [data-reveal="hidden"].reveal-frame { clip-path: inset(0 round 12px); }
+  [data-reveal="hidden"] .reveal-zoom { transform: none; }
+  .animate-scroll-cue { animation: none; }
   .animate-rise, .animate-unveil, .animate-settle { animation: none; }
 }
 

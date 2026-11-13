@@ -1,6 +1,4 @@
-import Image from "next/image";
 import Link from "next/link";
-import { CSSProperties } from "react";
 import { cn } from "@/lib/utils";
 import { EyeOff, FileText, ListChecks, Mail, MapPin, Phone, Receipt, ShieldAlert } from "lucide-react";
 import { SHIPPING_OPTIONS, FEE_SCHEDULE } from "@/app/(root)/shipments/create/type";
@@ -8,50 +6,101 @@ import { STORAGE_TYPE_CONFIG, MIN_MONTHLY_STORAGE_FEE } from "@/lib/vault/types"
 import { COMPANY } from "@/lib/company";
 import { Container, SectionHeading, ButtonLink, TextLink, buttonClass, formatPhone, plainRange, usd, usdCents } from "./primitives";
 import { Reveal } from "./reveal";
+import { ScrollFilm, type FilmChapter } from "./scroll-film";
+import { ParallaxImage } from "./parallax-image";
 import { EstimateLink, TaskPanel } from "./task-panel";
 import { Faq, FaqItem } from "./faq";
 import { PRICING_FAQ } from "./faqs";
 
-const delay = (ms: number) => ({ "--delay": `${ms}ms` }) as CSSProperties;
-
 // ─── Hero ───────────────────────────────────────────────────────────────
 
 export function HomeHero() {
+  const express = SHIPPING_OPTIONS.find((o) => o.id === "armored_express");
+  const allocated = STORAGE_TYPE_CONFIG.ALLOCATED;
+  const chapters: FilmChapter[] = [
+    {
+      label: "At sea",
+      still: "/images/film/film-0.webp",
+      stillAlt: "Aerial view of a loaded container ship under way at sea",
+      title: "Secure shipping and storage for valuables.",
+      body: "Sealed, tracked transport and precious-metals vault custody. Every charge is itemized from our published rate card before you book.",
+      actions: (
+        <>
+          <ButtonLink href="#track" arrow>
+            Track a shipment
+          </ButtonLink>
+          <ButtonLink href="/quote" variant="outlineLight">
+            Get a quote
+          </ButtonLink>
+        </>
+      ),
+    },
+    {
+      label: "Sealed on board",
+      still: "/images/film/film-2.webp",
+      stillAlt: "Containers stacked on the deck of a ship, seen from above",
+      title: "Sealed before it moves.",
+      body: "Tamper-evident seals, declared value and insurance are set when you book, and the total you accept is the total you pay.",
+      card: {
+        label: "Tamper-evident seals",
+        value: usd(FEE_SCHEDULE.tamperSealFee),
+        note: "Per package, listed on the published rate card.",
+      },
+    },
+    {
+      label: "At the terminal",
+      still: "/images/film/film-3.webp",
+      stillAlt: "Container terminal yard with cranes, seen from directly above",
+      title: "Every handover on record.",
+      body: "Pickups, departures and arrivals are logged with the time and place, and each update is emailed to sender and recipient.",
+      card: express && {
+        label: "Armored Express insurance",
+        value: `${express.insuranceRate}%`,
+        note: "Of declared value, with chain of custody logged at every handover.",
+      },
+    },
+    {
+      label: "In the vault",
+      still: "/images/film/film-4.webp",
+      stillAlt: "A wall of numbered safe deposit boxes with one drawer open",
+      title: "Custody, not just storage.",
+      body: "Gold, silver, platinum and palladium held allocated, segregated or unallocated, weighed and tested at intake.",
+      card: {
+        label: "Allocated storage",
+        value: usdCents(allocated.monthlyRatePerKg),
+        note: "Per kg a month. Specific bars assigned to you, serials recorded.",
+      },
+      actions: (
+        <ButtonLink href="/vault" variant="light" arrow>
+          Vault services and fees
+        </ButtonLink>
+      ),
+    },
+  ];
+
   return (
-    <section className="bg-canvas pb-6 pt-[calc(var(--header-h)+2.5rem)] sm:pt-[calc(var(--header-h)+3.5rem)] lg:pb-24">
-      <Container>
-        <div className="grid gap-8 lg:grid-cols-12 lg:gap-x-10 lg:gap-y-10">
-          <div className="lg:col-span-7 lg:row-start-1 lg:pt-4">
-            <h1 className="animate-rise type-display text-balance text-[2.6rem] font-semibold leading-[1.03] text-ink sm:text-[3.25rem] lg:text-[4rem]">
-              Secure shipping and storage for valuables.
-            </h1>
-            <p className="animate-rise mt-6 max-w-[36rem] text-pretty text-lg leading-relaxed text-ink-2" style={delay(90)}>
-              Sealed, tracked transport and precious-metals vault custody. Every charge is itemized from our published rate
-              card before you book.
-            </p>
-          </div>
+    <>
+      <ScrollFilm
+        chapters={chapters}
+        film="/videos/film-1280.mp4"
+        filmSmall="/videos/film-854.mp4"
+        timeline={[0, 5.7, 11.1, 16.5, 21.15]}
+      />
 
-          <div className="order-3 lg:order-none lg:col-span-5 lg:col-start-8 lg:row-span-2 lg:row-start-1">
-            <div className="animate-unveil relative aspect-[4/3] overflow-hidden rounded-xl bg-tint sm:aspect-[16/10] lg:aspect-auto lg:h-full lg:min-h-[560px]">
-              <Image
-                src="/images/port.jpeg"
-                alt="Container ship stacked with shipping containers"
-                fill
-                priority
-                sizes="(min-width: 1280px) 500px, (min-width: 1024px) 40vw, 100vw"
-                className="animate-settle object-cover object-[62%_center]"
-              />
-            </div>
-          </div>
-
-          <div className="relative z-10 order-2 lg:order-none lg:col-span-8 lg:col-start-1 lg:row-start-2 lg:-mb-8 lg:self-end">
-            <div className="animate-rise" style={delay(180)}>
-              <TaskPanel />
-            </div>
-          </div>
-        </div>
-      </Container>
-    </section>
+      <section id="track" className="scroll-mt-[var(--header-h)] bg-canvas pb-6 pt-16 sm:pt-20 lg:pb-24">
+        <Container className="grid gap-8 lg:grid-cols-12 lg:items-start lg:gap-10">
+          <Reveal className="lg:col-span-4 lg:pt-2">
+            <SectionHeading
+              title="Track, price or store"
+              intro="Follow a shipment by its tracking number, price a booking from the rate card, or estimate vault storage."
+            />
+          </Reveal>
+          <Reveal delay={80} className="lg:col-span-8">
+            <TaskPanel />
+          </Reveal>
+        </Container>
+      </section>
+    </>
   );
 }
 
@@ -154,13 +203,13 @@ export function AfterBooking() {
           />
         </Reveal>
 
-        <Reveal delay={60} className="relative mt-12 aspect-[16/9] overflow-hidden rounded-xl bg-tint sm:aspect-[21/8]">
-          <Image
-            src="/images/warehouse.jpg"
-            alt="Warehouse aisles with racked pallets and loading doors"
-            fill
+        <Reveal delay={60} className="reveal-frame relative mt-12 aspect-[16/9] overflow-hidden rounded-xl bg-tint sm:aspect-[21/8]">
+          <ParallaxImage
+            src="/images/handover-signature.webp"
+            alt="A recipient signs for a parcel handed over at a doorway"
             sizes="(min-width: 1280px) 1200px, 100vw"
-            className="object-cover object-[center_55%]"
+            imageClassName="reveal-zoom"
+            imageStyle={{ objectPosition: "62% 45%" }}
           />
         </Reveal>
 
@@ -204,13 +253,12 @@ export function VaultSection() {
         </Reveal>
 
         <div className="mt-12 grid gap-4 lg:grid-cols-12">
-          <Reveal className="relative min-h-[300px] overflow-hidden rounded-xl bg-navy-2 sm:min-h-[380px] lg:col-span-7 lg:row-span-2 lg:min-h-0">
-            <Image
-              src="/images/gold.jpeg"
-              alt="One-kilogram fine gold bars and gold bullion coins"
-              fill
+          <Reveal className="reveal-frame relative min-h-[300px] overflow-hidden rounded-xl bg-navy-2 sm:min-h-[380px] lg:col-span-7 lg:row-span-2 lg:min-h-0">
+            <ParallaxImage
+              src="/images/gold-bars-stack.webp"
+              alt="Cast and minted gold bars, some still sealed in their assay cards"
               sizes="(min-width: 1024px) 700px, 100vw"
-              className="object-cover"
+              imageClassName="reveal-zoom"
             />
           </Reveal>
 

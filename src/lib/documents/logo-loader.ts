@@ -42,6 +42,21 @@ export function getLogoFormat(): "PNG" | "JPEG" {
   }
 }
 
+let cachedMark: string | null | undefined;
+
+/** The container-and-shield emblem on its own, used beside the wordmark in document headers. */
+export function getMarkBase64(): string | null {
+  if (cachedMark !== undefined) return cachedMark;
+  try {
+    const markPath = path.join(process.cwd(), "public", "images", "logo-mark.png");
+    cachedMark = fs.existsSync(markPath) ? `data:image/png;base64,${fs.readFileSync(markPath).toString("base64")}` : null;
+  } catch (err) {
+    console.error("Failed to load logo mark:", err);
+    cachedMark = null;
+  }
+  return cachedMark;
+}
+
 let cachedWatermark: string | null | undefined;
 
 /** Transparent, single-tone version of the logo used as the page watermark. */

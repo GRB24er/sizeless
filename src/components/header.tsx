@@ -52,22 +52,56 @@ export const Header = () => {
     return () => io.disconnect();
   }, []);
 
+  // Over the home page's full-screen film the bar turns transparent with light text.
+  const [overFilm, setOverFilm] = useState(false);
+  useEffect(() => {
+    const film = document.getElementById("film");
+    if (!film) {
+      setOverFilm(false);
+      return;
+    }
+    let raf = 0;
+    const update = () => {
+      raf = 0;
+      const { top, bottom } = film.getBoundingClientRect();
+      setOverFilm(top <= 1 && bottom > 64);
+    };
+    const schedule = () => {
+      if (!raf) raf = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+    };
+  }, [pathname]);
+
   const isActive = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
   const nav = signedIn ? SIGNED_IN_NAV : NAV;
   const handleSignOut = () => signOut({ callbackUrl: "/" });
+  // Signed-in widgets (notifications, active shipment) are styled for the light bar.
+  const dark = overFilm && !signedIn;
 
   return (
     <>
       <span ref={sentinel} aria-hidden className="pointer-events-none absolute left-0 top-0 h-2 w-px" />
       <header
         className={cn(
-          "fixed inset-x-0 top-0 z-40 h-[var(--header-h)] border-b bg-canvas/85 backdrop-blur-md backdrop-saturate-150 transition-[border-color,box-shadow] duration-200",
-          scrolled ? "border-line shadow-[0_1px_12px_-6px_rgba(15,29,47,0.18)]" : "border-transparent"
+          "fixed inset-x-0 top-0 z-40 h-[var(--header-h)] border-b transition-[background-color,border-color,box-shadow,backdrop-filter] duration-300",
+          dark
+            ? "border-transparent bg-transparent"
+            : cn(
+                "bg-canvas/85 backdrop-blur-md backdrop-saturate-150",
+                scrolled ? "border-line shadow-[0_1px_12px_-6px_rgba(15,29,47,0.18)]" : "border-transparent"
+              )
         )}
       >
         <div className="mx-auto flex h-full w-full max-w-7xl items-center justify-between gap-6 px-5 sm:px-8 lg:px-10">
           <div className="flex items-center gap-8">
-            <Logo />
+            <Logo tone={dark ? "light" : "dark"} />
             <nav aria-label="Main" className="hidden lg:block">
               <ul className="flex items-center">
                 {nav.map((item) => {
@@ -79,7 +113,13 @@ export const Header = () => {
                         aria-current={active ? "page" : undefined}
                         className={cn(
                           "relative inline-flex h-[var(--header-h)] items-center px-3 text-[15px] font-medium transition-colors duration-150 focus-visible:outline-2 focus-visible:-outline-offset-8 focus-visible:outline-signal",
-                          active ? "text-ink" : "text-ink-2 hover:text-ink"
+                          active
+                            ? dark
+                              ? "text-white"
+                              : "text-ink"
+                            : dark
+                              ? "text-white/75 hover:text-white"
+                              : "text-ink-2 hover:text-ink"
                         )}
                       >
                         {item.label}
@@ -139,11 +179,14 @@ export const Header = () => {
               <>
                 <Link
                   href="/login"
-                  className="inline-flex h-9 items-center rounded-md px-3 text-[15px] font-medium text-ink-2 transition-colors hover:text-ink focus-visible:outline-2 focus-visible:outline-signal"
+                  className={cn(
+                    "inline-flex h-9 items-center rounded-md px-3 text-[15px] font-medium transition-colors focus-visible:outline-2 focus-visible:outline-signal",
+                    dark ? "text-white/80 hover:text-white" : "text-ink-2 hover:text-ink"
+                  )}
                 >
                   Sign in
                 </Link>
-                <Link href="/register" className={buttonClass("dark", "sm")}>
+                <Link href="/register" className={buttonClass(dark ? "light" : "dark", "sm")}>
                   Open an account
                 </Link>
               </>
@@ -153,7 +196,10 @@ export const Header = () => {
           <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
             <SheetTrigger
               aria-label="Open menu"
-              className="-mr-2 inline-flex size-11 items-center justify-center rounded-md text-ink transition-colors hover:bg-tint focus-visible:outline-2 focus-visible:outline-signal lg:hidden"
+              className={cn(
+                "-mr-2 inline-flex size-11 items-center justify-center rounded-md transition-colors focus-visible:outline-2 focus-visible:outline-signal lg:hidden",
+                dark ? "text-white hover:bg-white/10" : "text-ink hover:bg-tint"
+              )}
             >
               <Menu strokeWidth={1.75} className="size-6" />
             </SheetTrigger>
@@ -162,7 +208,7 @@ export const Header = () => {
                 <SheetTitle asChild>
                   <div>
                     <SheetClose asChild>
-                      <Logo />
+                      <Logo tone={dark ? "light" : "dark"} />
                     </SheetClose>
                   </div>
                 </SheetTitle>

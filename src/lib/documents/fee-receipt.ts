@@ -1,41 +1,16 @@
-import jsPDF from "jspdf";
-import { drawLogo, finalizePdf } from "./branding";
 import { generateTrackingQR } from "./qr-generator";
-
-const NAVY = [15, 29, 47] as const;
-const EMERALD = [30, 58, 95] as const;
-const GOLD = [140, 158, 175] as const;
-const WHITE = [255, 255, 255] as const;
-const GRAY = [107, 114, 128] as const;
-const TEXT_DARK = [17, 24, 39] as const;
-const TEXT_MED = [75, 85, 99] as const;
+import { Sheet, fmtDate, fmtDateTime, gx, INK_3 } from "./layout";
 
 const FEE_TYPE_LABELS: Record<string, string> = {
-  AIRWAY_BILL: "Airway Bill Fee",
-  SHIPPING_FREIGHT: "Shipping & Freight Fee",
-  HOLD_RELEASE: "Hold Release Fee",
-  CUSTOMS_DUTY: "Customs & Duty Fee",
-  CUSTOM: "Additional Fee",
+  AIRWAY_BILL: "Air waybill fee",
+  SHIPPING_FREIGHT: "Shipping and freight fee",
+  HOLD_RELEASE: "Hold release fee",
+  CUSTOMS_DUTY: "Customs and duty fee",
+  CUSTOM: "Additional fee",
 };
 
-function fmtDate(d: Date | string | null): string {
-  if (!d) return "—";
-  try {
-    return new Date(d).toLocaleDateString("en-GB", {
-      day: "2-digit",
-      month: "short",
-      year: "numeric",
-    });
-  } catch {
-    return "—";
-  }
-}
-
 function fmtCurrency(amount: number, currency: string = "USD"): string {
-  return new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency,
-  }).format(amount);
+  return new Intl.NumberFormat("en-US", { style: "currency", currency }).format(amount);
 }
 
 type FeeReceiptData = {
@@ -55,219 +30,54 @@ type FeeReceiptData = {
   recipientName: string;
 };
 
-export async function generateFeeReceiptPDF(
-  data: FeeReceiptData
-): Promise<Buffer> {
-  const doc = new jsPDF();
+/** Receipt for a fee paid against a shipment. */
+export async function generateFeeReceiptPDF(data: FeeReceiptData): Promise<Buffer> {
+  const s = new Sheet({ title: "Payment Receipt", reference: data.invoiceNumber });
   const qr = await generateTrackingQR(data.trackingNumber);
   const feeLabel = data.customType || FEE_TYPE_LABELS[data.feeType] || data.feeType;
+  const amount = fmtCurrency(data.amount, data.currency);
 
-  // ─── HEADER ───
-  doc.setFillColor(...NAVY);
-  doc.rect(0, 0, 210, 36, "F");
-  doc.setFillColor(...GOLD);
-  doc.rect(0, 36, 210, 1.5, "F");
-  doc.setFillColor(...EMERALD);
-  doc.rect(0, 37.5, 210, 0.5, "F");
+  s.header([
+    { label: "Receipt number", value: data.invoiceNumber, mono: true, strong: true, span: 4 },
+    { label: "Air waybill", value: data.trackingNumber, mono: true, span: 3 },
+    { label: "Paid", value: fmtDateTime(data.paidAt), mono: true, span: 5 },
+  ]);
 
-  drawLogo(doc, 12, 4, 17);
-  doc.setTextColor(180, 190, 200);
-  doc.setFontSize(7);
-  doc.setFont("helvetica", "normal");
-  doc.text("Global Logistics & Vault Services", 15, 27);
-  doc.text("admin@aegiscargo.org", 15, 31);
+  // Amount received, with the status beside it.
+  s.font("sans", 6.9, INK_3);
+  s.text("Amount received", gx(0), s.y);
+  s.text("Status", gx(9), s.y);
+  s.font("monoMedium", 20);
+  s.text(amount, gx(0), s.y + 9);
+  s.tag("Paid in full", gx(9), s.y + 7, "navy");
+  s.y += 16;
 
-  // Title
-  doc.setFontSize(14);
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(...WHITE);
-  doc.text("PAYMENT RECEIPT", 195, 14, { align: "right" });
-  doc.setFontSize(8);
-  doc.setTextColor(...GOLD);
-  doc.setFont("helvetica", "normal");
-  doc.text(data.invoiceNumber, 195, 21, { align: "right" });
-  doc.setTextColor(180, 190, 200);
-  doc.text(`Issued: ${fmtDate(new Date())}`, 195, 28, { align: "right" });
+  s.parties([
+    { heading: "Received from", name: data.payerName, lines: [], contact: [data.payerEmail, data.payerPhone] },
+    {
+      heading: "For shipment",
+      name: data.trackingNumber,
+      lines: [`${data.shipmentOrigin} to ${data.shipmentDestination}`, `Recipient: ${data.recipientName}`],
+    },
+  ]);
 
-  // QR code
-  doc.setFillColor(...WHITE);
-  doc.roundedRect(169, 44, 27, 27, 1, 1, "F");
-  doc.setDrawColor(220, 220, 225);
-  doc.roundedRect(169, 44, 27, 27, 1, 1, "S");
-  doc.addImage(qr, "PNG", 170, 45, 25, 25);
-  doc.setFontSize(4.5);
-  doc.setTextColor(...EMERALD);
-  doc.setFont("helvetica", "bold");
-  doc.text("SCAN TO VERIFY", 182.5, 74, { align: "center" });
-
-  // ─── PAID STAMP ───
-  doc.saveGraphicsState();
-  doc.setGState(new (doc as any).GState({ opacity: 0.15 }));
-  doc.setFontSize(48);
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(30, 58, 95);
-  doc.text("PAID", 105, 160, { align: "center", angle: 30 });
-  doc.restoreGraphicsState();
-
-  // ─── RECEIPT DETAILS ───
-  let y = 48;
-
-  // Big amount box
-  doc.setFillColor(238, 242, 247);
-  doc.roundedRect(15, y, 145, 26, 2, 2, "F");
-  doc.setDrawColor(...EMERALD);
-  doc.setLineWidth(0.5);
-  doc.roundedRect(15, y, 145, 26, 2, 2, "S");
-
-  doc.setFontSize(7);
-  doc.setTextColor(...EMERALD);
-  doc.setFont("helvetica", "bold");
-  doc.text("AMOUNT PAID", 22, y + 6);
-
-  doc.setFontSize(24);
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(...NAVY);
-  doc.text(fmtCurrency(data.amount, data.currency), 22, y + 18);
-
-  doc.setFontSize(9);
-  doc.setTextColor(...EMERALD);
-  doc.setFont("helvetica", "bold");
-  doc.text("CONFIRMED", 130, y + 18);
-
-  y += 34;
-
-  // Section: Payment Details
-  doc.setFillColor(...EMERALD);
-  doc.rect(15, y, 3, 6, "F");
-  doc.setFontSize(10);
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(...TEXT_DARK);
-  doc.text("Payment Details", 22, y + 5);
-  y += 14;
-
-  const drawKV = (
-    key: string,
-    value: string,
-    x: number,
-    yPos: number
-  ) => {
-    doc.setFontSize(6.5);
-    doc.setFont("helvetica", "normal");
-    doc.setTextColor(...GRAY);
-    doc.text(key.toUpperCase(), x, yPos);
-    doc.setFontSize(9);
-    doc.setFont("helvetica", "bold");
-    doc.setTextColor(...TEXT_DARK);
-    doc.text(value || "—", x, yPos + 5);
-  };
-
-  drawKV("Receipt Number", data.invoiceNumber, 22, y);
-  drawKV("Payment Date", fmtDate(data.paidAt), 90, y);
-  drawKV("Currency", data.currency, 155, y);
-  y += 16;
-
-  drawKV("Fee Type", feeLabel, 22, y);
-  drawKV("Amount", fmtCurrency(data.amount, data.currency), 90, y);
-  drawKV("Status", "PAID", 155, y);
-  y += 16;
-
-  // Itemized charges (one per line), wrapped to the page width
-  doc.setFontSize(6.5);
-  doc.setFont("helvetica", "normal");
-  doc.setTextColor(...GRAY);
-  doc.text("DETAILS", 22, y);
-  doc.setFontSize(8);
-  doc.setTextColor(...TEXT_DARK);
-  const detailLines: string[] = doc.splitTextToSize(data.reason || "—", 166);
-  doc.text(detailLines, 22, y + 5);
-  y += 8 + detailLines.length * 3.6;
-
-  // Section: Shipment Details
-  doc.setFillColor(...GOLD);
-  doc.rect(15, y, 3, 6, "F");
-  doc.setFontSize(10);
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(...TEXT_DARK);
-  doc.text("Shipment Details", 22, y + 5);
-  y += 14;
-
-  drawKV("Tracking Number", data.trackingNumber, 22, y);
-  drawKV("Origin", data.shipmentOrigin, 90, y);
-  y += 16;
-
-  drawKV("Destination", data.shipmentDestination, 22, y);
-  drawKV("Recipient", data.recipientName, 90, y);
-  y += 18;
-
-  // Section: Recipient Details
-  doc.setFillColor(...EMERALD);
-  doc.rect(15, y, 3, 6, "F");
-  doc.setFontSize(10);
-  doc.setFont("helvetica", "bold");
-  doc.setTextColor(...TEXT_DARK);
-  doc.text("Paid By", 22, y + 5);
-  y += 14;
-
-  drawKV("Name", data.payerName, 22, y);
-  drawKV("Email", data.payerEmail || "—", 90, y);
-  drawKV("Phone", data.payerPhone, 155, y);
-  y += 20;
-
-  // Confirmation statement
-  doc.setFillColor(238, 242, 247);
-  doc.roundedRect(15, y, 180, 18, 2, 2, "F");
-  doc.setDrawColor(179, 199, 219);
-  doc.roundedRect(15, y, 180, 18, 2, 2, "S");
-  doc.setFontSize(6.5);
-  doc.setFont("helvetica", "italic");
-  doc.setTextColor(...TEXT_MED);
-  doc.text(
-    "This receipt confirms that payment has been received and processed by Aegis Cargo Ltd.",
-    20,
-    y + 6,
-    { maxWidth: 170 }
+  s.section("Charges");
+  s.table(
+    [
+      { header: "Description", span: 9, medium: true },
+      { header: "Amount", span: 3, align: "right", mono: true },
+    ],
+    [[`${feeLabel}${data.reason ? `\n${data.reason}` : ""}`, amount]]
   );
-  doc.text(
-    "This is an official document. For any queries, contact admin@aegiscargo.org.",
-    20,
-    y + 12,
-    { maxWidth: 170 }
+  s.totals([
+    { label: "Subtotal", value: amount },
+    { label: "Total paid", value: amount },
+  ]);
+
+  s.note(
+    `Payment of ${amount} was received on ${fmtDate(data.paidAt)} against shipment ${data.trackingNumber}. Keep this receipt for your records; it is also stored with the shipment in your account.`
   );
 
-  // ─── FOOTER ───
-  const fy = 274;
-  doc.setFillColor(...NAVY);
-  doc.rect(15, fy, 180, 0.5, "F");
-
-  doc.setFontSize(6);
-  doc.setTextColor(...GRAY);
-  doc.setFont("helvetica", "italic");
-  doc.text(
-    "This is an official document of Aegis Cargo Ltd. Verify authenticity by scanning the QR code or visiting aegiscargo.org/verify",
-    105,
-    fy + 4,
-    { align: "center" }
-  );
-
-  doc.setFont("helvetica", "normal");
-  doc.setFontSize(6.5);
-  doc.text(
-    "Aegis Cargo Ltd  |  Registered in Romania  |  Strada Bulevardul Unirii 72, Floor 3, Office 12, 030833 Bucharest, Romania",
-    105,
-    fy + 8,
-    { align: "center" }
-  );
-
-
-  doc.setFontSize(5.5);
-  doc.setTextColor(...GRAY);
-  doc.setFont("helvetica", "normal");
-  doc.text(
-    `Page 1  |  © ${new Date().getFullYear()} Aegis Cargo. All rights reserved.`,
-    105,
-    fy + 19,
-    { align: "center" }
-  );
-
-  return finalizePdf(doc);
+  s.signatures({ lines: [], qr: { dataUrl: qr, caption: "Scan to follow this shipment on aegiscargo.org" } });
+  return s.finish();
 }
